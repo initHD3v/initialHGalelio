@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/auth.css', v=1) }}">
+{% endblock %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-wrapper">
+        <div class="auth-image-side mosaic-side">
+            <div class="mosaic-grid">
+                {% for image in images %}
+                    <div class="mosaic-item" style="background-image: url('{{ url_for('static', filename='images/' + image.filename) }}'); animation-delay: {{ loop.index * 0.05 }}s;"></div>
+                {% endfor %}
+            </div>
+            <div class="slogan">
+                <h2>Join Our Community</h2>
+                <p>And let us capture your story.</p>
+            </div>
+        </div>
+        <div class="auth-form-side">
+            <h3>Create Your Account</h3>
+            <form method="POST" action="" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    
+                    {{ form.full_name(class="form-control", placeholder="Full Name") }}
+                    {% for error in form.full_name.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    
+                    {{ form.username(class="form-control", placeholder="Username") }}
+                    {% for error in form.username.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    
+                    {{ form.email(class="form-control", placeholder="Email Address") }}
+                    {% for error in form.email.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                        
+                        {{ form.whatsapp_number(class="form-control", placeholder="nomor hp/wa") }}
+                        {% for error in form.whatsapp_number.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                <div class="form-group">
+                    
+                    {{ form.password(class="form-control", placeholder="Password") }}
+                    {% for error in form.password.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    
+                    {{ form.confirm_password(class="form-control", placeholder="Confirm Password") }}
+                    {% for error in form.confirm_password.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+            <div class="switch-auth">
+                <small class="text-muted">
+                    Already have an account? <a href="{{ url_for('auth.login') }}">Sign In</a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

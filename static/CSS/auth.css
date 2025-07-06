@@ -1,0 +1,303 @@
+/* === Auth Page Redesign === */
+
+/* CSS Variables for easy customization */
+:root {
+    --primary-color: #2c3e50; /* Dark Blue/Grey for text/headings */
+    --secondary-color: #7f8c8d; /* Muted Grey for secondary text */
+    --accent-color-1: #3498db; /* Bright Blue for primary actions/focus */
+    --accent-color-2: #2980b9; /* Darker Blue for hover/active states */
+    --background-light: #ecf0f1; /* Light Grey for overall background */
+    --card-background: #ffffff; /* White for form cards */
+    --border-color: #e0e0e0; /* Light border for inputs */
+    --error-color: #e74c3c; /* Red for error messages */
+    --success-color: #2ecc71; /* Green for success messages */
+
+    --font-primary: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-secondary: 'Montserrat', sans-serif;
+
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* General Body Styles */
+body {
+    font-family: var(--font-primary);
+    color: var(--primary-color);
+    line-height: 1.6;
+}
+
+/* Auth Container */
+.auth-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-light);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.auth-wrapper {
+    display: flex;
+    max-width: 1100px; /* Slightly wider */
+    width: 100%;
+    background: var(--card-background);
+    box-shadow: var(--shadow-medium); /* Stronger, softer shadow */
+    border-radius: 16px; /* More rounded corners */
+    overflow: hidden;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Image Side (Mosaic) */
+.auth-image-side {
+    flex: 3; /* Dynamic ratio, e.g., 60% */
+    position: relative;
+    overflow: hidden;
+    min-height: 450px; /* Ensure minimum height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+.mosaic-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.mosaic-item {
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transform: scale(0.9); /* Start slightly zoomed out */
+    animation: fadeInScale 1s forwards ease-out;
+    filter: grayscale(30%) brightness(90%); /* Subtle filter for mood */
+    transition: filter 0.3s ease;
+}
+
+.mosaic-item:hover {
+    filter: grayscale(0%) brightness(100%); /* Remove filter on hover */
+}
+
+/* Overlay for Slogan */
+.auth-image-side::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)); /* Darker gradient overlay */
+    z-index: 1;
+}
+
+.auth-image-side .slogan {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #fff;
+    padding: 20px;
+    animation: slideInUp 1s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.auth-image-side .slogan h2 {
+    font-family: var(--font-secondary);
+    font-size: 2.8rem; /* Larger slogan */
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.auth-image-side .slogan p {
+    font-size: 1.3rem;
+    font-weight: 300;
+    opacity: 0.9;
+}
+
+/* Form Side */
+.auth-form-side {
+    flex: 2; /* Dynamic ratio, e.g., 40% */
+    padding: 50px 40px; /* Adjusted padding */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: var(--card-background);
+}
+
+.auth-form-side h3 {
+    font-family: var(--font-secondary);
+    font-size: 2.2rem; /* Larger heading */
+    font-weight: 700;
+    margin-bottom: 25px; /* More space */
+    color: var(--primary-color);
+    text-align: center;
+}
+
+.auth-form-side .form-group {
+    margin-bottom: 25px; /* More space between fields */
+    position: relative; /* For floating labels */
+}
+
+/* Input Fields */
+.auth-form-side .form-control {
+    width: 100%;
+    padding: 12px 15px; /* Standard padding */
+    border: none;
+    border-bottom: 2px solid var(--border-color);
+    background-color: transparent;
+    color: var(--primary-color);
+    font-size: 1.1rem; /* Input text size */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Invalid Feedback */
+.invalid-feedback {
+    color: var(--error-color);
+    font-size: 0.9rem;
+    margin-top: 8px;
+    display: block;
+    font-weight: 500;
+}
+
+/* Submit Button */
+.auth-form-side .btn-primary {
+    background: linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); /* Gradient background */
+    border: none;
+    border-radius: 10px; /* More rounded */
+    padding: 15px 25px; /* Larger padding */
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-light); /* Soft shadow */
+    width: 100%;
+    letter-spacing: 0.5px;
+}
+
+.auth-form-side .btn-primary:hover {
+    transform: translateY(-3px); /* Lift effect */
+    box-shadow: var(--shadow-medium); /* Enhanced shadow on hover */
+    opacity: 0.95;
+}
+
+/* Switch Auth Link */
+.auth-form-side .switch-auth {
+    text-align: center;
+    margin-top: 30px; /* More space */
+    font-size: 1rem;
+    color: var(--secondary-color);
+}
+
+.auth-form-side .switch-auth a {
+    color: var(--accent-color-1);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.auth-form-side .switch-auth a:hover {
+    color: var(--accent-color-2);
+    text-decoration: underline;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .auth-wrapper {
+        flex-direction: column; /* Stack columns on smaller screens */
+        max-width: 500px; /* Max width for stacked layout */
+    }
+
+    .auth-image-side {
+        flex: none; /* Remove flex grow */
+        width: 100%;
+        height: 250px; /* Fixed height for image on mobile */
+        padding: 20px;
+    }
+
+    .auth-image-side .slogan h2 {
+        font-size: 2.2rem;
+    }
+
+    .auth-image-side .slogan p {
+        font-size: 1rem;
+    }
+
+    .auth-form-side {
+        flex: none; /* Remove flex grow */
+        width: 100%;
+        padding: 40px 30px; /* Adjust padding */
+    }
+
+    .auth-form-side h3 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .auth-container {
+        padding: 10px;
+    }
+
+    .auth-wrapper {
+        border-radius: 8px;
+    }
+
+    .auth-form-side {
+        padding: 30px 20px;
+    }
+
+    .auth-form-side h3 {
+        font-size: 1.6rem;
+    }
+
+    .auth-form-side .form-control {
+        font-size: 1rem;
+        padding: 10px 12px;
+    }
+
+    .auth-form-side .form-label {
+        font-size: 1rem;
+        top: 10px;
+    }
+
+    .auth-form-side .form-control:focus + .form-label,
+    .auth-form-side .form-control:not(:placeholder-shown) + .form-label {
+        top: -15px;
+        font-size: 0.8rem;
+    }
+
+    .auth-form-side .btn-primary {
+        font-size: 1.1rem;
+        padding: 12px 20px;
+    }
+}

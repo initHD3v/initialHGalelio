@@ -1,0 +1,41 @@
+{% extends "admin_base.html" %}
+{% block admin_content %}
+    <h1>Testimonials Management</h1>
+    <a href="{{ url_for('admin.new_testimonial') }}" class="btn btn-primary mb-3">Add New Testimonial</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Client Name</th>
+                <th>Testimonial Text</th>
+                <th>Rating</th>
+                <th>Approved</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for testimonial in testimonials %}
+            <tr>
+                <td>{{ testimonial.client_name }}</td>
+                <td>{{ testimonial.testimonial_text[:50] }}...</td>
+                <td>{{ testimonial.rating }}</td>
+                <td>{{ 'Yes' if testimonial.is_approved else 'No' }}</td>
+                <td>
+                    <a href="{{ url_for('admin.edit_testimonial', testimonial_id=testimonial.id) }}" class="btn btn-sm btn-warning me-2">Edit</a>
+                    <form action="{{ url_for('admin.delete_testimonial', testimonial_id=testimonial.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this testimonial?');">Delete</button>
+                    </form>
+                    {% if not testimonial.is_approved %}
+                    <form action="{{ url_for('admin.approve_testimonial', testimonial_id=testimonial.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-success ms-2">Approve</button>
+                    </form>
+                    {% else %}
+                    <form action="{{ url_for('admin.reject_testimonial', testimonial_id=testimonial.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-secondary ms-2">Reject</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

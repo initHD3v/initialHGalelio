@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Submit Testimonial for Order #{{ order.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Service: {{ order.service_type.capitalize() }} on {{ order.event_date.strftime('%Y-%m-%d') }}</p>
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        <div class="form-group mb-3">
+                            {{ form.testimonial_text.label(class="form-label") }}
+                            {{ form.testimonial_text(class="form-control", rows=5) }}
+                            {% for error in form.testimonial_text.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-group mb-3">
+                            {{ form.rating.label(class="form-label") }}
+                            {{ form.rating(class="form-select") }}
+                            {% for error in form.rating.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends "admin_base.html" %}
+{% block admin_content %}
+    <h1>{{ title }}</h1>
+    <div class="instagram-post-container">
+        <div class="instagram-post-header">
+            <h5>{{ title }}</h5>
+        </div>
+        <div class="instagram-post-body">
+            <div class="image-upload-section">
+                <div id="image-preview-carousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% if post and post.images %}
+                            {% for image in post.images %}
+                                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                    <img src="{{ url_for('static', filename='images/' + image.filename) }}" class="d-block w-100" alt="...">
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="carousel-item active d-flex align-items-center justify-content-center">
+                                <p class="no-image-selected-text">No image selected</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#image-preview-carousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#image-preview-carousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <label for="image-upload" class="custom-file-upload">
+                    Select Image(s)
+                </label>
+                <input type="file" id="image-upload" name="image" accept="image/*" multiple style="display: none;">
+
+                {% if post and post.images %}
+                    <h6 class="mt-3">Existing Images:</h6>
+                    <div class="existing-images-grid">
+                        {% for image in post.images %}
+                            <div class="existing-image-item">
+                                <img src="{{ url_for('static', filename='images/' + image.filename) }}" alt="Existing Image">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="delete_images" value="{{ image.id }}" id="deleteImage{{ image.id }}">
+                                    <label class="form-check-label" for="deleteImage{{ image.id }}">
+                                        Delete
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="form-section">
+                <form id="post-form" method="POST" enctype="multipart/form-data" action="{{ url_for('admin.new_portfolio_post') if title == 'New Portfolio Post' else url_for('admin.edit_portfolio_post', post_id=post.id) }}">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.content.label(class="form-label") }}
+                        {{ form.content(class="form-control", rows=5) }}
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">{{ title }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUpload = document.getElementById('image-upload');
+            const imagePreviewCarousel = document.getElementById('image-preview-carousel');
+            const carouselInner = imagePreviewCarousel.querySelector('.carousel-inner');
+            const noImageSelectedText = carouselInner.querySelector('.no-image-selected-text');
+
+            imageUpload.addEventListener('change', function(event) {
+                carouselInner.innerHTML = ''; // Clear existing previews
+                if (noImageSelectedText) {
+                    noImageSelectedText.style.display = 'none';
+                }
+
+                if (this.files && this.files.length > 0) {
+                    Array.from(this.files).forEach((file, index) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const carouselItem = document.createElement('div');
+                            carouselItem.classList.add('carousel-item');
+                            if (index === 0) {
+                                carouselItem.classList.add('active');
+                            }
+                            carouselItem.innerHTML = `<img src="${e.target.result}" class="d-block w-100" alt="...">`;
+                            carouselInner.appendChild(carouselItem);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    new bootstrap.Carousel(imagePreviewCarousel); // Re-initialize carousel
+                } else if (carouselInner.children.length === 0) {
+                    // If no new files and no existing images, show placeholder
+                    carouselInner.innerHTML = '<div class="carousel-item active d-flex align-items-center justify-content-center"><p class="no-image-selected-text">No image selected</p></div>';
+                }
+            });
+
+            // Handle form submission with AJAX
+            const postForm = document.getElementById('post-form');
+            postForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(postForm);
+                const newImages = imageUpload.files;
+                for (let i = 0; i < newImages.length; i++) {
+                    formData.append('image', newImages[i]);
+                }
+
+                fetch(postForm.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            });
+        });
+    </script>
+{% endblock %}

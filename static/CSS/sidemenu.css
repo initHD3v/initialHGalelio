@@ -1,0 +1,93 @@
+/* Admin Dashboard Sidebar Styles */
+#wrapper {
+    display: flex;
+    overflow-x: hidden;
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    width: 15rem; /* Fixed width for sidebar */
+    -webkit-transition: margin .25s ease-out;
+    -moz-transition: margin .25s ease-out;
+    -o-transition: margin .25s ease-out;
+    transition: margin .25s ease-out;
+    background: linear-gradient(to bottom, #2c3e50, #212529); /* Dark gradient background */
+    color: #ecf0f1; /* Very light gray text */
+}
+
+#page-content-wrapper {
+    min-width: 0; /* Allow content to shrink */
+    width: 100%;
+    -webkit-transition: width .25s ease-out;
+    -moz-transition: width .25s ease-out;
+    -o-transition: width .25s ease-out;
+    transition: width .25s ease-out;
+}
+
+/* Toggled state for sidebar */
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: -15rem;
+}
+
+#wrapper.toggled #page-content-wrapper {
+    width: 100vw;
+}
+
+/* Default state for larger screens */
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #page-content-wrapper {
+        width: calc(100% - 15rem); /* Content takes remaining width */
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -15rem;
+    }
+
+    #wrapper.toggled #page-content-wrapper {
+        width: 100vw;
+    }
+}
+
+/* Admin Sidebar Enhancements */
+#sidebar-wrapper .sidebar-heading {
+    color: #ecf0f1;
+    background-color: rgba(0,0,0,0.2); /* Slightly transparent dark for heading */
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 1.25rem 1.25rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+#sidebar-wrapper .list-group {
+    width: 15rem;
+}
+
+#sidebar-wrapper .list-group-item {
+    color: #ecf0f1;
+    background-color: transparent;
+    border: none;
+    padding: 15px 20px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+#sidebar-wrapper .list-group-item:hover {
+    background-color: rgba(255,255,255,0.1); /* Lighter on hover with transparency */
+    color: #fff;
+}
+
+#sidebar-wrapper .list-group-item.active {
+    background-color: #007bff; /* Bootstrap primary blue for active item */
+    color: #fff;
+    border-left: 5px solid #28a745; /* Green border for active */
+    padding-left: 15px; /* Adjust padding due to border */
+}
+
+#sidebar-wrapper .list-group-item i {
+    margin-right: 10px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Add shadow to icons */
+}

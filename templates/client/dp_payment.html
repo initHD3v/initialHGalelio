@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Down Payment Required</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Your order (ID: <strong>{{ order.id }}</strong>) has been placed successfully. A down payment is required to proceed with your booking.</p>
+                    <hr>
+                    <dl class="row">
+                        <dt class="col-sm-4">Service Type:</dt>
+                        <dd class="col-sm-8">{{ order.service_type.capitalize() }}</dd>
+
+                        <dt class="col-sm-4">Event Date:</dt>
+                        <dd class="col-sm-8">{{ order.event_date.strftime('%Y-%m-%d') }}</dd>
+
+                        <dt class="col-sm-4">Total Price:</dt>
+                        <dd class="col-sm-8">Rp {{ "{:,.2f}".format(order.total_price) }}</dd>
+
+                        <dt class="col-sm-4">Down Payment (15%):</dt>
+                        <dd class="col-sm-8"><strong>Rp {{ "{:,.2f}".format(dp_amount) }}</strong></dd>
+                    </dl>
+                    <hr>
+                    <p>Please upload your proof of down payment below.</p>
+                    <form action="{{ url_for('client.pay_dp', order_id=order.id) }}" method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.payment_proof.label(class="form-label") }}
+                            {{ form.payment_proof(class="form-control") }}
+                            {% for error in form.payment_proof.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {{ form.submit(class="btn btn-success btn-lg w-100") }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="display-4 mb-4 text-center">Kisah di Balik Lensa: Hidayat Fauzii Photography</h1>
+            
+            <!-- 1. Pengantar & Filosofi -->
+            <section class="mb-5">
+                <p class="lead text-center">Halo, saya Hidayat Fauzii, seorang fotografer pernikahan yang berdedikasi untuk mengabadikan setiap momen tak terlupakan dalam perjalanan cinta Anda. Bagi saya, fotografi bukan hanya sekadar mengambil gambar, tetapi tentang menceritakan kisah unik setiap pasangan dengan keindahan, emosi, dan keaslian.</p>
+                <p class="text-center">Filosofi saya berakar pada keyakinan bahwa setiap pernikahan adalah mahakarya yang tak terulang. Saya berusaha menangkap esensi dari hari istimewa Anda, dari tawa riang hingga air mata bahagia, menciptakan kenangan abadi yang akan Anda hargai selamanya.</p>
+            </section>
+
+            <!-- 2. Pengalaman & Keahlian -->
+            <section class="mb-5">
+                <h2 class="text-center mb-4">Perjalanan & Keahlian Saya</h2>
+                <div class="row align-items-center">
+                    <div class="col-md-6 order-md-2">
+                        <img src="{{ url_for('static', filename='images/photographer_profile.jpg') }}" class="img-fluid rounded shadow-lg mb-4" alt="Hidayat Fauzii - Wedding Photographer">
+                    </div>
+                    <div class="col-md-6 order-md-1">
+                        <p>Dengan pengalaman lebih dari [Jumlah Tahun] tahun di industri fotografi pernikahan, saya telah berkesempatan mengabadikan ratusan kisah cinta di berbagai lokasi dan budaya. Perjalanan ini telah mengasah keahlian saya dalam berbagai aspek fotografi pernikahan, termasuk:</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-camera-retro text-primary me-2"></i>Fotografi Candid yang Autentik</li>
+                            <li><i class="fas fa-lightbulb text-primary me-2"></i>Pencahayaan Alami dan Artistik</li>
+                            <li><i class="fas fa-palette text-primary me-2"></i>Editing yang Teliti dan Berkarakter</li>
+                            <li><i class="fas fa-users text-primary me-2"></i>Penguasaan Berbagai Gaya Pernikahan (Tradisional, Modern, Intim)</li>
+                        </ul>
+                        <p>Saya terus belajar dan berinovasi untuk memastikan setiap gambar yang saya hasilkan adalah yang terbaik.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Pendekatan Kerja -->
+            <section class="mb-5">
+                <h2 class="text-center mb-4">Pendekatan Saya dalam Mengabadikan Momen Anda</h2>
+                <p class="text-center">Pendekatan saya adalah menciptakan pengalaman yang nyaman dan menyenangkan bagi setiap pasangan. Saya percaya pada komunikasi terbuka, mulai dari sesi konsultasi awal untuk memahami visi Anda, hingga panduan selama sesi foto, dan proses pasca-produksi yang teliti untuk memastikan setiap gambar sempurna.</p>
+                <p class="text-center">Saya hadir untuk menjadi lebih dari sekadar fotografer; saya adalah pendukung Anda di hari besar Anda, memastikan Anda merasa rileks dan dapat menikmati setiap detik tanpa khawatir.</p>
+            </section>
+
+            <!-- 4. Nilai-nilai & Komitmen -->
+            <section class="mb-5 bg-light p-4 rounded shadow-sm">
+                <h2 class="text-center mb-4">Nilai & Komitmen</h2>
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                        <h5>Integritas</h5>
+                        <p>Menjaga kepercayaan dan kejujuran dalam setiap interaksi dan hasil karya.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-lightbulb fa-3x text-warning mb-3"></i>
+                        <h5>Kreativitas</h5>
+                        <p>Menghadirkan perspektif segar dan unik untuk setiap cerita cinta.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-handshake fa-3x text-success mb-3"></i>
+                        <h5>Dedikasi</h5>
+                        <p>Memberikan yang terbaik dari hati untuk setiap pasangan dan setiap momen.</p>
+                    </div>
+                </div>
+                <p class="text-center mt-4">Saya berkomitmen untuk memberikan hasil yang melampaui ekspektasi, dengan perhatian terhadap detail dan kualitas tanpa kompromi. Setiap pernikahan adalah unik, dan saya berjanji untuk memperlakukannya dengan hormat dan kehati-hatian yang sama.</p>
+            </section>
+
+            <!-- 5. Sentuhan Personal (Optional) -->
+            <section class="mb-5 text-center">
+                <h2 class="mb-4">Di Balik Lensa</h2>
+                <p>Di luar lensa kamera, saya adalah seorang [sebutkan hobi/minat singkat, misal: pecinta kopi, penjelajah alam, penggemar musik]. Saya percaya bahwa passion saya dalam hidup juga tercermin dalam karya saya, membawa energi dan keaslian ke setiap proyek.</p>
+            </section>
+
+            <!-- 6. Ajakan Bertindak -->
+            <section class="text-center">
+                <h2 class="mb-4">Mari Kita Mulai Kisah Anda</h2>
+                <p class="lead">Saya tidak sabar untuk mendengar kisah cinta Anda dan membantu mengabadikannya. Mari kita mulai percakapan!</p>
+                <a href="{{ url_for('main.contact') }}" class="btn btn-primary btn-lg"><i class="fas fa-envelope me-2"></i>Hubungi Saya untuk Konsultasi Gratis</a>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
