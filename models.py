@@ -1,9 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 from extensions import db
-
-
 
 
 class User(db.Model, UserMixin):
@@ -13,26 +10,35 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True, nullable=False)
     whatsapp_number = db.Column(db.String(20), nullable=False)
     password = db.Column(db.String(150), nullable=False)
-    role = db.Column(db.String(50), default='client', nullable=False)  # 'admin' or 'client'
+    role = db.Column(
+        db.String(50), default="client", nullable=False
+    )  # 'admin' or 'client'
     date_registered = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    orders = db.relationship('Order', backref='client', lazy=True)
+    orders = db.relationship("Order", backref="client", lazy=True)
+
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     content = db.Column(db.Text, nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    is_hidden = db.Column(db.Boolean, default=False, nullable=False) # New field for visibility
-    images = db.relationship('PostImage', backref='post', lazy=True, cascade="all, delete-orphan")
+    is_hidden = db.Column(
+        db.Boolean, default=False, nullable=False
+    )  # New field for visibility
+    images = db.relationship(
+        "PostImage", backref="post", lazy=True, cascade="all, delete-orphan"
+    )
+
 
 class PostImage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey("post.id"), nullable=False)
     filename = db.Column(db.String(150), nullable=False)
+
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    client_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     service_type = db.Column(db.String(100), nullable=False)
     event_date = db.Column(db.DateTime, nullable=False)
     event_start_time = db.Column(db.DateTime, nullable=False)
@@ -43,16 +49,33 @@ class Order(db.Model):
     details = db.Column(db.Text, nullable=True)
     total_price = db.Column(db.Float, nullable=False, default=0.0)
     dp_paid = db.Column(db.Float, nullable=False, default=0.0)
-    dp_payment_proof = db.Column(db.String(200), nullable=True) # Path to the uploaded proof file
-    status = db.Column(db.String(50), default='waiting_dp', nullable=False) # e.g., waiting_dp, waiting_approval, accepted, rejected, completed
+    dp_payment_proof = db.Column(
+        db.String(200), nullable=True
+    )  # Path to the uploaded proof file
+    status = db.Column(
+        db.String(50), default="waiting_dp", nullable=False
+    )  # e.g., waiting_dp, waiting_approval, accepted, rejected, completed
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    is_notified = db.Column(db.Boolean, default=False, nullable=False) # New field for notification
-    can_submit_testimonial = db.Column(db.Boolean, default=False, nullable=False) # New field
-    wedding_package_id = db.Column(db.Integer, db.ForeignKey('wedding_package.id'), nullable=True)
-    wedding_package = db.relationship('WeddingPackage', backref='orders')
-    calendar_event = db.relationship('CalendarEvent', backref='order', uselist=False, cascade="all, delete-orphan")
-    testimonial_submitted = db.relationship('Testimonial', backref='order', uselist=False, cascade="all, delete-orphan")
+    updated_at = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    is_notified = db.Column(
+        db.Boolean, default=False, nullable=False
+    )  # New field for notification
+    can_submit_testimonial = db.Column(
+        db.Boolean, default=False, nullable=False
+    )  # New field
+    wedding_package_id = db.Column(
+        db.Integer, db.ForeignKey("wedding_package.id"), nullable=True
+    )
+    wedding_package = db.relationship("WeddingPackage", backref="orders")
+    calendar_event = db.relationship(
+        "CalendarEvent", backref="order", uselist=False, cascade="all, delete-orphan"
+    )
+    testimonial_submitted = db.relationship(
+        "Testimonial", backref="order", uselist=False, cascade="all, delete-orphan"
+    )
+
 
 class CalendarEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -61,21 +84,30 @@ class CalendarEvent(db.Model):
     end_time = db.Column(db.DateTime, nullable=False)
     description = db.Column(db.Text, nullable=True)
     is_available = db.Column(db.Boolean, default=True, nullable=False)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), unique=True, nullable=True)
+    order_id = db.Column(
+        db.Integer, db.ForeignKey("order.id"), unique=True, nullable=True
+    )
+
 
 class Testimonial(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     client_name = db.Column(db.String(100), nullable=False)
     testimonial_text = db.Column(db.Text, nullable=False)
-    rating = db.Column(db.Integer, nullable=True) # e.g., 1-5 stars
+    rating = db.Column(db.Integer, nullable=True)  # e.g., 1-5 stars
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    is_approved = db.Column(db.Boolean, default=False, nullable=False) # Admin can approve before showing on public site
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # Link to User
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), unique=True, nullable=True) # Link to Order
+    is_approved = db.Column(
+        db.Boolean, default=False, nullable=False
+    )  # Admin can approve before showing on public site
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), nullable=False
+    )  # Link to User
+    order_id = db.Column(
+        db.Integer, db.ForeignKey("order.id"), unique=True, nullable=True
+    )  # Link to Order
+
 
 class WeddingPackage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text, nullable=True)
     price = db.Column(db.Float, nullable=False)
-
