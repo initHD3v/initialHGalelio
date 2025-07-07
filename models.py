@@ -13,6 +13,10 @@ class User(db.Model, UserMixin):
     role = db.Column(
         db.String(50), default="client", nullable=False
     )  # 'admin' or 'client'
+    company_name = db.Column(db.String(200), nullable=True)
+    company_address = db.Column(db.String(200), nullable=True)
+    company_email = db.Column(db.String(150), nullable=True)
+    company_phone = db.Column(db.String(20), nullable=True)
     date_registered = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     orders = db.relationship("Order", backref="client", lazy=True)
 
@@ -70,6 +74,8 @@ class Order(db.Model):
         db.Integer, db.ForeignKey("wedding_package.id"), nullable=True
     )
     wedding_package = db.relationship("WeddingPackage", backref="orders")
+    bank_account_id = db.Column(db.Integer, db.ForeignKey("bank_account.id"), nullable=True)
+    bank_account = db.relationship("BankAccount", backref="orders")
     calendar_event = db.relationship(
         "CalendarEvent", backref="order", uselist=False, cascade="all, delete-orphan"
     )

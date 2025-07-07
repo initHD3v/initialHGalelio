@@ -21,7 +21,13 @@ from wtforms.validators import (
     Optional,
 )
 from wtforms_sqlalchemy.fields import QuerySelectField
-from models import User, WeddingPackage
+from models import User, WeddingPackage, BankAccount # Added BankAccount
+from extensions import db # Added import
+
+def get_active_bank_accounts():
+    accounts = BankAccount.query.filter_by(is_active=True).order_by(BankAccount.bank_name)
+    print(f"DEBUG: Active bank accounts query: {accounts.all()}") # Added debug print
+    return accounts
 
 
 class LoginForm(FlaskForm):
@@ -168,6 +174,10 @@ class UserEditForm(FlaskForm):
     username = StringField("Nama Panggilan (untuk login)", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
     whatsapp_number = StringField("Nomor WhatsApp", validators=[DataRequired()])
+    company_name = StringField("Nama Perusahaan (Admin Saja)", validators=[Optional()])
+    company_address = TextAreaField("Alamat Perusahaan (Admin Saja)", validators=[Optional()])
+    company_email = StringField("Email Perusahaan (Admin Saja)", validators=[Optional(), Email()])
+    company_phone = StringField("Telepon Perusahaan (Admin Saja)", validators=[Optional()])
     password = PasswordField("New Password (leave blank to keep current)")
     confirm_password = PasswordField(
         "Confirm New Password",
@@ -198,6 +208,13 @@ class UserEditForm(FlaskForm):
 
 
 class DPPaymentForm(FlaskForm):
+    bank_account = QuerySelectField(
+        "Pilih Rekening Bank Tujuan",
+        query_factory=get_active_bank_accounts,
+        get_label=lambda x: f"{x.bank_name} - {x.account_name} ({x.account_number})",
+        allow_blank=False,
+        validators=[DataRequired()]
+    )
     payment_proof = FileField("Upload Bukti Pembayaran", validators=[DataRequired()])
     submit = SubmitField("Kirim Bukti Pembayaran")
 

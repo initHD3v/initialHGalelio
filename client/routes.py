@@ -5,6 +5,7 @@ from flask import (
     flash,
     request,
     current_app,
+    send_file
 )
 from flask_login import login_required, current_user
 from models import Order, Testimonial, db, BankAccount
@@ -17,7 +18,7 @@ from forms import (
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename # Added import
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta # Added timedelta
 from client import client
 
 
@@ -208,6 +209,7 @@ def dp_payment(order_id):
 
     # --- Form Processing (moved from pay_dp) ---
     if form.validate_on_submit():
+        order.bank_account_id = form.bank_account.data.id # Save selected bank account
         if form.payment_proof.data:
             # Save the uploaded file
             filename = secure_filename(form.payment_proof.data.filename)
@@ -242,6 +244,19 @@ def dp_payment(order_id):
         time_remaining=time_remaining,
         deadline=deadline,
     )
+
+
+@client.route("/client/order/<int:order_id>/view_invoice")
+@login_required
+def view_invoice_client(order_id):
+    order = Order.query.get_or_404(order_id)
+
+    if order.client_id != current_user.id:
+        flash("You do not have permission to view this invoice.", "danger")
+        return redirect(url_for("client.dashboard"))
+
+    # bank_accounts = BankAccount.query.filter_by(is_active=True).all() # Removed
+    return render_template('invoice.html', order=order, timedelta=timedelta, bank_account=order.bank_account)
 
 
 @client.route("/profile", methods=["GET", "POST"])

@@ -5,28 +5,103 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Down Payment Required</h4>
+                    <h4 class="mb-0">Pembayaran Down Payment (DP)</h4>
                 </div>
                 <div class="card-body">
-                    <p class="lead">Your order (ID: <strong>{{ order.id }}</strong>) has been placed successfully. A down payment is required to proceed with your booking.</p>
+                    {% if order.status == 'rejected' %}
+                        <div class="alert alert-warning" role="alert">
+                            <h5 class="alert-heading">Bukti Pembayaran Ditolak</h5>
+                            <p>Bukti pembayaran Anda sebelumnya ditolak oleh admin. Silakan unggah ulang bukti yang valid.</p>
+                            <hr>
+                            <p class="mb-0">Batas waktu untuk unggah ulang: <strong>{{ deadline.strftime('%d %B %Y, %H:%M:%S') }}</strong></p>
+                            <p>Sisa waktu: <strong id="countdown"></strong></p>
+                        </div>
+                        {% if time_remaining %}
+                        <script>
+                            // Set the date we're counting down to
+                            var countDownDate = new Date("{{ deadline.isoformat() }}").getTime();
+
+                            // Update the count down every 1 second
+                            var x = setInterval(function() {
+
+                                // Get today's date and time
+                                var now = new Date().getTime();
+
+                                // Find the distance between now and the count down date
+                                var distance = countDownDate - now;
+
+                                // Time calculations for days, hours, minutes and seconds
+                                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                                // Display the result in the element with id="countdown"
+                                document.getElementById("countdown").innerHTML = hours + " jam "
+                                + minutes + " menit " + seconds + " detik ";
+
+                                // If the count down is finished, write some text
+                                if (distance < 0) {
+                                    clearInterval(x);
+                                    document.getElementById("countdown").innerHTML = "WAKTU HABIS";
+                                    // Optionally, disable the form
+                                    document.querySelector('form').style.display = 'none';
+                                }
+                            }, 1000);
+                        </script>
+                        {% endif %}
+                    {% else %}
+                        <p class="lead">Pesanan Anda (ID: <strong>{{ order.id }}</strong>) telah berhasil dibuat. Silakan lakukan pembayaran DP untuk melanjutkan pemesanan.</p>
+                    {% endif %}
                     <hr>
+                    
+                    <h4>Detail Pesanan</h4>
                     <dl class="row">
-                        <dt class="col-sm-4">Service Type:</dt>
+                        <dt class="col-sm-4">Jenis Layanan:</dt>
                         <dd class="col-sm-8">{{ order.service_type.capitalize() }}</dd>
 
-                        <dt class="col-sm-4">Event Date:</dt>
-                        <dd class="col-sm-8">{{ order.event_date.strftime('%Y-%m-%d') }}</dd>
+                        <dt class="col-sm-4">Tanggal Acara:</dt>
+                        <dd class="col-sm-8">{{ order.event_date.strftime('%d %B %Y') }}</dd>
 
-                        <dt class="col-sm-4">Total Price:</dt>
-                        <dd class="col-sm-8">Rp {{ "{:,.2f}".format(order.total_price) }}</dd>
+                        <dt class="col-sm-4">Total Harga:</dt>
+                        <dd class="col-sm-8">Rp {{ "{:,.0f}".format(order.total_price) }}</dd>
 
-                        <dt class="col-sm-4">Down Payment (15%):</dt>
-                        <dd class="col-sm-8"><strong>Rp {{ "{:,.2f}".format(dp_amount) }}</strong></dd>
+                        <dt class="col-sm-4">Jumlah DP (15%):</dt>
+                        <dd class="col-sm-8"><strong class="fs-5">Rp {{ "{:,.0f}".format(dp_amount) }}</strong></dd>
                     </dl>
                     <hr>
-                    <p>Please upload your proof of down payment below.</p>
-                    <form action="{{ url_for('client.pay_dp', order_id=order.id) }}" method="POST" enctype="multipart/form-data">
+
+                    <h4>Rekening Pembayaran</h4>
+                    <p>Silakan transfer ke salah satu rekening berikut:</p>
+                    <div class="row">
+                        {% for account in bank_accounts %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ account.bank_name }}</h5>
+                                    <p class="card-text mb-1">Nomor Rekening: <strong>{{ account.account_number }}</strong></p>
+                                    <p class="card-text">Atas Nama: <strong>{{ account.account_name }}</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="col-12">
+                            <p class="text-muted">Tidak ada rekening bank yang tersedia saat ini. Silakan hubungi admin.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr>
+                    <h4>Unggah Bukti Pembayaran</h4>
+                    <p>Setelah melakukan transfer, silakan unggah bukti pembayaran Anda di bawah ini.</p>
+                    <form method="POST" enctype="multipart/form-data">
                         {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.bank_account.label(class="form-label") }}
+                            {{ form.bank_account(class="form-select") }}
+                            {% for error in form.bank_account.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
                         <div class="mb-3">
                             {{ form.payment_proof.label(class="form-label") }}
                             {{ form.payment_proof(class="form-control") }}

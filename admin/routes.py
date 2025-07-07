@@ -31,7 +31,7 @@ from extensions import db
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash
 import os
-from datetime import datetime  # timedelta removed
+from datetime import datetime, timedelta # Added timedelta
 from . import admin
 
 
@@ -818,7 +818,16 @@ def delete_bank_account(account_id):
     return redirect(url_for("admin.bank_account_list"))
 
 
-# Wedding Packages Routes
+@admin.route("/admin/order/<int:order_id>/view_invoice")
+@login_required
+def view_invoice_admin(order_id):
+    if current_user.role != "admin":
+        flash("You do not have permission to perform this action.", "danger")
+        return redirect(url_for("main.index"))
+
+    order = Order.query.get_or_404(order_id)
+    # bank_accounts = BankAccount.query.filter_by(is_active=True).all() # Removed
+    return render_template('invoice.html', order=order, timedelta=timedelta, bank_account=order.bank_account)
 @admin.route("/admin/wedding_packages")
 @login_required
 def wedding_package_list():

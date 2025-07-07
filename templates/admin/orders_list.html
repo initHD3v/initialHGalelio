@@ -33,6 +33,7 @@
             <th>Status</th>
             <th>Payment Proof</th>
             <th>Actions</th>
+            <th>Invoice</th>
             <th>Delete</th>
         </tr>
     </thead>
@@ -78,6 +79,9 @@
                 {% else %}
                 <button class="btn btn-secondary btn-sm" disabled>No Action</button>
                 {% endif %}
+            </td>
+            <td>
+                <a href="{{ url_for('admin.view_invoice_admin', order_id=order.id) }}" class="btn btn-primary btn-sm" target="_blank">View Invoice</a>
             </td>
             <td>
                 <form action="{{ url_for('admin.delete_order', order_id=order.id) }}" method="POST" style="display:inline;">
