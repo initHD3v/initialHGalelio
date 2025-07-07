@@ -52,6 +52,15 @@
                         <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
                     </li>
                     {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Language
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for(request.endpoint, lang='en', **request.view_args) }}">English</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for(request.endpoint, lang='id', **request.view_args) }}">Bahasa Indonesia</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>

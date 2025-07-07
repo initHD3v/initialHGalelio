@@ -1,6 +1,6 @@
-from flask import Flask
+from flask import Flask, request, session
 from dotenv import load_dotenv
-from extensions import db, login_manager, migrate
+from extensions import db, login_manager, migrate, babel
 from models import User, Post, PostImage
 from werkzeug.security import generate_password_hash
 import click
@@ -33,12 +33,20 @@ app.config.from_object("config.Config")
 db.init_app(app)
 login_manager.init_app(app)
 migrate.init_app(app, db)
+babel.init_app(app)
 login_manager.login_view = "auth.login"
 
 app.register_blueprint(auth)
 app.register_blueprint(admin)
 app.register_blueprint(main)
 app.register_blueprint(client)
+
+
+@babel.localeselector
+def get_locale():
+    if request.args.get('lang'):
+        session['lang'] = request.args.get('lang')
+    return session.get('lang', 'en')
 
 
 @app.context_processor
