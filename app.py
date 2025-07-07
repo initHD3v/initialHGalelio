@@ -42,12 +42,12 @@ app.register_blueprint(admin)
 app.register_blueprint(main)
 app.register_blueprint(client)
 
-
-@babel.localeselector
 def get_locale():
     if request.args.get('lang'):
         session['lang'] = request.args.get('lang')
     return session.get('lang', 'en')
+
+babel.init_app(app, locale_selector=get_locale)
 
 
 @app.context_processor
