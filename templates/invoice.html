@@ -29,6 +29,22 @@
             justify-content: space-between;
             align-items: center;
         }
+        @media (max-width: 768px) {
+            .invoice-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .invoice-header .invoice-meta {
+                text-align: center;
+                margin-top: 10px;
+            }
+            .info-block {
+                margin-bottom: 20px;
+            }
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
         .invoice-header h1 {
             color: #007bff;
             font-weight: 700;
