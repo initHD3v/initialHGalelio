@@ -226,3 +226,15 @@ class WeddingPackageForm(FlaskForm):
         ],
     )
     submit = SubmitField("Save Package")
+
+
+class BankAccountForm(FlaskForm):
+    bank_name = StringField("Nama Bank", validators=[DataRequired()])
+    account_number = StringField("Nomor Rekening", validators=[DataRequired()])
+    account_name = StringField("Nama Pemilik Rekening", validators=[DataRequired()])
+    is_active = BooleanField("Aktifkan Rekening Ini")
+    submit = SubmitField("Simpan Rekening")
+
+    def validate_account_number(self, account_number):
+        if not account_number.data.isdigit():
+            raise ValidationError("Nomor Rekening harus berupa angka.")

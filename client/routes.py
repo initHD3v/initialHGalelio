@@ -7,7 +7,7 @@ from flask import (
     current_app,
 )
 from flask_login import login_required, current_user
-from models import Order, Testimonial, db
+from models import Order, Testimonial, db, BankAccount
 from forms import (
     TestimonialSubmissionForm,
     TestimonialEditForm,
@@ -15,10 +15,10 @@ from forms import (
     DPPaymentForm,
 )
 from werkzeug.security import generate_password_hash
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename # Added import
 import os
 from datetime import datetime, timedelta
-from . import client
+from client import client
 
 
 @client.app_template_global("get_testimonial_for_order")
@@ -150,9 +150,9 @@ def delete_order(order_id):
         flash("You do not have permission to delete this order.", "danger")
         return redirect(url_for("client.dashboard"))
 
-    # Only allow deletion if the order is rejected
-    if order.status != "rejected":
-        flash("Only rejected orders can be deleted.", "danger")
+    # Only allow deletion if the order is rejected or expired
+    if order.status not in ["rejected", "expired"]:
+        flash("Only rejected or expired orders can be deleted.", "danger")
         return redirect(url_for("client.dashboard"))
 
     # Delete associated CalendarEvent if exists
@@ -175,46 +175,38 @@ def delete_order(order_id):
 def dp_payment(order_id):
     order = Order.query.get_or_404(order_id)
     form = DPPaymentForm()
+
     if order.client_id != current_user.id:
         flash("You do not have permission to view this page.", "danger")
         return redirect(url_for("client.dashboard"))
-    if order.status != "waiting_dp":
-        flash("This order is not awaiting DP payment.", "warning")
+
+    # Allow payment/re-upload only if status is 'waiting_dp' or 'rejected'
+    if order.status not in ["waiting_dp", "rejected"]:
+        flash(f"This order is not awaiting DP payment (status: {order.status}).", "warning")
         return redirect(url_for("client.dashboard"))
 
-    dp_amount = order.total_price * 0.15  # Calculate 15% DP
-    return render_template(
-        "client/dp_payment.html", order=order, dp_amount=dp_amount, form=form
-    )
+    # --- Timeout Logic ---
+    time_remaining = None
+    deadline = None
 
+    if order.status == "waiting_dp":
+        deadline = order.created_at + timedelta(hours=1)
+    elif order.status == "rejected":
+        # If rejected, the deadline is 1 hour from rejection timestamp.
+        # If dp_rejection_timestamp is somehow None for a rejected order,
+        # give a fresh 1-hour window from now to allow re-upload.
+        base_time = order.dp_rejection_timestamp if order.dp_rejection_timestamp else datetime.utcnow()
+        deadline = base_time + timedelta(hours=1)
 
-@client.route("/pay_dp/<int:order_id>", methods=["POST"])
-@login_required
-def pay_dp(order_id):
-    order = Order.query.get_or_404(order_id)
-    form = DPPaymentForm()
-
-    if order.client_id != current_user.id:
-        flash("You do not have permission to perform this action.", "danger")
-        return redirect(url_for("client.dashboard"))
-
-    if order.status != "waiting_dp":
-        flash("This order is not awaiting DP payment.", "warning")
-        return redirect(url_for("client.dashboard"))
-
-    # Check if more than 1 hour has passed since order creation
-    time_elapsed = datetime.utcnow() - order.created_at
-    if time_elapsed > timedelta(hours=1):
-        order.status = "cancelled"  # Or 'timed_out'
+    if deadline and datetime.utcnow() > deadline:
+        order.status = "expired"
         db.session.commit()
-        flash(
-            "Your order has been automatically cancelled because the DP payment "
-            "was not received within 1 hour. Please place a new order if you wish "
-            "to proceed.",
-            "danger",
-        )
+        flash("This order has expired because the DP was not paid within the allowed time.", "danger")
         return redirect(url_for("client.dashboard"))
+    elif deadline:
+        time_remaining = deadline - datetime.utcnow()
 
+    # --- Form Processing (moved from pay_dp) ---
     if form.validate_on_submit():
         if form.payment_proof.data:
             # Save the uploaded file
@@ -222,26 +214,34 @@ def pay_dp(order_id):
             upload_folder = os.path.join(
                 current_app.root_path, "static", "payment_proofs"
             )
-            os.makedirs(upload_folder, exist_ok=True)  # Ensure the directory exists
+            os.makedirs(upload_folder, exist_ok=True)
             file_path = os.path.join(upload_folder, filename)
             form.payment_proof.data.save(file_path)
-            order.dp_payment_proof = filename  # Store only the filename
+            order.dp_payment_proof = filename
 
-        order.dp_paid = order.total_price * 0.15  # Calculate 15% DP
+        order.dp_paid = order.total_price * 0.15
         order.status = "waiting_approval"
+        order.dp_rejection_timestamp = None  # Clear timestamp on new submission
         db.session.commit()
         flash(
-            "DP payment proof submitted successfully! Your order is now awaiting "
-            "admin approval.",
+            "DP payment proof submitted successfully! Your order is now awaiting admin approval.",
             "success",
         )
         return redirect(url_for("client.dashboard"))
-    else:
-        # If form validation fails, re-render the dp_payment page with errors
-        dp_amount = order.total_price * 0.15
-        return render_template(
-            "client/dp_payment.html", order=order, dp_amount=dp_amount, form=form
-        )
+
+    # --- Data for Template ---
+    dp_amount = order.total_price * 0.15
+    bank_accounts = BankAccount.query.filter_by(is_active=True).all()
+
+    return render_template(
+        "client/dp_payment.html",
+        order=order,
+        dp_amount=dp_amount,
+        form=form,
+        bank_accounts=bank_accounts,
+        time_remaining=time_remaining,
+        deadline=deadline,
+    )
 
 
 @client.route("/profile", methods=["GET", "POST"])

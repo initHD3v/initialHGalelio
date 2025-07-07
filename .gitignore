@@ -30,3 +30,4 @@ instance/
 # Uploads (if any)
 static/payment_proofs/
 static/images/dummy_image_*
+.env

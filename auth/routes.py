@@ -3,8 +3,9 @@ from flask_login import login_user, logout_user, login_required
 from forms import LoginForm, RegistrationForm
 from models import User, PostImage
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import auth
 from extensions import login_manager, db
+from . import auth
+
 
 
 @login_manager.user_loader

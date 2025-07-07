@@ -1,4 +1,5 @@
 from flask import Flask
+from dotenv import load_dotenv
 from extensions import db, login_manager, migrate
 from models import User, Post, PostImage
 from werkzeug.security import generate_password_hash
@@ -6,6 +7,9 @@ import click
 import os
 import random
 from datetime import datetime
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Import blueprints here to avoid circular imports
 from auth import auth
@@ -129,6 +133,9 @@ def generate_dummy_portfolio(num_posts, images_per_post):
 
 
 if __name__ == "__main__":
+    # The app.run() call is only for local development and will now respect
+    # the FLASK_DEBUG environment variable.
+    is_debug = app.config.get("DEBUG", False)
     with app.app_context():
         db.create_all()
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=is_debug, host="0.0.0.0", port=5001)

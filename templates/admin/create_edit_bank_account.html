@@ -1,0 +1,58 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">{{ title }}</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_panel') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.bank_account_list') }}">Rekening Bank</a></li>
+        <li class="breadcrumb-item active">{{ title }}</li>
+    </ol>
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-edit me-1"></i>
+            Formulir Rekening Bank
+        </div>
+        <div class="card-body">
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.bank_name.label(class="form-label") }}
+                    {{ form.bank_name(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    {{ form.account_number.label(class="form-label") }}
+                    {{ form.account_number(class="form-control", pattern="[0-9]*", oninput="validateAccountNumber(this)") }}
+                    <div class="invalid-feedback">
+                        Harap masukkan hanya angka.
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.account_name.label(class="form-label") }}
+                    {{ form.account_name(class="form-control") }}
+                </div>
+                <div class="form-check mb-3">
+                    {{ form.is_active(class="form-check-input") }}
+                    {{ form.is_active.label(class="form-check-label") }}
+                </div>
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function validateAccountNumber(input) {
+    if (input.validity.patternMismatch) {
+        input.setCustomValidity("Harap masukkan hanya angka.");
+    } else {
+        input.setCustomValidity("");
+    }
+    input.reportValidity();
+}
+</script>
+{% endblock %}

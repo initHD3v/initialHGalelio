@@ -25,6 +25,7 @@
                 <a href="{{ url_for('admin.calendar') }}" class="list-group-item list-group-item-action text-white {% if request.endpoint == 'admin.calendar' %}active{% endif %}"><i class="fas fa-calendar-alt me-2"></i>Calendar</a>
                 <a href="{{ url_for('admin.testimonials_admin') }}" class="list-group-item list-group-item-action text-white {% if request.endpoint == 'admin.testimonials_admin' %}active{% endif %}"><i class="fas fa-comments me-2"></i>Testimonials</a>
                 <a href="{{ url_for('admin.wedding_package_list') }}" class="list-group-item list-group-item-action text-white {% if request.endpoint == 'admin.wedding_package_list' %}active{% endif %}"><i class="fas fa-dollar-sign me-2"></i>Price List Wedding</a>
+                <a href="{{ url_for('admin.bank_account_list') }}" class="list-group-item list-group-item-action text-white {% if 'bank_account' in request.endpoint %}active{% endif %}"><i class="fas fa-university me-2"></i>Rekening Bank</a>
                 <a href="{{ url_for('admin.edit_profile_admin') }}" class="list-group-item list-group-item-action text-white {% if request.endpoint == 'admin.edit_profile_admin' %}active{% endif %}"><i class="fas fa-user-cog me-2"></i>Edit Profile</a>
                 <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action text-white"><i class="fas fa-home me-2"></i>Home Page</a>
                 <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action text-white"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>

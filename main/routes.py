@@ -11,6 +11,7 @@ from forms import OrderForm
 from flask_login import login_required, current_user
 from sqlalchemy import or_
 from . import main
+from . import main
 
 
 @main.route("/")
@@ -148,7 +149,6 @@ def order():
         return redirect(
             url_for("client.dp_payment", order_id=order.id)
         )  # Redirect to DP payment page
-    print(form.errors)  # Added for debugging
     return render_template("order.html", form=form, wedding_packages=wedding_packages)
 
 

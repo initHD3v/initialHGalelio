@@ -111,12 +111,20 @@
         </div>
     </div>
     <div class="col-lg-4">
-        <!-- Right Column for other widgets if needed -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h2 class="h5 card-title mb-0">Calendar Overview</h2>
+            </div>
+            <div class="card-body">
+                <div id='admin-dashboard-calendar'></div>
+            </div>
+        </div>
     </div>
 </div>
 
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
 <script>
-
+    document.addEventListener('DOMContentLoaded', function() {
         const toggleScheduleBtn = document.getElementById('toggleScheduleBtn');
         const upcomingScheduleCardContainer = document.getElementById('upcomingScheduleCardContainer');
 
@@ -134,80 +142,29 @@
                 toggleScheduleBtn.textContent = 'Hide Schedule';
             }
         });
-    });
-</script>
 
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('admin-dashboard-calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev',
-                center: 'title',
-                right: 'next'
-            },
-            events: {{ calendar_events | tojson }},
-            eventDidMount: function(info) {
-                var tooltip = new bootstrap.Tooltip(info.el, {
-                    title: info.event.extendedProps.description || 'No description',
-                    placement: 'top',
-                    trigger: 'hover',
-                    container: 'body'
-                });
-            }
-        });
-        calendar.render();
-    });
-</script>
+        if (calendarEl) {
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev',
+                    center: 'title',
+                    right: 'next'
+                },
+                events: {{ calendar_events | tojson | safe }},
+                eventDidMount: function(info) {
+                    var tooltip = new bootstrap.Tooltip(info.el, {
+                        title: info.event.extendedProps.description || 'No description',
+                        placement: 'top',
+                        trigger: 'hover',
+                        container: 'body'
+                    });
+                }
+            });
+            calendar.render();
+        }
 
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('admin-dashboard-calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev',
-                center: 'title',
-                right: 'next'
-            },
-            events: {{ calendar_events | tojson }},
-            eventDidMount: function(info) {
-                var tooltip = new bootstrap.Tooltip(info.el, {
-                    title: info.event.extendedProps.description || 'No description',
-                    placement: 'top',
-                    trigger: 'hover',
-                    container: 'body'
-                });
-            }
-        });
-        calendar.render();
-    });
-</script>
-
-<style>
-    .countdown-display {
-        font-size: 1.1em;
-        font-weight: bold;
-        color: #007bff; /* Bootstrap primary blue */
-    }
-    .countdown-display.expired {
-        color: #dc3545; /* Bootstrap danger red */
-    }
-    .countdown-item {
-        border-left: 5px solid #007bff;
-        padding-left: 15px;
-        margin-bottom: 10px;
-    }
-    .hidden {
-        display: none !important;
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
         const countdownElements = document.querySelectorAll('[id^="countdown-"]');
 
         function updateCountdown() {
@@ -238,4 +195,23 @@
         setInterval(updateCountdown, 1000);
     });
 </script>
+
+<style>
+    .countdown-display {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #007bff; /* Bootstrap primary blue */
+    }
+    .countdown-display.expired {
+        color: #dc3545; /* Bootstrap danger red */
+    }
+    .countdown-item {
+        border-left: 5px solid #007bff;
+        padding-left: 15px;
+        margin-bottom: 10px;
+    }
+    .hidden {
+        display: none !important;
+    }
+</style>
 {% endblock %}

@@ -16,6 +16,7 @@ from models import (
     CalendarEvent,
     User,
     WeddingPackage,
+    BankAccount,
     PostImage,  # Added PostImage
 )
 from forms import (
@@ -24,6 +25,7 @@ from forms import (
     CalendarEventForm,
     UserEditForm,
     WeddingPackageForm,
+    BankAccountForm,
 )
 from extensions import db
 from werkzeug.utils import secure_filename
@@ -160,10 +162,12 @@ def delete_client(user_id):
         # )
         for order in user.orders:
             if order.dp_payment_proof:
+                # Secure the filename before creating the path
+                safe_filename = secure_filename(order.dp_payment_proof)
                 file_path = os.path.join(
                     current_app.root_path,
                     "static/payment_proofs",
-                    order.dp_payment_proof,
+                    safe_filename,
                 )
                 if os.path.exists(file_path):
                     os.remove(file_path)
@@ -256,8 +260,9 @@ def delete_order(order_id):
     try:
         # Delete associated payment proof file if it exists
         if order.dp_payment_proof:
+            safe_filename = secure_filename(order.dp_payment_proof)
             file_path = os.path.join(
-                current_app.root_path, "static/payment_proofs", order.dp_payment_proof
+                current_app.root_path, "static/payment_proofs", safe_filename
             )
             if os.path.exists(file_path):
                 os.remove(file_path)
@@ -314,10 +319,12 @@ def reject_order(order_id):
         return redirect(url_for("admin.order_list"))
     order.status = "rejected"
     order.is_notified = False  # Reset notification status
+    order.dp_rejection_timestamp = datetime.utcnow()  # Set rejection timestamp
     # Delete payment proof if exists
     if order.dp_payment_proof:
+        safe_filename = secure_filename(order.dp_payment_proof)
         file_path = os.path.join(
-            current_app.root_path, "static/payment_proofs", order.dp_payment_proof
+            current_app.root_path, "static/payment_proofs", safe_filename
         )
         if os.path.exists(file_path):
             os.remove(file_path)
@@ -342,7 +349,7 @@ def download_ics(order_id):
 
     # Create iCalendar content
     ics_content = (
-        f"""BEGIN:VCALENDAR
+        f'''BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Your Photography Portfolio//NONSGML v1.0//EN
 "
@@ -362,7 +369,7 @@ DTEND:{dtend}
         f"DESCRIPTION:Details: {order.details or 'N/A'}. Client WhatsApp: "
         f"{order.client.whatsapp_number}
 END:VEVENT
-END:VCALENDAR"""
+END:VCALENDAR'''
     )
 
     # Create a temporary file to serve
@@ -464,8 +471,9 @@ def edit_portfolio_post(post_id):
             image_to_delete = PostImage.query.get(img_id)
             if image_to_delete:
                 # Delete from filesystem
+                safe_filename = secure_filename(image_to_delete.filename)
                 image_path = os.path.join(
-                    current_app.root_path, "static/images", image_to_delete.filename
+                    current_app.root_path, "static/images", safe_filename
                 )
                 if os.path.exists(image_path):
                     os.remove(image_path)
@@ -546,8 +554,9 @@ def delete_portfolio_post(post_id):
     post = Post.query.get_or_404(post_id)
     # Delete associated images from filesystem
     for image in post.images:
+        safe_filename = secure_filename(image.filename)
         image_path = os.path.join(
-            current_app.root_path, "static/images", image.filename
+            current_app.root_path, "static/images", safe_filename
         )
         if os.path.exists(image_path):
             os.remove(image_path)
@@ -724,6 +733,89 @@ def reject_testimonial(testimonial_id):
     db.session.commit()
     flash("Testimonial rejected successfully!", "success")
     return redirect(url_for("admin.testimonials_admin"))
+
+
+# Bank Account Routes
+@admin.route("/admin/bank_accounts")
+@login_required
+def bank_account_list():
+    
+    if current_user.role != "admin":
+        flash("You do not have access to this page.", "danger")
+        return redirect(url_for("main.index"))
+    accounts = BankAccount.query.all()
+    print(f"DEBUG: Accounts fetched: {accounts}")
+    return render_template("admin/bank_accounts.html", accounts=accounts)
+
+
+from sqlalchemy.exc import IntegrityError # Added import
+
+@admin.route("/admin/bank_accounts/new", methods=["GET", "POST"])
+@login_required
+def new_bank_account():
+    if current_user.role != "admin":
+        flash("You do not have access to this page.", "danger")
+        return redirect(url_for("main.index"))
+    form = BankAccountForm()
+    if form.validate_on_submit():
+        try:
+            account = BankAccount(
+                bank_name=form.bank_name.data,
+                account_number=form.account_number.data,
+                account_name=form.account_name.data,
+                is_active=form.is_active.data,
+            )
+            db.session.add(account)
+            db.session.commit()
+            flash("Bank account created successfully!", "success")
+            return redirect(url_for("admin.bank_account_list"))
+        except IntegrityError:
+            db.session.rollback()
+            flash("Nomor Rekening ini sudah terdaftar. Mohon gunakan nomor lain.", "danger")
+    return render_template(
+        "admin/create_edit_bank_account.html", form=form, title="New Bank Account"
+    )
+
+
+@admin.route("/admin/bank_accounts/<int:account_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_bank_account(account_id):
+    if current_user.role != "admin":
+        flash("You do not have access to this page.", "danger")
+        return redirect(url_for("main.index"))
+    account = BankAccount.query.get_or_404(account_id)
+    form = BankAccountForm()
+    if form.validate_on_submit():
+        account.bank_name = form.bank_name.data
+        account.account_number = form.account_number.data
+        account.account_name = form.account_name.data
+        account.is_active = form.is_active.data
+        db.session.commit()
+        flash("Bank account updated successfully!", "success")
+        return redirect(url_for("admin.bank_account_list"))
+    elif request.method == "GET":
+        form.bank_name.data = account.bank_name
+        form.account_number.data = account.account_number
+        form.account_name.data = account.account_name
+        form.is_active.data = account.is_active
+    return render_template(
+        "admin/create_edit_bank_account.html",
+        form=form,
+        title="Edit Bank Account",
+    )
+
+
+@admin.route("/admin/bank_accounts/<int:account_id>/delete", methods=["POST"])
+@login_required
+def delete_bank_account(account_id):
+    if current_user.role != "admin":
+        flash("You do not have permission to perform this action.", "danger")
+        return redirect(url_for("main.index"))
+    account = BankAccount.query.get_or_404(account_id)
+    db.session.delete(account)
+    db.session.commit()
+    flash("Bank account deleted successfully!", "success")
+    return redirect(url_for("admin.bank_account_list"))
 
 
 # Wedding Packages Routes

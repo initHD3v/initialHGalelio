@@ -59,6 +59,7 @@ class Order(db.Model):
     updated_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )
+    dp_rejection_timestamp = db.Column(db.DateTime, nullable=True)
     is_notified = db.Column(
         db.Boolean, default=False, nullable=False
     )  # New field for notification
@@ -111,3 +112,14 @@ class WeddingPackage(db.Model):
     name = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text, nullable=True)
     price = db.Column(db.Float, nullable=False)
+
+
+class BankAccount(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    bank_name = db.Column(db.String(100), nullable=False)
+    account_number = db.Column(db.String(50), nullable=False, unique=True)
+    account_name = db.Column(db.String(150), nullable=False)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+
+    def __repr__(self):
+        return f"<BankAccount {self.bank_name} - {self.account_number}>"
