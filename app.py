@@ -1,4 +1,4 @@
-from flask import Flask, request, session
+from flask import Flask, request, session, flash
 from dotenv import load_dotenv
 from extensions import db, login_manager, migrate, babel
 from models import User, Post, PostImage
@@ -7,6 +7,7 @@ import click
 import os
 import random
 from datetime import datetime
+from flask_babel import _ # Import _ function
 
 # Load environment variables from .env file
 load_dotenv()
@@ -24,8 +25,8 @@ except ImportError:
     ImageDraw = None
     ImageFont = None
     print(
-        "Pillow is not installed. Please install it using 'pip install Pillow' "
-        "to generate dummy images."
+        _("Pillow is not installed. Please install it using 'pip install Pillow' "
+          "to generate dummy images.")
     )
 
 app = Flask(__name__)
@@ -71,7 +72,7 @@ def create_admin(username, password):
     with app.app_context():
         db.session.add(admin)
         db.session.commit()
-    print(f"Admin user {username} created successfully.")
+    print(_("Admin user {username} created successfully.").format(username=username))
 
 
 @app.cli.command("generate-dummy-portfolio")
@@ -81,8 +82,8 @@ def generate_dummy_portfolio(num_posts, images_per_post):
     """Generate dummy portfolio posts and images."""
     if Image is None:
         print(
-            "Pillow is not installed. Cannot generate dummy images. "
-            "Please install it using 'pip install Pillow'."
+            _("Pillow is not installed. Cannot generate dummy images. "
+              "Please install it using 'pip install Pillow'.")
         )
         return
 
@@ -91,12 +92,14 @@ def generate_dummy_portfolio(num_posts, images_per_post):
 
     with app.app_context():
         print(
-            f"Generating {num_posts} dummy posts with {images_per_post} images each..."
+            _("Generating {num_posts} dummy posts with {images_per_post} images each...").format(
+                num_posts=num_posts, images_per_post=images_per_post
+            )
         )
         for i in range(num_posts):
-            title = f"Dummy Post {i+1}"
-            content = ("This is dummy content for post {i+1}. It showcases some of "
-                       "our amazing work.")
+            title = _("Dummy Post {i}").format(i=i+1)
+            content = _("This is dummy content for post {i}. It showcases some of "
+                        "our amazing work.").format(i=i+1)
             post = Post(title=title, content=content, date_posted=datetime.utcnow())
             db.session.add(post)
             db.session.flush()  # To get post.id before committing
@@ -123,7 +126,7 @@ def generate_dummy_portfolio(num_posts, images_per_post):
                 except IOError:
                     font = ImageFont.load_default()
 
-                text = f"Image {j+1}"
+                text = _("Image {j}").format(j=j+1)
                 # Use textbbox for modern Pillow versions
                 bbox = d.textbbox((0, 0), text, font=font)
                 text_width = bbox[2] - bbox[0]
@@ -137,7 +140,7 @@ def generate_dummy_portfolio(num_posts, images_per_post):
                 db.session.add(post_image)
 
         db.session.commit()
-        print("Dummy portfolio data generated successfully!")
+        print(_("Dummy portfolio data generated successfully!"))
 
 
 if __name__ == "__main__":

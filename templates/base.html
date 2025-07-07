@@ -23,21 +23,21 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
+                        <a class="nav-link" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.about') }}">About</a>
+                        <a class="nav-link" href="{{ url_for('main.about') }}">{{ _('About') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.portfolio') }}">Portfolio</a>
+                        <a class="nav-link" href="{{ url_for('main.portfolio') }}">{{ _('Portfolio') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.testimonials') }}">Testimonials</a>
+                        <a class="nav-link" href="{{ url_for('main.testimonials') }}">{{ _('Testimonials') }}</a>
                     </li>
                     {% if current_user.is_authenticated %}
                     {% if current_user.role == 'admin' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.admin_panel') }}">Admin</a>
+                        <a class="nav-link" href="{{ url_for('admin.admin_panel') }}">{{ _('Admin') }}</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
@@ -45,20 +45,20 @@
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
                     </li>
                     {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Language
+                            {{ _('Language') }}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{{ url_for(request.endpoint, lang='en', **request.view_args) }}">English</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for(request.endpoint, lang='id', **request.view_args) }}">Bahasa Indonesia</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for(request.endpoint, lang='en', **request.view_args) }}">{{ _('English') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for(request.endpoint, lang='id', **request.view_args) }}">{{ _('Bahasa Indonesia') }}</a></li>
                         </ul>
                     </li>
                 </ul>
