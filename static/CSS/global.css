@@ -262,7 +262,7 @@ body {
 /* Home Page Specific Styles */
 .hero-section {
     height: 70vh; /* Full viewport height */
-    background: url('{{ url_for('static', filename='images/hero_background.jpg') }}') no-repeat center center/cover;
+    background: url('../images/hf.jpg') no-repeat center center/cover;
     position: relative;
     overflow: hidden;
 }
