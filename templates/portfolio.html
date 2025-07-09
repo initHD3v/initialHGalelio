@@ -1,47 +1,85 @@
 {% extends "base.html" %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/portfolio.css') }}">
+{% endblock %}
+
 {% block content %}
-    <h1>My Portfolio</h1>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+<div class="container portfolio-container">
+    <h1 class="text-center mb-3">Karya-karya Terbaik Aruna</h1>
+    <p class="lead text-center mb-5">Jelajahi koleksi portofolio Aruna yang mengabadikan setiap momen berharga dengan sentuhan artistik dan profesionalisme.</p>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for post in posts %}
         <div class="col">
-            <div class="card h-100 shadow-sm">
-                {% if post.images %}
-                    <div id="carousel{{ post.id }}" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-indicators">
-                            {% for image in post.images %}
-                                <button type="button" data-bs-target="#carousel{{ post.id }}" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.first %}active{% endif %}" aria-current="{% if loop.first %}true{% endif %}" aria-label="Slide {{ loop.index }}"></button>
-                            {% endfor %}
-                        </div>
-                        <div class="carousel-inner">
-                            {% for image in post.images %}
-                                <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                    <img src="{{ url_for('static', filename='images/' + image.filename) }}" class="d-block w-100" alt="{{ post.title }}">
-                                </div>
-                            {% endfor %}
-                        </div>
-                        {% if post.images|length > 1 %}
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ post.id }}" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ post.id }}" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
-                        </button>
-                        {% endif %}
+            <div class="card h-100 shadow-sm portfolio-card">
+                <!-- Bootstrap Carousel -->
+                <div id="carousel-{{ post.id }}" class="carousel slide" data-bs-ride="false">
+                    <!-- Carousel Indicators (the dots) -->
+                    <div class="carousel-indicators">
+                        {% for image in post.images %}
+                        <button type="button" data-bs-target="#carousel-{{ post.id }}" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.first %}active{% endif %}" aria-current="true" aria-label="Slide {{ loop.index }}"></button>
+                        {% endfor %}
                     </div>
-                {% else %}
-                    <img src="{{ url_for('static', filename='images/placeholder.png') }}" class="card-img-top" alt="No Image">
-                {% endif %}
+
+                    <!-- Carousel Inner Content -->
+                    <div class="carousel-inner">
+                        {% for image in post.images %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}" data-image-id="{{ image.id }}" data-likes="{{ image.likes }}" data-is-liked="{{ image.is_liked_by_current_user }}">
+                            <img src="{{ url_for('static', filename='images/' + image.filename) }}" class="d-block w-100 portfolio-image" alt="{{ post.title }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Carousel Controls (Arrows) -->
+                    {% if post.images|length > 1 %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ post.id }}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ post.id }}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                    {% endif %}
+                </div>
+
+                <!-- Card Body -->
                 <div class="card-body">
                     <h5 class="card-title">{{ post.title }}</h5>
-                    <p class="card-text">{{ post.content[:100] }}...</p>
+                    <p class="card-text">{{ post.content | truncate(100) }}</p>
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+
+                <!-- Card Footer with Like Button -->
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <small class="text-muted">{{ post.date_posted.strftime('%d %B %Y') }}</small>
+                    <div class="like-section" data-post-id="{{ post.id }}">
+                        <button class="like-btn">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        <span class="likes-count">...</span> <!-- Placeholder, will be updated by JS -->
+                    </div>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+
+    <!-- Call to Action Section -->
+<div class="fixed-cta py-5 my-5">
+    <div class="container d-flex flex-column align-items-center">
+        <p class="cta-text mb-4 text-center">Siap mengabadikan kisah Anda?</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('main.order') }}" class="hero-text-button">Pesan Sesi</a>
+            <a href="{{ url_for('main.pricelist') }}" class="hero-text-button">Lihat Pricelist</a>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Daftar Harga Paket Fotografi</title>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Section Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Abadikan Momen Berharga Anda</h1>
+        <p class="lead text-muted">Kami menawarkan paket fotografi profesional untuk mengabadikan setiap detik momen spesial Anda. Pilih paket yang paling sesuai dengan kebutuhan Anda.</p>
+    </div>
+
+    {% if categorized_packages %}
+        <!-- Tab Navigation -->
+        <ul class="nav nav-pills justify-content-center mb-4" id="pricelistTab" role="tablist">
+            {% for category in categorized_packages.keys() %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if loop.first %}active{% endif %}" id="{{ category|lower|replace(' ', '-') }}-tab" data-bs-toggle="tab" data-bs-target="#{{ category|lower|replace(' ', '-') }}" type="button" role="tab" aria-controls="{{ category|lower|replace(' ', '-') }}" aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                        Paket {{ category }}
+                    </button>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="pricelistTabContent">
+            {% for category, packages in categorized_packages.items() %}
+                <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="{{ category|lower|replace(' ', '-') }}" role="tabpanel" aria-labelledby="{{ category|lower|replace(' ', '-') }}-tab">
+                    <div class="row justify-content-center g-4">
+                        {% for package in packages %}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 shadow border-0 rounded-lg pricelist-card">
+                                    <div class="card-header text-center bg-primary text-white border-0 rounded-top-lg">
+                                        <h5 class="mb-0">{{ package.name }}</h5>
+                                    </div>
+                                    <div class="card-body p-4 d-flex flex-column">
+                                        <div class="text-center mb-4">
+                                            <span class="display-5 fw-bold">Rp {{ "{:,.0f}".format(package.price) }}</span>
+                                        </div>
+                                        <div class="package-description mb-4 flex-grow-1">
+                                            {% if package.description %}
+                                                <ul>
+                                                    {% for item in package.description.split('-') %}
+                                                        {% if item.strip() %}
+                                                            <li>{{ item.strip() }}</li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </div>
+                                        <a href="{{ url_for('main.order', package_id=package.id, service_type=category|lower) }}" class="btn btn-outline-primary mt-auto">Pilih Paket</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center">
+            <p>Saat ini belum ada paket yang tersedia. Silakan periksa kembali nanti.</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .nav-pills .nav-link {
+        color: #0d6efd;
+        border: 1px solid #0d6efd;
+        border-radius: 50rem;
+        padding: 0.5rem 1.5rem;
+        margin: 0 0.5rem;
+        transition: all 0.2s ease-in-out;
+    }
+    .nav-pills .nav-link:hover {
+        background-color: #e9ecef;
+    }
+    .nav-pills .nav-link.active {
+        color: #fff;
+        background-color: #0d6efd;
+    }
+    .pricelist-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .pricelist-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    .package-description ul {
+        list-style: none;
+        padding-left: 0;
+        text-align: left;
+    }
+    .package-description ul li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        color: #495057;
+    }
+    .package-description ul li::before {
+        content: '\2022'; /* Bullet dot */
+        color: #0d6efd; /* Primary color */
+        font-size: 1.2em;
+        line-height: 1;
+        margin-right: 0.75rem;
+    }
+    .fw-bold {
+        font-weight: 700 !important;
+    }
+    .rounded-lg {
+        border-radius: 0.75rem !important;
+    }
+    .rounded-top-lg {
+        border-top-left-radius: 0.75rem !important;
+        border-top-right-radius: 0.75rem !important;
+    }
+</style>
+{% endblock %}

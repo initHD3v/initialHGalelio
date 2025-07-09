@@ -44,8 +44,8 @@
             <td>{{ order.client.username }} ({{ order.client.full_name }})</td>
             <td>{{ order.service_type }}</td>
             <td>{{ order.event_date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ order.event_start_time.strftime('%H:%M') }}</td>
-            <td>{{ order.event_end_time.strftime('%H:%M') }}</td>
+            <td>{% if order.event_start_time %}{{ order.event_start_time.strftime('%H:%M') }}{% else %}N/A{% endif %}</td>
+            <td>{% if order.event_end_time %}{{ order.event_end_time.strftime('%H:%M') }}{% else %}N/A{% endif %}</td>
             <td>{{ order.location }}</td>
             <td>{{ order.details }}</td>
             <td>Rp {{ "{:,.2f}".format(order.dp_paid) }}</td>

@@ -6,6 +6,7 @@
         <thead>
             <tr>
                 <th>Client Name</th>
+                <th>Service Type</th>
                 <th>Testimonial Text</th>
                 <th>Rating</th>
                 <th>Approved</th>
@@ -16,6 +17,13 @@
             {% for testimonial in testimonials %}
             <tr>
                 <td>{{ testimonial.client_name }}</td>
+                <td>
+                    {% if testimonial.order %}
+                        {{ testimonial.order.service_type.capitalize() }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
                 <td>{{ testimonial.testimonial_text[:50] }}...</td>
                 <td>{{ testimonial.rating }}</td>
                 <td>{{ 'Yes' if testimonial.is_approved else 'No' }}</td>

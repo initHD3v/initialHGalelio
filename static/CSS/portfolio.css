@@ -1,0 +1,110 @@
+/*
+  Card Carousel Portfolio Design
+*/
+
+.portfolio-card {
+    border: none; /* Remove default card border */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.portfolio-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
+}
+
+.portfolio-image {
+    aspect-ratio: 4 / 3; /* Common aspect ratio for photography */
+    object-fit: cover;
+}
+
+/* Styling for the carousel indicators (dots) */
+.carousel-indicators button {
+    background-color: rgba(255, 255, 255, 0.5) !important; /* Semi-transparent white */
+    border-radius: 50%;
+    width: 10px !important;
+    height: 10px !important;
+    margin: 0 5px !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.carousel-indicators .active {
+    background-color: white !important; /* Solid white for the active dot */
+}
+
+/* Like Button Styling */
+.like-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.like-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: #ff4757;
+    font-size: 1.3rem;
+    transition: transform 0.2s ease;
+}
+
+.like-btn:hover {
+    transform: scale(1.15);
+}
+
+.like-btn .fas.fa-heart {
+    font-weight: 900; /* Solid heart for liked state */
+}
+
+.likes-count {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Call to Action Section */
+.fixed-cta {
+    background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%); /* Gradient background */
+    color: white;
+    padding: 20px 0; /* More padding */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Stronger shadow */
+    z-index: 1030;
+    text-align: center; /* Center content */
+}
+
+.fixed-cta .container {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center horizontally */
+    gap: 15px; /* Space between text and button */
+}
+
+.fixed-cta .cta-text {
+    font-size: 1.3rem; /* Larger font */
+    font-weight: 600; /* Bolder text */
+    margin-bottom: 0; /* Remove default margin */
+    line-height: 1.4; /* Better readability */
+}
+
+/* Hero Text Button Style (reused from index.html concept) */
+.hero-text-button {
+    background: none;
+    border: none;
+    color: white; /* Text color */
+    font-size: 1.25rem; /* Equivalent to btn-lg */
+    padding: 0.5rem 1rem; /* Standard button padding */
+    text-decoration: none; /* Remove default underline for links */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    cursor: pointer;
+}
+
+.hero-text-button:hover {
+    color: #f8f9fa; /* Slightly brighter white on hover */
+    text-decoration: underline; /* Underline on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+@media (max-width: 768px) {
+    .fixed-cta .cta-text {
+        font-size: 1.1rem;
+    }
+}

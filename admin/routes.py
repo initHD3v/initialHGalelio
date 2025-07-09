@@ -17,7 +17,8 @@ from models import (
     User,
     WeddingPackage,
     BankAccount,
-    PostImage,  # Added PostImage
+    PostImage,
+    ImageLike, # Added ImageLike
 )
 from forms import (
     PostForm,
@@ -32,6 +33,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash
 import os
 from datetime import datetime, timedelta # Added timedelta
+from flask_babel import _ # Import _ function
+from sqlalchemy import or_
 from . import admin
 
 
@@ -39,14 +42,23 @@ from . import admin
 @login_required
 def admin_panel():
     if current_user.role != "admin":
-        flash("You do not have access to this page.", "danger")
+        flash(_("You do not have access to this page."), "danger")
         return redirect(url_for("main.index"))
     orders = Order.query.all()
     testimonials = Testimonial.query.all()
     # Fetch calendar events for approved orders or unavailable events
-    calendar_events = CalendarEvent.query.filter(
-        (CalendarEvent.order_id.isnot(None)) | (not CalendarEvent.is_available)
-    ).all()
+    calendar_events = (
+        CalendarEvent.query.join(Order, CalendarEvent.order_id == Order.id, isouter=True)
+        .filter(
+            or_(
+                # Event is for an order that is not completed or rejected
+                (Order.status.notin_(['completed', 'rejected'])),
+                # Event is a manual unavailability block (no order)
+                (CalendarEvent.order_id.is_(None) & (CalendarEvent.is_available == False))
+            )
+        )
+        .all()
+    )
     # Format events for FullCalendar
     formatted_events = [
         {
@@ -71,6 +83,7 @@ def admin_panel():
         Order.query.filter(
             Order.status == "accepted",
             Order.event_date >= datetime.utcnow().date(),  # Only future events
+            Order.event_start_time.isnot(None),
         )
         .order_by(Order.event_date.asc())
         .all()
@@ -109,7 +122,16 @@ def manage_portfolio():
     if current_user.role != "admin":
         flash("You do not have access to this page.", "danger")
         return redirect(url_for("main.index"))
+    
     posts = Post.query.all()
+
+    for post in posts:
+        for image in post.images:
+            # Fetch all likes for this image, and eager load the User relationship
+            image.liking_users = [
+                like.user.username for like in ImageLike.query.filter_by(post_image_id=image.id).join(User).all()
+            ]
+    
     return render_template("admin/manage_portfolio.html", posts=posts)
 
 
@@ -342,6 +364,10 @@ def download_ics(order_id):
         return redirect(url_for("main.index"))
 
     order = Order.query.get_or_404(order_id)
+
+    if not order.event_start_time or not order.event_end_time:
+        flash("Cannot generate ICS file because event start or end time is not set.", "danger")
+        return redirect(url_for("admin.order_list"))
 
     # Format dates for iCalendar
     dtstart = order.event_start_time.strftime("%Y%m%dT%H%M%S")
@@ -850,6 +876,7 @@ def new_wedding_package():
             name=form.name.data,
             description=form.description.data,
             price=form.price.data,
+            category=form.category.data,
         )
         db.session.add(package)
         db.session.commit()
@@ -872,6 +899,7 @@ def edit_wedding_package(package_id):
         package.name = form.name.data
         package.description = form.description.data
         package.price = form.price.data
+        package.category = form.category.data
         db.session.commit()
         flash("Wedding package updated successfully!", "success")
         return redirect(url_for("admin.wedding_package_list"))
@@ -879,6 +907,7 @@ def edit_wedding_package(package_id):
         form.name.data = package.name
         form.description.data = package.description
         form.price.data = package.price
+        form.category.data = package.category
     return render_template(
         "admin/create_edit_wedding_package.html",
         form=form,

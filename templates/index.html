@@ -6,8 +6,11 @@
         <div class="container position-relative" style="z-index: 2;">
             <h1 class="mb-3">we take photo as a return ticket to moment otherwise gone</h1>
             <p class="lead mb-4">As a professional wedding & pre-wedding photographer, I transform fleeting moments into timeless memories.</p>
-            <a href="{{ url_for('main.portfolio') }}" class="btn btn-light btn-lg me-3">View My Portfolio</a>
-            <a href="{{ url_for('main.order') }}" class="btn btn-outline-light btn-lg">Book a Session</a>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <a href="{{ url_for('main.portfolio') }}" class="hero-text-button">View My Portfolio</a>
+                <a href="{{ url_for('main.order') }}" class="hero-text-button">Book a Session</a>
+                <a href="{{ url_for('main.pricelist') }}" class="hero-text-button">View Pricelist</a>
+            </div>
         </div>
     </section>
 
@@ -16,13 +19,13 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center mb-4 mb-md-0">
-                    <img src="{{ url_for('static', filename='images/photographer_profile.jpg') }}" alt="Photographer Profile" class="img-fluid rounded-circle shadow-lg" style="width: 250px; height: 250px; object-fit: cover;">
+                    <img src="{{ url_for('static', filename='images/pp.jpg') }}" alt="Photographer Profile" class="img-fluid rounded-circle shadow-lg" style="width: 250px; height: 250px; object-fit: cover;">
                 </div>
                 <div class="col-md-6">
-                    <h2 class="mb-3">Hello, I'm Hidayat Fauzii</h2>
-                    <p class="lead">Your dedicated storyteller behind the lens.</p>
-                    <p>With a passion for capturing genuine emotions and intricate details, I specialize in wedding and pre-wedding photography. My goal is to create stunning, authentic images that reflect your unique love story, ensuring every precious moment is preserved beautifully for generations to come.</p>
-                    <p>I believe in building a connection with my clients, understanding their vision, and delivering a personalized experience that goes beyond just taking pictures. Let's create magic together!</p>
+                    <h2 class="mb-3">Halo, Saya Hidayat Fauzii</h2>
+                    <p class="lead">Pencerita berdedikasi Anda di balik lensa.</p>
+                    <p>Dengan semangat menangkap emosi yang tulus dan detail yang indah, saya berspesialisasi dalam fotografi pernikahan dan pre-wedding. Tujuan saya adalah menciptakan foto-foto otentik yang memukau dan mencerminkan kisah cinta unik Anda, memastikan setiap momen berharga tersimpan dengan indah untuk selamanya.</p>
+                    <p>Saya percaya dalam membangun koneksi dengan setiap klien, memahami visi mereka, dan memberikan pengalaman personal yang lebih dari sekadar memotret. Mari ciptakan keajaiban bersama!</p>
                 </div>
             </div>
         </div>
@@ -31,7 +34,7 @@
     <!-- Featured Portfolio Section -->
     <section class="featured-portfolio-section py-5 bg-light">
         <div class="container">
-            <h2 class="text-center mb-5">My Latest & Featured Work</h2>
+            <h2 class="text-center mb-5">Karya Terbaru & Unggulan Saya</h2>
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 {% for post in posts[:3] %} {# Displaying up to 3 latest posts as featured #}
                 <div class="col">
@@ -48,11 +51,11 @@
                                 {% if post.images|length > 1 %}
                                 <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel{{ post.id }}" data-bs-slide="prev">
                                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
+                                    <span class="visually-hidden">Sebelumnya</span>
                                 </button>
                                 <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel{{ post.id }}" data-bs-slide="next">
                                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
+                                    <span class="visually-hidden">Berikutnya</span>
                                 </button>
                                 {% endif %}
                             </div>
@@ -71,7 +74,7 @@
                 {% endfor %}
             </div>
             <div class="text-center mt-5">
-                <a href="{{ url_for('main.portfolio') }}" class="btn btn-primary btn-lg">View All Portfolio</a>
+                <a href="{{ url_for('main.portfolio') }}" class="btn btn-primary btn-lg">Lihat Semua Portofolio</a>
             </div>
         </div>
     </section>
@@ -79,9 +82,27 @@
     <!-- Call to Action Section -->
     <section class="cta-section py-5 text-center text-white">
         <div class="container">
-            <h2 class="mb-3">Ready to Capture Your Story?</h2>
-            <p class="lead mb-4">Let's create beautiful, lasting memories together.</p>
-            <a href="{{ url_for('main.order') }}" class="btn btn-light btn-lg">Get a Quote Today</a>
+            <h2 class="mb-3">Siap Mengabadikan Kisah Anda?</h2>
+            <p class="lead mb-4">Mari ciptakan kenangan indah dan abadi bersama.</p>
+            <a href="{{ url_for('main.order') }}" class="btn btn-light btn-lg">Pesan Sekarang</a>
         </div>
     </section>
+<style>
+.hero-text-button {
+    background: none;
+    border: none;
+    color: white; /* Text color */
+    font-size: 1.25rem; /* Equivalent to btn-lg */
+    padding: 0.5rem 1rem; /* Standard button padding */
+    text-decoration: none; /* Remove default underline for links */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    cursor: pointer;
+}
+
+.hero-text-button:hover {
+    color: #f8f9fa; /* Slightly brighter white on hover */
+    text-decoration: underline; /* Underline on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+</style>
 {% endblock %}

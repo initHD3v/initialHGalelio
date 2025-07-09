@@ -265,7 +265,13 @@
                     <tr>
                         <td data-label="Jenis Layanan">{{ order.service_type.capitalize() }} {% if order.wedding_package %}({{ order.wedding_package.name }}){% endif %}</td>
                         <td data-label="Tanggal Acara">{{ order.event_date.strftime('%d %B %Y') }}</td>
-                        <td data-label="Waktu">{{ order.event_start_time.strftime('%H:%M') }} - {{ order.event_end_time.strftime('%H:%M') }}</td>
+                        <td data-label="Waktu">
+                            {% if order.event_start_time and order.event_end_time %}
+                                {{ order.event_start_time.strftime('%H:%M') }} - {{ order.event_end_time.strftime('%H:%M') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
                         <td data-label="Lokasi">{{ order.location }}</td>
                         <td data-label="Detail">{{ order.details if order.details else 'N/A' }}</td>
                     </tr>

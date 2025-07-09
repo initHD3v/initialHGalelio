@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-07 23:02+0700\n"
-"PO-Revision-Date: 2025-07-07 23:03+0700\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2025-07-07 23:29+0700\n"
+"PO-Revision-Date: 2025-07-07 23:26+0700\n"
+"Last-Translator: \n"
 "Language: id\n"
 "Language-Team: id <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -18,41 +18,120 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.12.1\n"
 
+#: app.py:28
+msgid ""
+"Pillow is not installed. Please install it using 'pip install Pillow' to "
+"generate dummy images."
+msgstr ""
+
+#: app.py:75
+msgid "Admin user {username} created successfully."
+msgstr ""
+
+#: app.py:85
+msgid ""
+"Pillow is not installed. Cannot generate dummy images. Please install it "
+"using 'pip install Pillow'."
+msgstr ""
+
+#: app.py:95
+msgid "Generating {num_posts} dummy posts with {images_per_post} images each..."
+msgstr ""
+
+#: app.py:100
+msgid "Dummy Post {i}"
+msgstr ""
+
+#: app.py:101
+msgid "This is dummy content for post {i}. It showcases some of our amazing work."
+msgstr ""
+
+#: app.py:129
+msgid "Image {j}"
+msgstr ""
+
+#: app.py:143
+msgid "Dummy portfolio data generated successfully!"
+msgstr ""
+
+#: templates/base.html:26
+msgid "Home"
+msgstr ""
+
+#: templates/base.html:29
+#, fuzzy
+msgid "About"
+msgstr "Dibatalkan"
+
+#: templates/base.html:32
+msgid "Portfolio"
+msgstr ""
+
+#: templates/base.html:35
+msgid "Testimonials"
+msgstr ""
+
+#: templates/base.html:40
+msgid "Admin"
+msgstr ""
+
+#: templates/base.html:48
+msgid "Logout"
+msgstr ""
+
+#: templates/base.html:52
+msgid "Login"
+msgstr ""
+
+#: templates/base.html:57
+msgid "Language"
+msgstr ""
+
+#: templates/base.html:60
+msgid "English"
+msgstr ""
+
+#: templates/base.html:61
+msgid "Bahasa Indonesia"
+msgstr ""
+
 #: venv/lib/python3.10/site-packages/click/_termui_impl.py:518
 msgid "{editor}: Editing failed"
-msgstr ""
+msgstr "{editor}: Pengeditan gagal"
 
 #: venv/lib/python3.10/site-packages/click/_termui_impl.py:522
 msgid "{editor}: Editing failed: {e}"
-msgstr ""
+msgstr "{editor}: Pengeditan gagal: {e}"
 
 #: venv/lib/python3.10/site-packages/click/core.py:1120
 msgid "Aborted!"
-msgstr ""
+msgstr "Dibatalkan"
 
 #: venv/lib/python3.10/site-packages/click/core.py:1309
 #: venv/lib/python3.10/site-packages/click/decorators.py:559
 msgid "Show this message and exit."
-msgstr ""
+msgstr "Tampilkan pesan ini dan keluar."
 
 #: venv/lib/python3.10/site-packages/click/core.py:1340
 #: venv/lib/python3.10/site-packages/click/core.py:1370
 msgid "(Deprecated) {text}"
-msgstr ""
+msgstr "(Tidak digunakan lagi) {text}"
 
 #: venv/lib/python3.10/site-packages/click/core.py:1387
 msgid "Options"
-msgstr ""
+msgstr "pengaturan"
 
 #: venv/lib/python3.10/site-packages/click/core.py:1415
 msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
-msgstr[0] ""
+msgstr[0] "Mendapat argumen tambahan yang tidak terduga ({args})"
 msgstr[1] ""
 
 #: venv/lib/python3.10/site-packages/click/core.py:1428
 msgid "DeprecationWarning: The command {name!r} is deprecated."
 msgstr ""
+"Peringatan Tidak Digunakan lagi: Perintah {name!r} sudah tidak digunakan "
+"lagi."
 
 #: venv/lib/python3.10/site-packages/click/core.py:1636
 msgid "Commands"

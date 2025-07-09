@@ -11,6 +11,7 @@
             <th>Name</th>
             <th>Description</th>
             <th>Price</th>
+            <th>Category</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -21,6 +22,7 @@
             <td>{{ package.name }}</td>
             <td>{{ package.description }}</td>
             <td>Rp {{ "{:,.2f}".format(package.price) }}</td>
+            <td>{{ package.category }}</td>
             <td>
                 <a href="{{ url_for('admin.edit_wedding_package', package_id=package.id) }}" class="btn btn-sm btn-warning">Edit</a>
                 <form action="{{ url_for('admin.delete_wedding_package', package_id=package.id) }}" method="POST" style="display:inline;">

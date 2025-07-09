@@ -99,20 +99,30 @@ class OrderForm(FlaskForm):
     )
     wedding_package = QuerySelectField(
         "Wedding Package",
-        query_factory=lambda: WeddingPackage.query.all(),
+        query_factory=lambda: WeddingPackage.query.filter_by(category='Wedding').all(),
         get_label=lambda x: x.name,
         get_pk=lambda x: x.id,
         allow_blank=True,
-        blank_text="-- Select a package --",
+        blank_text="-- Select a Wedding package --",
+        validators=[Optional()] # Make optional, will be required conditionally
+    )
+    prewedding_package = QuerySelectField(
+        "Pre-wedding Package",
+        query_factory=lambda: WeddingPackage.query.filter_by(category='Pre-wedding').all(),
+        get_label=lambda x: x.name,
+        get_pk=lambda x: x.id,
+        allow_blank=True,
+        blank_text="-- Select a Pre-wedding package --",
+        validators=[Optional()] # Make optional, will be required conditionally
     )
     event_date = DateField("Event Date", format="%Y-%m-%d", validators=[DataRequired()])
-    event_start_time = StringField("Start Time", validators=[DataRequired()])
-    event_end_time = StringField("End Time", validators=[DataRequired()])
+    event_start_time = StringField("Start Time", validators=[Optional()])
+    event_end_time = StringField("End Time", validators=[Optional()])
     location = StringField("Location", validators=[DataRequired()])
     latitude = HiddenField()
     longitude = HiddenField()
     details = TextAreaField("Details")
-    total_price = FloatField("Total Price", validators=[Optional()])
+    total_price = FloatField("Total Price", validators=[Optional()]) # Still optional, will be calculated
     submit = SubmitField("Place Order")
 
 
@@ -241,6 +251,11 @@ class WeddingPackageForm(FlaskForm):
             DataRequired(),
             NumberRange(min=0.01, message="Price must be greater than zero."),
         ],
+    )
+    category = SelectField(
+        "Category",
+        choices=[('Wedding', 'Wedding'), ('Pre-wedding', 'Pre-wedding'), ('Event', 'Event')],
+        validators=[DataRequired()]
     )
     submit = SubmitField("Save Package")
 

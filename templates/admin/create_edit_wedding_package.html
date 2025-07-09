@@ -32,6 +32,13 @@
                                 <span class="text-danger">{{ error }}</span>
                             {% endfor %}
                         </div>
+                        <div class="form-group mb-3">
+                            {{ form.category.label(class="form-label") }}
+                            {{ form.category(class="form-control") }}
+                            {% for error in form.category.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
                         <div class="d-flex justify-content-between mt-4">
                             <a href="{{ url_for('admin.wedding_package_list') }}" class="btn btn-secondary">Cancel</a>
                             {{ form.submit(class="btn btn-primary") }}

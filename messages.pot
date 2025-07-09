@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-07 23:02+0700\n"
+"POT-Creation-Date: 2025-07-07 23:29+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,82 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.12.1\n"
+
+#: app.py:28
+msgid ""
+"Pillow is not installed. Please install it using 'pip install Pillow' to "
+"generate dummy images."
+msgstr ""
+
+#: app.py:75
+msgid "Admin user {username} created successfully."
+msgstr ""
+
+#: app.py:85
+msgid ""
+"Pillow is not installed. Cannot generate dummy images. Please install it "
+"using 'pip install Pillow'."
+msgstr ""
+
+#: app.py:95
+msgid "Generating {num_posts} dummy posts with {images_per_post} images each..."
+msgstr ""
+
+#: app.py:100
+msgid "Dummy Post {i}"
+msgstr ""
+
+#: app.py:101
+msgid "This is dummy content for post {i}. It showcases some of our amazing work."
+msgstr ""
+
+#: app.py:129
+msgid "Image {j}"
+msgstr ""
+
+#: app.py:143
+msgid "Dummy portfolio data generated successfully!"
+msgstr ""
+
+#: templates/base.html:26
+msgid "Home"
+msgstr ""
+
+#: templates/base.html:29
+msgid "About"
+msgstr ""
+
+#: templates/base.html:32
+msgid "Portfolio"
+msgstr ""
+
+#: templates/base.html:35
+msgid "Testimonials"
+msgstr ""
+
+#: templates/base.html:40
+msgid "Admin"
+msgstr ""
+
+#: templates/base.html:48
+msgid "Logout"
+msgstr ""
+
+#: templates/base.html:52
+msgid "Login"
+msgstr ""
+
+#: templates/base.html:57
+msgid "Language"
+msgstr ""
+
+#: templates/base.html:60
+msgid "English"
+msgstr ""
+
+#: templates/base.html:61
+msgid "Bahasa Indonesia"
+msgstr ""
 
 #: venv/lib/python3.10/site-packages/click/_termui_impl.py:518
 msgid "{editor}: Editing failed"

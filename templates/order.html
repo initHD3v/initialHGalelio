@@ -2,6 +2,7 @@
 {% block content %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initMap" async defer></script>
 
     <style>
         #map {
@@ -28,17 +29,25 @@
                         {{ form.wedding_package(class="form-select", id="wedding_package") }}
                     </div>
                 </div>
+                <div id="prewedding-package-section" style="display: none;">
+                    <div class="form-group mb-3">
+                        {{ form.prewedding_package.label(class="form-label") }}
+                        {{ form.prewedding_package(class="form-select", id="prewedding_package") }}
+                    </div>
+                </div>
                 <div class="form-group mb-3">
                     {{ form.event_date.label(class="form-label") }}
                     {{ form.event_date(class="form-control", id="event-date-picker") }}
                 </div>
-                <div class="form-group mb-3">
-                    {{ form.event_start_time.label(class="form-label") }}
-                    {{ form.event_start_time(class="form-control", id="event-start-time-picker") }}
-                </div>
-                <div class="form-group mb-3">
-                    {{ form.event_end_time.label(class="form-label") }}
-                    {{ form.event_end_time(class="form-control", id="event-end-time-picker") }}
+                <div id="event-time-section">
+                    <div class="form-group mb-3">
+                        {{ form.event_start_time.label(class="form-label") }}
+                        {{ form.event_start_time(class="form-control", id="event-start-time-picker") }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.event_end_time.label(class="form-label") }}
+                        {{ form.event_end_time(class="form-control", id="event-end-time-picker") }}
+                    </div>
                 </div>
                 <div class="form-group mb-3">
                     {{ form.location.label(class="form-label") }}
@@ -182,41 +191,47 @@
             {% endif %}
             const serviceTypeSelect = document.getElementById('service_type');
             const weddingPackageSection = document.getElementById('wedding-package-section');
+            const preweddingPackageSection = document.getElementById('prewedding-package-section');
             const weddingPackageSelect = document.getElementById('wedding_package');
+            const preweddingPackageSelect = document.getElementById('prewedding_package');
             const totalPriceSection = document.getElementById('total-price-section');
             const totalPriceInput = document.getElementById('total_price');
+            const eventTimeSection = document.getElementById('event-time-section');
 
-            function toggleWeddingPackageVisibility() {
-                if (serviceTypeSelect.value === 'wedding') {
+            function togglePackageVisibility() {
+                const selectedServiceType = serviceTypeSelect.value;
+
+                // Hide all package sections and total price section initially
+                weddingPackageSection.style.display = 'none';
+                preweddingPackageSection.style.display = 'none';
+                totalPriceSection.style.display = 'none';
+                eventTimeSection.style.display = 'block'; // Default to visible
+
+                // Disable all package select fields and total price input initially
+                weddingPackageSelect.disabled = true;
+                preweddingPackageSelect.disabled = true;
+                totalPriceInput.disabled = true;
+
+                if (selectedServiceType === 'wedding') {
                     weddingPackageSection.style.display = 'block';
-                    totalPriceSection.style.display = 'none';
-                    totalPriceInput.disabled = true; // Disable the input
-                } else {
-                    weddingPackageSection.style.display = 'none';
+                    weddingPackageSelect.disabled = false;
+                } else if (selectedServiceType === 'prewedding') {
+                    preweddingPackageSection.style.display = 'block';
+                    preweddingPackageSelect.disabled = false;
+                    eventTimeSection.style.display = 'none'; // Hide for prewedding
+                } else { // For 'event', 'portrait', etc.
                     totalPriceSection.style.display = 'block';
-                    totalPriceInput.disabled = false; // Enable the input
+                    totalPriceInput.disabled = false;
                 }
             }
 
-            function updateTotalPriceForWeddingPackage() {
-                const selectedPackageId = weddingPackageSelect.value;
-                if (selectedPackageId && window.weddingPackages[selectedPackageId]) {
-                    totalPriceInput.value = window.weddingPackages[selectedPackageId];
-                } else {
-                    totalPriceInput.value = '';
-                }
-            }
+            togglePackageVisibility(); // Call on page load
 
-            toggleWeddingPackageVisibility();
-
-            serviceTypeSelect.addEventListener('change', toggleWeddingPackageVisibility);
+            serviceTypeSelect.addEventListener('change', togglePackageVisibility);
             
 
             const eventDatePicker = document.getElementById('event-date-picker');
             let unavailableDates = [];
-
-            // Inject weddingPackages data into JavaScript
-            window.weddingPackages = {{ wedding_packages | tojson }};
 
             fetch('{{ url_for('main.unavailable_dates') }}')
                 .then(response => response.json())

@@ -38,6 +38,20 @@ class PostImage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey("post.id"), nullable=False)
     filename = db.Column(db.String(150), nullable=False)
+    likes = db.Column(db.Integer, default=0, nullable=False)
+
+
+class ImageLike(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_image_id = db.Column(db.Integer, db.ForeignKey('post_image.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Ensure a user can only like a specific image once
+    __table_args__ = (db.UniqueConstraint('user_id', 'post_image_id', name='_user_image_uc'),)
+
+    user = db.relationship('User', backref='image_likes')
+    post_image = db.relationship('PostImage', backref='image_likes')
 
 
 class Order(db.Model):
@@ -45,8 +59,8 @@ class Order(db.Model):
     client_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     service_type = db.Column(db.String(100), nullable=False)
     event_date = db.Column(db.DateTime, nullable=False)
-    event_start_time = db.Column(db.DateTime, nullable=False)
-    event_end_time = db.Column(db.DateTime, nullable=False)
+    event_start_time = db.Column(db.DateTime, nullable=True)
+    event_end_time = db.Column(db.DateTime, nullable=True)
     location = db.Column(db.String(200), nullable=False)
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
@@ -118,6 +132,7 @@ class WeddingPackage(db.Model):
     name = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text, nullable=True)
     price = db.Column(db.Float, nullable=False)
+    category = db.Column(db.String(50), nullable=True, default='Wedding') # New field
 
 
 class BankAccount(db.Model):

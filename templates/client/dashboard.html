@@ -54,7 +54,9 @@
                         <h6 class="card-subtitle mb-3 text-muted">Order ID: {{ order.id }}</h6>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex align-items-center"><i class="far fa-calendar-alt me-2 text-muted"></i> <strong>Date:</strong> <span class="ms-auto">{{ order.event_date.strftime('%Y-%m-%d') }}</span></li>
+                            {% if order.event_start_time and order.event_end_time %}
                             <li class="list-group-item d-flex align-items-center"><i class="far fa-clock me-2 text-muted"></i> <strong>Time:</strong> <span class="ms-auto">{{ order.event_start_time.strftime('%H:%M') }} - {{ order.event_end_time.strftime('%H:%M') }}</span></li>
+                            {% endif %}
                             <li class="list-group-item d-flex align-items-center"><i class="fas fa-map-marker-alt me-2 text-muted"></i> <strong>Location:</strong> <span class="ms-auto">{{ order.location }}</span></li>
                             <li class="list-group-item d-flex align-items-center"><i class="fas fa-dollar-sign me-2 text-muted"></i> <strong>Total Price:</strong> <span class="ms-auto">Rp {{ "{:,.2f}".format(order.total_price) }}</span></li>
                             {% if order.dp_paid > 0 %}

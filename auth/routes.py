@@ -4,6 +4,7 @@ from forms import LoginForm, RegistrationForm
 from models import User, PostImage
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import login_manager, db
+from flask_babel import _
 from . import auth
 
 
@@ -25,7 +26,7 @@ def login():
             else:
                 return redirect(url_for("client.dashboard"))
         else:
-            flash("Login Unsuccessful. Please check username and password", "danger")
+            flash(_("Login Unsuccessful. Please check username and password"), "danger")
     images = PostImage.query.limit(9).all()
     return render_template("login.html", form=form, images=images)
 
@@ -47,7 +48,7 @@ def register():
         )
         db.session.add(user)
         db.session.commit()
-        flash("Your account has been created! You are now able to log in", "success")
+        flash(_("Your account has been created! You are now able to log in"), "success")
         return redirect(url_for("auth.login"))
     images = PostImage.query.limit(9).all()
     return render_template("register.html", form=form, images=images)

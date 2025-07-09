@@ -23,6 +23,18 @@
                         <div class="card-body d-flex flex-column p-2">
                             <h6 class="card-title text-truncate mb-1">{{ post.title }}</h6>
                             <p class="card-text text-muted" style="font-size: 0.75rem;"><small>{{ post.date_posted.strftime('%Y-%m-%d') }}</small></p>
+                            
+                            <!-- Like Information -->
+                            {% for image in post.images %}
+                                <div class="d-flex align-items-center mb-1" style="font-size: 0.7rem;">
+                                    <i class="fas fa-heart text-danger me-1"></i> {{ image.likes }} likes
+                                    {% if image.liking_users %}
+                                        <span class="ms-2 text-muted">({{ image.liking_users | join(', ') }})</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            <!-- End Like Information -->
+
                             <div class="mt-auto d-flex justify-content-between pt-2">
                                 <a href="{{ url_for('admin.edit_portfolio_post', post_id=post.id) }}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
                                 <form action="{{ url_for('admin.delete_portfolio_post', post_id=post.id) }}" method="POST" style="display:inline;">
