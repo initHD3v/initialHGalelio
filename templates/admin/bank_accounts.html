@@ -1,23 +1,21 @@
 {% extends 'admin_base.html' %}
-
-{% block title %}Kelola Rekening Bank{% endblock %}
-
 {% block admin_content %}
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Kelola Rekening Bank</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_panel') }}">Dashboard</a></li>
-        <li class="breadcrumb-item active">Rekening Bank</li>
-    </ol>
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-table me-1"></i>
-            Daftar Rekening Bank
-            <a href="{{ url_for('admin.new_bank_account') }}" class="btn btn-primary btn-sm float-end">Tambah Rekening Baru</a>
-        </div>
-        <div class="card-body">
-            {% if accounts %}
-            <table id="datatablesSimple">
+
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Kelola Rekening Bank</h1>
+    <a href="{{ url_for('admin.new_bank_account') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Tambah Rekening Baru</a>
+</div>
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Daftar Rekening Bank</h6>
+    </div>
+    <div class="card-body">
+        {% if accounts %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th>Nama Bank</th>
@@ -41,24 +39,25 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{{ url_for('admin.edit_bank_account', account_id=account.id) }}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{{ url_for('admin.edit_bank_account', account_id=account.id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
                             <form action="{{ url_for('admin.delete_bank_account', account_id=account.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menghapus rekening ini?');">
-                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                                <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Hapus</button>
                             </form>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            {% else %}
-            <div class="alert alert-info text-center" role="alert">
-                <h4 class="alert-heading">Belum Ada Rekening Bank!</h4>
-                <p>Anda belum menambahkan rekening bank apapun. Silakan tambahkan rekening bank pertama Anda untuk memulai.</p>
-                <hr>
-                <a href="{{ url_for('admin.new_bank_account') }}" class="btn btn-success btn-lg"><i class="fas fa-plus-circle me-2"></i>Tambah Rekening Bank Baru</a>
-            </div>
-            {% endif %}
         </div>
+        {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            <h4 class="alert-heading">Belum Ada Rekening Bank!</h4>
+            <p>Anda belum menambahkan rekening bank apapun. Silakan tambahkan rekening bank pertama Anda untuk memulai.</p>
+            <hr>
+            <a href="{{ url_for('admin.new_bank_account') }}" class="btn btn-success btn-lg"><i class="fas fa-plus-circle me-2"></i>Tambah Rekening Bank Baru</a>
+        </div>
+        {% endif %}
     </div>
 </div>
+
 {% endblock %}

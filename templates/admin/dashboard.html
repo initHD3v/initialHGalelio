@@ -1,0 +1,160 @@
+{% extends 'admin_base.html' %}
+
+{% block admin_content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Dashboard Admin</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">Dashboard</li>
+    </ol>
+    <!-- Add your dashboard content here -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">Total Clients: {{ total_clients }}</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{{ url_for('admin.client_list') }}">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">Total Orders: {{ total_orders }}</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{{ url_for('admin.order_list') }}">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">Pending Orders: {{ pending_orders }}</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{{ url_for('admin.order_list', status='pending') }}">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-danger text-white mb-4">
+                <div class="card-body">Total Wedding Packages: {{ total_wedding_packages }}</div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{{ url_for('admin.wedding_package_list') }}">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-calendar-alt me-1"></i>
+                    Jadwal kerja
+                </div>
+                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                    {% if upcoming_orders %}
+                    <ul class="list-group list-group-flush">
+                        {% for order in upcoming_orders %}
+                        <li class="list-group-item">
+                            <strong>{{ order.client.full_name }}</strong> - {{ order.service_type }} on {{ order.event_date.strftime('%Y-%m-%d') }} at {{ order.event_start_time.strftime('%H:%M') }}
+                            {% if order.time_remaining %}
+                                <span class="badge bg-info text-dark float-end">
+                                    {{ order.time_remaining.days }} hari, {{ order.time_remaining.seconds // 3600 }} jam
+                                </span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>Tidak ada pesanan yang akan datang.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-calendar-check me-1"></i>
+                        Kalender
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary" id="toggleCalendarBtn">
+                        <i class="fas fa-eye-slash"></i> Sembunyikan
+                    </button>
+                </div>
+                <div class="card-body" id="calendarCardBody">
+                    <div id='calendar-dashboard'></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extra %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar-dashboard');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'id', // Set locale to Indonesian
+            headerToolbar: {
+                left: 'prev,next',
+                center: 'title',
+                right: '' // Remove other views to keep it compact
+            },
+            events: {{ calendar_events | tojson }},
+            height: 'auto', // Set height to auto
+            contentHeight: 'auto', // Adjust content height automatically
+            eventClick: function(info) {
+                // Optional: Redirect to full calendar page or show event details in a modal
+                window.location.href = "{{ url_for('admin.calendar') }}";
+            }
+        });
+        calendar.render();
+
+        // Toggle calendar visibility
+        var toggleBtn = document.getElementById('toggleCalendarBtn');
+        var calendarCardBody = document.getElementById('calendarCardBody');
+        var isHidden = false;
+
+        toggleBtn.addEventListener('click', function() {
+            if (isHidden) {
+                calendarCardBody.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Sembunyikan';
+                isHidden = false;
+            } else {
+                calendarCardBody.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Tampilkan';
+                isHidden = true;
+            }
+        });
+    });
+</script>
+<style>
+    /* Custom CSS for smaller FullCalendar in dashboard */
+    #calendar-dashboard .fc-toolbar-title {
+        font-size: 1em; /* Smaller title */
+    }
+    #calendar-dashboard .fc-daygrid-day-number {
+        font-size: 0.7em; /* Smaller day numbers */
+    }
+    #calendar-dashboard .fc-event {
+        font-size: 0.6em; /* Smaller event text */
+        padding: 1px 2px; /* Reduced padding for events */
+    }
+    #calendar-dashboard .fc-button {
+        padding: 0.2em 0.4em; /* Smaller buttons */
+        font-size: 0.7em;
+    }
+    #calendar-dashboard .fc-daygrid-day {
+        padding: 0; /* Remove padding from day cells */
+    }
+    #calendar-dashboard .fc-daygrid-body-unpadded {
+        padding: 0; /* Remove padding from the grid body */
+    }
+</style>
+{% endblock %}

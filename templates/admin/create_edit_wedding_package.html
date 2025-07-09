@@ -1,52 +1,53 @@
-{% extends 'admin_base.html' %}
+{% extends "admin_base.html" %}
 {% block admin_content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white">
-                    <h1 class="card-title mb-0">{{ title }}</h1>
-                    <p class="card-text">Use this form to {{ 'add a new' if title == 'New Wedding Package' else 'edit the' }} wedding package. Provide a clear name, a detailed description of what's included, and the price.</p>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="">
-                        {{ form.hidden_tag() }}
-                        <div class="form-group mb-3">
-                            {{ form.name.label(class="form-label") }}
-                            {{ form.name(class="form-control", placeholder="e.g., Silver Package") }}
-                            {% for error in form.name.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="form-group mb-3">
-                            {{ form.description.label(class="form-label") }}
-                            {{ form.description(class="form-control", rows=7, placeholder="e.g., Includes 8 hours of coverage, 2 photographers, online gallery...") }}
-                            {% for error in form.description.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="form-group mb-3">
-                            {{ form.price.label(class="form-label") }}
-                            {{ form.price(class="form-control", type="number", step="0.01", placeholder="e.g., 15000000.00 (Enter without Rp or commas)") }}
-                            {% for error in form.price.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="form-group mb-3">
-                            {{ form.category.label(class="form-label") }}
-                            {{ form.category(class="form-control") }}
-                            {% for error in form.category.errors %}
-                                <span class="text-danger">{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        <div class="d-flex justify-content-between mt-4">
-                            <a href="{{ url_for('admin.wedding_package_list') }}" class="btn btn-secondary">Cancel</a>
-                            {{ form.submit(class="btn btn-primary") }}
-                        </div>
-                    </form>
-                </div>
+
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{{ title }}</h1>
+</div>
+
+<!-- Form Card -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">{{ title }}</h6>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <div class="form-group mb-3">
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control", placeholder="e.g., Silver Package") }}
+                {% for error in form.name.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
             </div>
-        </div>
+            <div class="form-group mb-3">
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-control", rows=7, placeholder="e.g., Includes 8 hours of coverage, 2 photographers, online gallery...") }}
+                {% for error in form.description.errors %}
+                    <span class="text-danger">{{ error %}</span>
+                {% endfor %}
+            </div>
+            <div class="form-group mb-3">
+                {{ form.price.label(class="form-label") }}
+                {{ form.price(class="form-control", type="number", step="0.01", placeholder="e.g., 15000000.00 (Enter without Rp or commas)") }}
+                {% for error in form.price.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="form-group mb-3">
+                {{ form.category.label(class="form-label") }}
+                {{ form.category(class="form-control") }}
+                {% for error in form.category.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ url_for('admin.wedding_package_list') }}" class="btn btn-secondary">Cancel</a>
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
     </div>
 </div>
+
 {% endblock %}

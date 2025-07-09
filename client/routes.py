@@ -8,7 +8,7 @@ from flask import (
     send_file
 )
 from flask_login import login_required, current_user
-from models import Order, Testimonial, db, BankAccount
+from models import Order, Testimonial, db, BankAccount, Notification, User
 from forms import (
     TestimonialSubmissionForm,
     TestimonialEditForm,
@@ -77,6 +77,20 @@ def submit_testimonial(order_id):
         )
         db.session.add(testimonial)
         db.session.commit()
+
+        # --- NOTIFICATION: New Testimonial --- #
+        admins = User.query.filter_by(role='admin').all()
+        for admin_user in admins:
+            notification = Notification(
+                user_id=admin_user.id,
+                type='new_testimonial',
+                entity_id=testimonial.id,
+                message=f"Testimoni baru dari {current_user.username} menunggu persetujuan."
+            )
+            db.session.add(notification)
+        db.session.commit()
+        # --- END NOTIFICATION --- #
+
         flash("Your testimonial has been submitted for review!", "success")
         return redirect(url_for("client.dashboard"))
 

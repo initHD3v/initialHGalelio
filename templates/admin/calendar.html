@@ -1,47 +1,52 @@
 {% extends "admin_base.html" %}
 {% block admin_content %}
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Calendar Management</h1>
-        <a href="{{ url_for('admin.new_calendar_event') }}" class="btn btn-primary">Add New Event</a>
-    </div>
 
-    <div class="row justify-content-center">
-        <div class="col-md-10 col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div id='calendar'></div>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Calendar Management</h1>
+    <a href="{{ url_for('admin.new_calendar_event') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Add New Event</a>
+</div>
 
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                events: {{ events | tojson }},
-                eventClick: function(info) {
-                    // Redirect to edit page on event click
-                    window.location.href = "{{ url_for('admin.edit_calendar_event', event_id=0) }}".replace('0', info.event.id);
-                },
-                eventDidMount: function(info) {
-                    // Add description to event title on hover
-                    var tooltip = new bootstrap.Tooltip(info.el, {
-                        title: info.event.extendedProps.description || 'No description',
-                        placement: 'top',
-                        trigger: 'hover',
-                        container: 'body'
-                    });
-                }
-            });
-            calendar.render();
+<!-- Calendar Card -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Event Calendar</h6>
+    </div>
+    <div class="card-body">
+        <div id='calendar'></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts_extra %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: {{ events | tojson }},
+            eventClick: function(info) {
+                // Redirect to edit page on event click
+                window.location.href = "{{ url_for('admin.edit_calendar_event', event_id=0) }}".replace('0', info.event.id);
+            },
+            eventDidMount: function(info) {
+                // Add description to event title on hover
+                var tooltip = new bootstrap.Tooltip(info.el, {
+                    title: info.event.extendedProps.description || 'No description',
+                    placement: 'top',
+                    trigger: 'hover',
+                    container: 'body'
+                });
+            }
         });
-    </script>
+        calendar.render();
+    });
+</script>
 {% endblock %}

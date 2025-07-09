@@ -1,4 +1,4 @@
-from models import Post, Order, db, CalendarEvent, Testimonial, WeddingPackage, PostImage, ImageLike
+from models import Post, Order, db, CalendarEvent, Testimonial, WeddingPackage, PostImage, ImageLike, Notification, User
 from flask import (
     render_template,
     redirect,
@@ -197,6 +197,19 @@ def order():
             )
             db.session.add(calendar_event)
             db.session.commit()
+
+        # --- NOTIFICATION: New Order --- #
+        admins = User.query.filter_by(role='admin').all()
+        for admin_user in admins:
+            notification = Notification(
+                user_id=admin_user.id,
+                type='new_order',
+                entity_id=order.id,
+                message=f"Pesanan baru dari {current_user.username} untuk {service_type} pada {requested_date.strftime('%Y-%m-%d')}."
+            )
+            db.session.add(notification)
+        db.session.commit()
+        # --- END NOTIFICATION --- #
 
         flash(
             "Your order has been placed successfully! Please proceed to DP payment.",

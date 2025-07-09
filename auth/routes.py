@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
 from forms import LoginForm, RegistrationForm
-from models import User, PostImage
+from models import User, PostImage, Notification
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import login_manager, db
 from flask_babel import _
@@ -48,6 +48,20 @@ def register():
         )
         db.session.add(user)
         db.session.commit()
+
+        # --- NOTIFICATION: New Client Registration --- #
+        admins = User.query.filter_by(role='admin').all()
+        for admin_user in admins:
+            notification = Notification(
+                user_id=admin_user.id,
+                type='new_client',
+                entity_id=user.id,
+                message=f"Klien baru mendaftar: {user.username} ({user.email})."
+            )
+            db.session.add(notification)
+        db.session.commit()
+        # --- END NOTIFICATION --- #
+
         flash(_("Your account has been created! You are now able to log in"), "success")
         return redirect(url_for("auth.login"))
     images = PostImage.query.limit(9).all()

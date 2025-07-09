@@ -19,6 +19,7 @@ from models import (
     BankAccount,
     PostImage,
     ImageLike, # Added ImageLike
+    Notification # Added Notification
 )
 from forms import (
     PostForm,
@@ -102,7 +103,7 @@ def admin_panel():
     rejected_orders = Order.query.filter_by(status="rejected").count()
 
     return render_template(
-        "admin.html",
+        "admin/dashboard.html",
         orders=orders,
         testimonials=testimonials,
         calendar_events=formatted_events,
@@ -502,7 +503,7 @@ def edit_portfolio_post(post_id):
                     current_app.root_path, "static/images", safe_filename
                 )
                 if os.path.exists(image_path):
-                    os.remove(image_path)
+                    os.remove(file_path)
                 # Delete from database
                 db.session.delete(image_to_delete)
         db.session.commit()
@@ -570,7 +571,7 @@ def edit_portfolio_post(post_id):
         form.title.data = post.title
         form.content.data = post.content
     return render_template(
-        "admin_post_form.html", form=form, title="Edit Portfolio Post", post=post
+        "admin_post_form.html", form=form, title="New Portfolio Post"
     )
 
 
@@ -926,3 +927,48 @@ def delete_wedding_package(package_id):
     db.session.commit()
     flash("Wedding package deleted successfully!", "success")
     return redirect(url_for("admin.wedding_package_list"))
+
+
+# API Endpoints for Notifications
+@admin.route("/api/notifications/unread_count")
+@login_required
+def get_unread_notifications_count():
+    if current_user.role != "admin":
+        return jsonify({"count": 0}), 403
+    count = Notification.query.filter_by(user_id=current_user.id, is_read=False).count()
+    return jsonify({"count": count})
+
+
+@admin.route("/api/notifications")
+@login_required
+def get_notifications():
+    if current_user.role != "admin":
+        return jsonify({"notifications": []}), 403
+    
+    notifications = Notification.query.filter_by(user_id=current_user.id, is_read=False).order_by(Notification.timestamp.desc()).limit(10).all()
+    
+    formatted_notifications = []
+    for notif in notifications:
+        formatted_notifications.append({
+            "id": notif.id,
+            "type": notif.type,
+            "message": notif.message,
+            "timestamp": notif.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "is_read": notif.is_read
+        })
+    return jsonify({"notifications": formatted_notifications})
+
+
+@admin.route("/api/notifications/mark_read/<int:notification_id>", methods=["POST"])
+@login_required
+def mark_notification_read(notification_id):
+    if current_user.role != "admin":
+        return jsonify({"success": False}), 403
+    
+    notification = Notification.query.get_or_404(notification_id)
+    if notification.user_id != current_user.id:
+        return jsonify({"success": False}), 403 # Ensure admin can only mark their own notifications as read
+    
+    notification.is_read = True
+    db.session.commit()
+    return jsonify({"success": True})
