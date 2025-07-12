@@ -5,8 +5,8 @@ from flask import (
     url_for,
     request,
     send_file,
-    current_app,  # Added
-    jsonify,  # Added
+    current_app,
+    jsonify,
 )
 from flask_login import login_required, current_user
 from models import (
@@ -18,8 +18,10 @@ from models import (
     WeddingPackage,
     BankAccount,
     PostImage,
-    ImageLike, # Added ImageLike
-    Notification # Added Notification
+    ImageLike,
+    Notification,
+    HomepageContent,
+    HeroImage, # Added HeroImage
 )
 from forms import (
     PostForm,
@@ -28,16 +30,83 @@ from forms import (
     UserEditForm,
     WeddingPackageForm,
     BankAccountForm,
-    AdminOrderForm, # Added AdminOrderForm
+    AdminOrderForm,
+    HomepageContentForm,
 )
 from extensions import db
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash
 import os
-from datetime import datetime, timedelta # Added timedelta
-from flask_babel import _ # Import _ function
+from datetime import datetime, timedelta
+from flask_babel import _
 from sqlalchemy import or_
 from . import admin
+
+
+@admin.route("/admin/manage_homepage", methods=["GET", "POST"])
+@login_required
+def manage_homepage():
+    if current_user.role != "admin":
+        flash(_("You do not have access to this page."), "danger")
+        return redirect(url_for("main.index"))
+
+    homepage_content = HomepageContent.query.first()
+    if not homepage_content:
+        homepage_content = HomepageContent(about_text="Teks default tentang Aruna Moment.", about_image_filename="pp.jpg")
+        db.session.add(homepage_content)
+        db.session.commit()
+
+    form = HomepageContentForm(obj=homepage_content)
+    hero_images = HeroImage.query.order_by(HeroImage.order.asc()).all()
+
+    # Ensure the directory for hero images exists
+    hero_image_dir = os.path.join(current_app.root_path, "static/hero_carousel_images")
+    os.makedirs(hero_image_dir, exist_ok=True)
+
+    if form.validate_on_submit():
+        # Handle about_text update
+        homepage_content.about_text = form.about_text.data
+
+        # Handle about_image upload
+        if form.about_image.data:
+            image_file = form.about_image.data
+            filename = secure_filename(image_file.filename)
+            image_path = os.path.join(current_app.root_path, "static/images", filename)
+            image_file.save(image_path)
+            homepage_content.about_image_filename = filename
+
+        # Handle new hero image uploads
+        if form.hero_images.data:
+            for hero_image_file in request.files.getlist(form.hero_images.name):
+                if hero_image_file.filename:
+                    filename = secure_filename(hero_image_file.filename)
+                    filepath = os.path.join(hero_image_dir, filename)
+                    hero_image_file.save(filepath)
+                    new_hero_image = HeroImage(filename=filename, order=len(hero_images) + 1)
+                    db.session.add(new_hero_image)
+
+        # Handle existing hero image deletions
+        for image in hero_images:
+            delete_checkbox_name = f"delete_hero_image_{image.id}"
+            if request.form.get(delete_checkbox_name):
+                # Delete from filesystem
+                filepath = os.path.join(hero_image_dir, image.filename)
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+                # Delete from database
+                db.session.delete(image)
+
+        db.session.commit()
+        flash(_("Homepage content updated successfully!"), "success")
+        return redirect(url_for("admin.manage_homepage"))
+
+    return render_template(
+        "admin/manage_homepage.html",
+        form=form,
+        homepage_content=homepage_content,
+        hero_images=hero_images, # Pass hero_images to template
+        title=_("Manage Homepage"),
+    )
 
 
 @admin.route("/admin")
@@ -712,7 +781,7 @@ def edit_portfolio_post(post_id):
         form.title.data = post.title
         form.content.data = post.content
     return render_template(
-        "admin_post_form.html", form=form, title="New Portfolio Post"
+        "admin_post_form.html", form=form, title="Edit Portfolio Post", post=post
     )
 
 

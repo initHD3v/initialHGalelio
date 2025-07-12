@@ -370,3 +370,9 @@ class AdminOrderForm(FlaskForm):
 
         return initial_validation
 
+
+class HomepageContentForm(FlaskForm):
+    about_text = TextAreaField("Teks Tentang Aruna Moment", validators=[DataRequired()])
+    about_image = FileField("Gambar Profil/Studio (Opsional)")
+    hero_images = FileField("Unggah Gambar Hero Baru (Bisa Lebih Dari Satu)", render_kw={'multiple': True})
+    submit = SubmitField("Simpan Perubahan Homepage")

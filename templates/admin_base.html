@@ -110,6 +110,11 @@
                                 <div class="nav-link-icon"><i data-feather="credit-card"></i></div>
                                 Bank Accounts
                             </a>
+                            <!-- Sidenav Link (Manage Homepage)-->
+                            <a class="nav-link {% if request.endpoint == 'admin.manage_homepage' %}active{% endif %}" href="{{ url_for('admin.manage_homepage') }}">
+                                <div class="nav-link-icon"><i data-feather="layout"></i></div>
+                                Kelola Homepage
+                            </a>
                             <!-- Sidenav Link (Edit Profile)-->
                             <a class="nav-link {% if request.endpoint == 'admin.edit_profile_admin' %}active{% endif %}" href="{{ url_for('admin.edit_profile_admin') }}">
                                 <div class="nav-link-icon"><i data-feather="user"></i></div>

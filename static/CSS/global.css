@@ -42,10 +42,6 @@ body {
     z-index: 1030; /* Ensure it stays on top of other content */
 }
 
-body {
-    padding-top: 60px; /* Add padding to the body to prevent content from being hidden under the fixed navbar */
-}
-
 .navbar-brand {
     font-weight: 600;
     color: #262626 !important;
@@ -67,30 +63,7 @@ body {
     object-position: center; /* Center the image within the frame */
 }
 
-.carousel-indicators [data-bs-target] {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #fff;
-    opacity: 0.5;
-    transition: opacity 0.6s ease;
-}
 
-.carousel-indicators .active {
-    opacity: 1;
-}
-
-.carousel-inner {
-    max-height: 500px; /* Set a maximum height for the carousel container */
-}
-
-/* Ensure carousel items maintain aspect ratio and smooth height transition */
-.carousel-item img {
-    width: 100%;
-    max-height: 500px; /* Set a maximum height for the images */
-    object-fit: contain; /* Ensure entire image is visible, no cropping */
-    object-position: center; /* Center the image within the frame */
-}
 
 .card-body {
     padding: 1.25rem;
@@ -284,69 +257,7 @@ body {
     }
 }
 
-/* Home Page Specific Styles */
-.hero-section {
-    height: 70vh; /* Full viewport height */
-    background: url('../images/hf.jpg') no-repeat center center/cover;
-    position: relative;
-    overflow: hidden;
-}
 
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
-    z-index: 1;
-}
-
-.hero-section h1 {
-    font-size: 2rem; /* Adjusted font size for single line */
-    font-weight: normal; /* Removed bold effect */
-    letter-spacing: 1px; /* Adjusted spacing */
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.8); /* Stronger shadow for depth */
-    opacity: 0; /* Start hidden for animation */
-    animation: fadeInScale 1.5s ease-out forwards; /* Apply animation */
-    text-align: center; /* Ensure text is centered */
-    white-space: nowrap; /* Ensure text stays on a single line */
-    overflow: hidden; /* Hide overflowing content */
-    text-overflow: ellipsis; /* Add ellipsis for overflowing text */
-}
-
-.hero-section p {
-    font-size: 1rem; /* Adjusted font size */
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.7); /* Stronger shadow */
-    opacity: 0; /* Start hidden for animation */
-    animation: fadeInScale 1.5s ease-out forwards; /* Apply animation */
-    animation-delay: 0.5s; /* Delay for sequential appearance */
-    text-align: center; /* Ensure text is centered */
-}
-
-/* Keyframes for a subtle fade-in and scale animation */
-@keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.about-me-section {
-    background-color: #ffffff;
-}
-
-.featured-portfolio-section {
-    background-color: #f8f9fa;
-}
-
-.cta-section {
-    background-color: #343a40; /* Dark background for CTA */
-}
 
 /* Order Form Styles */
 .order-form-container {

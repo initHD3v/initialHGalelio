@@ -159,3 +159,21 @@ class Notification(db.Model):
 
     def __repr__(self):
         return f"<Notification {self.type} - {self.message[:20]}...>"
+
+
+class HomepageContent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    about_text = db.Column(db.Text, nullable=False)
+    about_image_filename = db.Column(db.String(150), nullable=True)
+
+    def __repr__(self):
+        return f"<HomepageContent {self.id}>"
+
+
+class HeroImage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(150), nullable=False)
+    order = db.Column(db.Integer, default=0, nullable=False)
+
+    def __repr__(self):
+        return f"<HeroImage {self.filename}>"

@@ -1,4 +1,4 @@
-from models import Post, Order, db, CalendarEvent, Testimonial, WeddingPackage, PostImage, ImageLike, Notification, User
+from models import Post, Order, db, CalendarEvent, Testimonial, WeddingPackage, PostImage, ImageLike, Notification, User, HomepageContent, HeroImage
 from flask import (
     render_template,
     redirect,
@@ -13,13 +13,20 @@ from forms import OrderForm
 from flask_login import login_required, current_user
 from sqlalchemy import or_
 from . import main
-from . import main
 
 
 @main.route("/")
 def index():
-    posts = Post.query.all()
-    return render_template("index.html", posts=posts)
+    hero_images = HeroImage.query.order_by(HeroImage.order.asc()).all()
+    featured_gallery_images = PostImage.query.order_by(PostImage.likes.desc()).limit(8).all()
+    testimonials = Testimonial.query.filter_by(is_approved=True).order_by(Testimonial.id.desc()).limit(3).all()
+    homepage_content = HomepageContent.query.first()
+    if not homepage_content:
+        # Create a default entry if none exists
+        homepage_content = HomepageContent(about_text="Teks default tentang Aruna Moment.", about_image_filename="pp.jpg")
+        db.session.add(homepage_content)
+        db.session.commit()
+    return render_template("index.html", hero_images=hero_images, featured_gallery_images=featured_gallery_images, testimonials=testimonials, homepage_content=homepage_content)
 
 
 @main.route("/about")

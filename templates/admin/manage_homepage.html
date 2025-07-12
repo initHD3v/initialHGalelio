@@ -1,0 +1,63 @@
+{% extends 'admin_base.html' %}
+{% from "_form_macros.html" import render_field %}
+
+{% block admin_content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">{{ title }}</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_panel') }}">Dashboard</a></li>
+        <li class="breadcrumb-item active">{{ title }}</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-home me-1"></i>
+            Kelola Konten Homepage
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    {{ render_field(form.about_text, class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    {{ render_field(form.about_image, class="form-control") }}
+                    {% if homepage_content.about_image_filename %}
+                        <small class="form-text text-muted">
+                            Gambar saat ini: <img src="{{ url_for('static', filename='images/' + homepage_content.about_image_filename) }}" alt="Current About Image" style="max-height: 100px; border-radius: 5px;">
+                        </small>
+                    {% else %}
+                        <small class="form-text text-muted">Belum ada gambar yang diunggah untuk bagian ini.</small>
+                    {% endif %}
+                </div>
+
+                <h4 class="mt-4 mb-3">Unggah Gambar untuk Hero Carousel</h4>
+                <div class="mb-3">
+                    {{ render_field(form.hero_images, class="form-control", multiple=True) }}
+                    <small class="form-text text-muted">Pilih satu atau beberapa gambar untuk hero carousel.</small>
+                    <div class="row mt-3">
+                        {% for image in hero_images %}
+                        <div class="col-md-3 mb-3">
+                            <div class="card h-100">
+                                <img src="{{ url_for('static', filename='hero_carousel_images/' + image.filename) }}" class="card-img-top" alt="Hero Image" style="height: 150px; object-fit: cover;">
+                                <div class="card-body text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="delete_hero_image_{{ image.id }}" id="delete_hero_image_{{ image.id }}" value="1">
+                                        <label class="form-check-label" for="delete_hero_image_{{ image.id }}">
+                                            Hapus
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4">{{ form.submit.label }}</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

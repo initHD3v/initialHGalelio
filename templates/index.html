@@ -1,108 +1,132 @@
 {% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/home.css') }}">
+    <title>Aruna Moment - Professional Photography</title>
+{% endblock %}
+
 {% block content %}
-    <!-- Hero Section -->
-    <section class="hero-section text-white text-center d-flex align-items-center justify-content-center">
-        <div class="hero-overlay" style="background-image: url('{{ url_for('static', filename='images/hf.jpg') }}');"></div>
-        <div class="container position-relative" style="z-index: 2;">
-            <h1 class="mb-3">we take photo as a return ticket to moment otherwise gone</h1>
-            <p class="lead mb-4">As a professional wedding & pre-wedding photographer, I transform fleeting moments into timeless memories.</p>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                <a href="{{ url_for('main.portfolio') }}" class="hero-text-button">View My Portfolio</a>
-                <a href="{{ url_for('main.order') }}" class="hero-text-button">Book a Session</a>
-                <a href="{{ url_for('main.pricelist') }}" class="hero-text-button">View Pricelist</a>
+<!-- Hero Section with Carousel (Full-width) -->
+<section class="hero-section text-center text-white">
+    {% include '_header.html' %}
+
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-interval="15000">
+        <div class="carousel-indicators">
+            {% for image in hero_images %}
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.first %}active{% endif %}" aria-current="{% if loop.first %}true{% endif %}" aria-label="Slide {{ loop.index }}"></button>
+            {% endfor %}
+        </div>
+        <div class="carousel-inner">
+            {% for image in hero_images %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                <img src="{{ url_for('static', filename='hero_carousel_images/' + image.filename) }}" class="d-block w-100" alt="Hero Image">
+            </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <div class="max-w-lg">
+            <h1 class="display-3 fade-in-text text-nowrap-single-line">Mengabadikan Momen, Menciptakan Kenangan</h1>
+            <p class="lead my-4 fade-in-text delay-1">Layanan fotografi profesional untuk setiap momen berharga dalam hidup Anda.</p>
+            <div class="hero-links-container">
+                <a href="{{ url_for('main.portfolio') }}" class="hero-link fade-in-text delay-2">Lihat Portofolio</a>
+                <a href="{{ url_for('main.pricelist') }}" class="hero-link fade-in-text delay-3">Paket Harga</a>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- About Me Section -->
-    <section class="about-me-section py-5">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center mb-4 mb-md-0">
-                    <img src="{{ url_for('static', filename='images/pp.jpg') }}" alt="Photographer Profile" class="img-fluid rounded-circle shadow-lg" style="width: 250px; height: 250px; object-fit: cover;">
-                </div>
-                <div class="col-md-6">
-                    <h2 class="mb-3">Halo, Saya Hidayat Fauzii</h2>
-                    <p class="lead">Pencerita berdedikasi Anda di balik lensa.</p>
-                    <p>Dengan semangat menangkap emosi yang tulus dan detail yang indah, saya berspesialisasi dalam fotografi pernikahan dan pre-wedding. Tujuan saya adalah menciptakan foto-foto otentik yang memukau dan mencerminkan kisah cinta unik Anda, memastikan setiap momen berharga tersimpan dengan indah untuk selamanya.</p>
-                    <p>Saya percaya dalam membangun koneksi dengan setiap klien, memahami visi mereka, dan memberikan pengalaman personal yang lebih dari sekadar memotret. Mari ciptakan keajaiban bersama!</p>
-                </div>
-            </div>
+<!-- Featured Gallery Section (Contained) -->
+<section class="featured-gallery py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Galeri Unggulan</h2>
+            <p class="text-muted">Sekilas karya terbaik dari kami.</p>
         </div>
-    </section>
-
-    <!-- Featured Portfolio Section -->
-    <section class="featured-portfolio-section py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-5">Karya Terbaru & Unggulan Saya</h2>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                {% for post in posts[:3] %} {# Displaying up to 3 latest posts as featured #}
-                <div class="col">
-                    <div class="card h-100 shadow-sm">
-                        {% if post.images %}
-                            <div id="featuredCarousel{{ post.id }}" class="carousel slide" data-bs-ride="carousel">
-                                <div class="carousel-inner">
-                                    {% for image in post.images %}
-                                        <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                            <img src="{{ url_for('static', filename='images/' + image.filename) }}" class="d-block w-100" alt="{{ post.title }}">
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                {% if post.images|length > 1 %}
-                                <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel{{ post.id }}" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Sebelumnya</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel{{ post.id }}" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Berikutnya</span>
-                                </button>
-                                {% endif %}
-                            </div>
-                        {% else %}
-                            <img src="{{ url_for('static', filename='images/placeholder.png') }}" class="card-img-top" alt="No Image">
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ post.title }}</h5>
-                            <p class="card-text">{{ post.content[:100] }}...</p>
-                        </div>
-                        <div class="card-footer">
-                            <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
-                        </div>
+        <div class="row g-4">
+            {% for image in featured_gallery_images %}
+            <div class="col-md-4">
+                <div class="card bg-dark text-white gallery-card">
+                    <img src="{{ url_for('static', filename='images/' + image.filename) }}" class="card-img" alt="Portfolio Image">
+                    <div class="card-img-overlay gallery-overlay">
+                        <h5 class="card-title">{{ image.post.title }}</h5>
                     </div>
                 </div>
-                {% endfor %}
             </div>
-            <div class="text-center mt-5">
-                <a href="{{ url_for('main.portfolio') }}" class="btn btn-primary btn-lg">Lihat Semua Portofolio</a>
+            {% else %}
+            <p class="text-center">Portofolio unggulan akan segera ditampilkan.</p>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ url_for('main.portfolio') }}" class="btn btn-outline-primary">Lihat Semua Portofolio</a>
+        </div>
+    </div>
+</section>
+
+<!-- About Me Section (Contained) -->
+<section class="about-me-section bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+                <img src="{{ url_for('static', filename='images/' + homepage_content.about_image_filename) }}" class="img-fluid rounded-circle about-me-img" alt="Photographer">
+            </div>
+            <div class="col-md-8">
+                <h2 class="fw-bold">Tentang Aruna Moment</h2>
+                <p class="lead text-muted">Lebih dari sekadar penyedia jasa, kami adalah pencerita visual.</p>
+                <p>{{ homepage_content.about_text }}</p>
+                <a href="{{ url_for('main.about') }}" class="btn btn-primary">Pelajari Lebih Lanjut</a>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Call to Action Section -->
-    <section class="cta-section py-5 text-center text-white">
-        <div class="container">
-            <h2 class="mb-3">Siap Mengabadikan Kisah Anda?</h2>
-            <p class="lead mb-4">Mari ciptakan kenangan indah dan abadi bersama.</p>
-            <a href="{{ url_for('main.order') }}" class="btn btn-light btn-lg">Pesan Sekarang</a>
+<!-- Testimonials Section (Contained) -->
+<section class="testimonials-section py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Apa Kata Mereka</h2>
+            <p class="text-muted">Kepuasan klien adalah prioritas utama kami.</p>
         </div>
-    </section>
-<style>
-.hero-text-button {
-    background: none;
-    border: none;
-    color: white; /* Text color */
-    font-size: 1.25rem; /* Equivalent to btn-lg */
-    padding: 0.5rem 1rem; /* Standard button padding */
-    text-decoration: none; /* Remove default underline for links */
-    transition: all 0.3s ease; /* Smooth transition for hover effects */
-    cursor: pointer;
-}
+        <div class="row">
+            {% for testimonial in testimonials %}
+            <div class="col-md-4">
+                <div class="card testimonial-card">
+                    <div class="card-body">
+                        <p class="card-text">"{{ testimonial.testimonial_text }}"</p>
+                        <footer class="blockquote-footer mt-3">{{ testimonial.client_name }},
+                            {% for i in range(testimonial.rating) %}
+                                <span class="text-warning">&#9733;</span>
+                            {% endfor %}
+                            {% for i in range(5 - testimonial.rating) %}
+                                <span class="text-muted">&#9733;</span>
+                            {% endfor %}
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-center">Belum ada testimoni untuk ditampilkan.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
-.hero-text-button:hover {
-    color: #f8f9fa; /* Slightly brighter white on hover */
-    text-decoration: underline; /* Underline on hover */
-    transform: translateY(-2px); /* Slight lift effect */
-}
-</style>
+<!-- Final CTA Section (Full-width) -->
+<section class="final-cta-section bg-primary text-white text-center py-5">
+    <div class="container">
+        <h2 class="fw-bold">Siap Mengabadikan Momen Spesial Anda?</h2>
+        <p class="lead my-4">Jangan biarkan momen berharga berlalu begitu saja. Hubungi kami untuk konsultasi gratis.</p>
+        <a href="{{ url_for('main.order') }}" class="btn btn-light btn-lg">Pesan Sesi Foto</a>
+    </div>
+</section>
 {% endblock %}

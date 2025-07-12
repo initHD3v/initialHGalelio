@@ -5,27 +5,32 @@
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">{{ title }}</h1>
 </div>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_panel') }}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('admin.manage_portfolio') }}">Manage Portfolio</a></li>
+    <li class="breadcrumb-item active">{{ title }}</li>
+</ol>
 
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">{{ title }}</h6>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-lg-6">
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Gambar Portofolio</h6>
+            </div>
+            <div class="card-body">
                 <!-- Image Upload Section -->
                 <div class="image-upload-section mb-4">
-                    <div id="image-preview-carousel" class="carousel slide bg-light border rounded" data-bs-ride="carousel" style="min-height: 250px; display: flex; align-items: center; justify-content: center;">
+                    <div id="image-preview-carousel" class="carousel slide bg-light border rounded" data-bs-ride="carousel" style="min-height: 400px; display: flex; align-items: center; justify-content: center;">
                         <div class="carousel-inner">
                             {% if post and post.images %}
                                 {% for image in post.images %}
                                     <div class="carousel-item {% if loop.first %}active{% endif %}">
-                                        <img src="{{ url_for('static', filename='images/' + image.filename) }}" class="d-block w-100" alt="..." style="object-fit: contain; max-height: 250px;">
+                                        <img src="{{ url_for('static', filename='images/' + image.filename) }}" class="d-block w-100" alt="..." style="object-fit: contain; max-height: 400px;">
                                     </div>
                                 {% endfor %}
                             {% else %}
-                                <div class="carousel-item active d-flex align-items-center justify-content-center">
-                                    <p class="text-muted">No image selected</p>
+                                <div class="carousel-item active d-flex align-items-center justify-content-center" style="min-height: 400px;">
+                                    <p class="text-muted">Tidak ada gambar yang dipilih</p>
                                 </div>
                             {% endif %}
                         </div>
@@ -39,12 +44,12 @@
                         </button>
                     </div>
                     <label for="image-upload" class="btn btn-primary mt-3 w-100">
-                        Select Image(s)
+                        Pilih Gambar(s)
                     </label>
                     <input type="file" id="image-upload" name="image" accept="image/*" multiple style="display: none;">
 
                     {% if post and post.images %}
-                        <h6 class="mt-4 mb-2 text-gray-800">Existing Images:</h6>
+                        <h6 class="mt-4 mb-2 text-gray-800">Gambar yang Ada:</h6>
                         <div class="row row-cols-3 g-2">
                             {% for image in post.images %}
                                 <div class="col">
@@ -54,7 +59,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" name="delete_images" value="{{ image.id }}" id="deleteImage{{ image.id }}">
                                                 <label class="form-check-label small" for="deleteImage{{ image.id }}">
-                                                    Delete
+                                                    Hapus
                                                 </label>
                                             </div>
                                         </div>
@@ -65,7 +70,17 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="col-lg-6">
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Detail Postingan</h6>
+            </div>
+            <div class="card-body">
                 <!-- Form Section -->
                 <form id="post-form" method="POST" enctype="multipart/form-data" action="{{ url_for('admin.new_portfolio_post') if title == 'New Portfolio Post' else url_for('admin.edit_portfolio_post', post_id=post.id) }}">
                     {{ form.hidden_tag() }}
@@ -78,7 +93,7 @@
                         {{ form.content(class="form-control", rows=5) }}
                     </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary mt-3">{{ title }}</button>
+                        <button type="submit" class="btn btn-primary mt-3">{% if title == 'Edit Portfolio Post' %}Simpan Perubahan{% else %}{{ title }}{% endif %}</button>
                     </div>
                 </form>
             </div>
@@ -91,19 +106,16 @@
         const imageUpload = document.getElementById('image-upload');
         const imagePreviewCarousel = document.getElementById('image-preview-carousel');
         const carouselInner = imagePreviewCarousel.querySelector('.carousel-inner');
-        const noImageSelectedText = carouselInner.querySelector('.no-image-selected-text'); // This might be null now, handle it
-
         // Initial check for existing images to show/hide placeholder
-        if (carouselInner.children.length === 0 || (carouselInner.children.length === 1 && carouselInner.children[0].classList.contains('d-flex'))) {
-            // If no images or only the placeholder is present
-            carouselInner.innerHTML = '<div class="carousel-item active d-flex align-items-center justify-content-center" style="min-height: 250px;"><p class="text-muted">No image selected</p></div>';
+        function updateCarouselPlaceholder() {
+            if (carouselInner.children.length === 0 || (carouselInner.children.length === 1 && carouselInner.children[0].classList.contains('d-flex') && carouselInner.children[0].querySelector('p').innerText === 'Tidak ada gambar yang dipilih')) {
+                carouselInner.innerHTML = '<div class="carousel-item active d-flex align-items-center justify-content-center" style="min-height: 400px;"><p class="text-muted">Tidak ada gambar yang dipilih</p></div>';
+            }
         }
-
+        updateCarouselPlaceholder();
 
         imageUpload.addEventListener('change', function(event) {
             carouselInner.innerHTML = ''; // Clear existing previews
-            // noImageSelectedText might be null if it was replaced by actual images
-            // if (noImageSelectedText) { noImageSelectedText.style.display = 'none'; }
 
             if (this.files && this.files.length > 0) {
                 Array.from(this.files).forEach((file, index) => {
@@ -123,9 +135,9 @@
                 if (this.files.length > 0) {
                     new bootstrap.Carousel(imagePreviewCarousel);
                 }
-            } else if (carouselInner.children.length === 0) {
-                // If no new files and no existing images, show placeholder
-                carouselInner.innerHTML = '<div class="carousel-item active d-flex align-items-center justify-content-center" style="min-height: 250px;"><p class="text-muted">No image selected</p></div>';
+            } else {
+                // If no new files are selected, and there are no existing images, show placeholder
+                updateCarouselPlaceholder();
             }
         });
 
