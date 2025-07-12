@@ -15,4 +15,5 @@ class Config:
     )  # Replace with your actual Map ID
     DEBUG = os.environ.get("FLASK_DEBUG") == "1"
     BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'Asia/Jakarta'
     BABEL_TRANSLATION_DIRECTORIES = 'translations'

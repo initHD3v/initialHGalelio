@@ -28,6 +28,7 @@ from forms import (
     UserEditForm,
     WeddingPackageForm,
     BankAccountForm,
+    AdminOrderForm, # Added AdminOrderForm
 )
 from extensions import db
 from werkzeug.utils import secure_filename
@@ -117,6 +118,138 @@ def admin_panel():
     )
 
 
+@admin.route("/admin/order/<int:order_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_order(order_id):
+    if current_user.role != "admin":
+        flash("You do not have access to this page.", "danger")
+        return redirect(url_for("main.index"))
+
+    order = Order.query.get_or_404(order_id)
+    form = AdminOrderForm(obj=order) # Populate form with existing order data
+
+    if form.validate_on_submit():
+        # Update order details from form data
+        order.service_type = form.service_type.data
+        order.event_date = form.event_date.data
+        order.location = form.location.data
+        # Convert empty strings for latitude/longitude to None
+        order.latitude = float(form.latitude.data) if form.latitude.data else None
+        order.longitude = float(form.longitude.data) if form.longitude.data else None
+        order.details = form.details.data
+        order.total_price = form.total_price.data
+        order.status = form.status.data
+        order.bank_account = form.bank_account.data # Assign the selected BankAccount object
+
+        # Handle event start/end times based on service type
+        if form.service_type.data == "prewedding":
+            order.event_start_time = datetime.combine(form.event_date.data, datetime.min.time())
+            order.event_end_time = datetime.combine(form.event_date.data, datetime.max.time())
+        else:
+            # Convert string times to datetime objects
+            order.event_start_time = datetime.combine(form.event_date.data, datetime.strptime(form.event_start_time.data, "%H:%M").time())
+            order.event_end_time = datetime.combine(form.event_date.data, datetime.strptime(form.event_end_time.data, "%H:%M").time())
+
+        # Handle wedding/prewedding packages
+        if form.service_type.data == "wedding":
+            order.wedding_package = form.wedding_package.data
+            order.prewedding_package = None # Clear prewedding package if service type changes
+        elif form.service_type.data == "prewedding":
+            order.prewedding_package = form.prewedding_package.data
+            order.wedding_package = None # Clear wedding package if service type changes
+        else:
+            order.wedding_package = None
+            order.prewedding_package = None
+
+        db.session.commit()
+        flash("Order updated successfully!", "success")
+        return redirect(url_for("admin.order_list"))
+
+    elif request.method == "GET":
+        # For GET request, populate time fields from existing order object
+        if order.event_start_time:
+            form.event_start_time.data = order.event_start_time.strftime("%H:%M")
+        if order.event_end_time:
+            form.event_end_time.data = order.event_end_time.strftime("%H:%M")
+
+    return render_template("admin/create_edit_order.html", form=form, order=order, title="Edit Order")
+@login_required
+def get_dashboard_summary():
+    if current_user.role != "admin":
+        return jsonify({"message": "Unauthorized"}), 403
+
+    total_clients = User.query.filter_by(role="client").count()
+    total_orders = Order.query.count()
+    pending_orders = Order.query.filter_by(status="pending").count()
+    approved_orders = Order.query.filter_by(status="accepted").count()
+    rejected_orders = Order.query.filter_by(status="rejected").count()
+    total_wedding_packages = WeddingPackage.query.count()
+
+    upcoming_orders_data = []
+    upcoming_orders = (
+        Order.query.filter(
+            Order.status == "accepted",
+            Order.event_date >= datetime.utcnow().date(),
+            Order.event_start_time.isnot(None),
+        )
+        .order_by(Order.event_date.asc())
+        .all()
+    )
+
+    for order in upcoming_orders:
+        event_datetime = datetime.combine(
+            order.event_date, order.event_start_time.time()
+        )
+        time_remaining = event_datetime - datetime.utcnow()
+        
+        # Format time_remaining for JSON
+        days = time_remaining.days
+        hours = time_remaining.seconds // 3600
+        minutes = (time_remaining.seconds % 3600) // 60
+
+        upcoming_orders_data.append({
+            "client_name": order.client.full_name,
+            "service_type": order.service_type,
+            "event_date": order.event_date.strftime("%Y-%m-%d"),
+            "event_start_time": order.event_start_time.strftime("%H:%M"),
+            "time_remaining": {"days": days, "hours": hours, "minutes": minutes}
+        })
+
+    return jsonify({
+        "total_clients": total_clients,
+        "total_orders": total_orders,
+        "pending_orders": pending_orders,
+        "approved_orders": approved_orders,
+        "rejected_orders": rejected_orders,
+        "total_wedding_packages": total_wedding_packages,
+        "upcoming_orders": upcoming_orders_data,
+    })
+@login_required
+def manage_portfolio():
+    if current_user.role != "admin":
+        flash("You do not have access to this page.", "danger")
+        return redirect(url_for("main.index"))
+    
+    posts = Post.query.all()
+
+    for post in posts:
+        # Calculate total likes for the post
+        post.total_likes = sum(image.likes for image in post.images)
+        
+        # Collect unique users who liked any image in the post
+        liking_users_list = []
+        for image in post.images:
+            for like in image.image_likes:
+                liking_users_list.append({
+                    'username': like.user.username,
+                    'timestamp': like.timestamp # Pass raw datetime object
+                })
+        # Sort by timestamp (newest first) and then by username
+        post.liking_users_list = sorted(liking_users_list, key=lambda x: (x['timestamp'], x['username']), reverse=True)
+    
+    return render_template("admin/manage_portfolio.html", posts=posts)
+
+
 @admin.route("/admin/manage_portfolio")
 @login_required
 def manage_portfolio():
@@ -127,11 +260,19 @@ def manage_portfolio():
     posts = Post.query.all()
 
     for post in posts:
+        # Calculate total likes for the post
+        post.total_likes = sum(image.likes for image in post.images)
+        
+        # Collect unique users who liked any image in the post
+        liking_users_list = []
         for image in post.images:
-            # Fetch all likes for this image, and eager load the User relationship
-            image.liking_users = [
-                like.user.username for like in ImageLike.query.filter_by(post_image_id=image.id).join(User).all()
-            ]
+            for like in image.image_likes:
+                liking_users_list.append({
+                    'username': like.user.username,
+                    'timestamp': like.timestamp # Pass raw datetime object
+                })
+        # Sort by timestamp (newest first) and then by username
+        post.liking_users_list = sorted(liking_users_list, key=lambda x: (x['timestamp'], x['username']), reverse=True)
     
     return render_template("admin/manage_portfolio.html", posts=posts)
 
@@ -953,7 +1094,7 @@ def get_notifications():
             "id": notif.id,
             "type": notif.type,
             "message": notif.message,
-            "timestamp": notif.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": notif.timestamp, # Pass raw datetime object
             "is_read": notif.is_read
         })
     return jsonify({"notifications": formatted_notifications})

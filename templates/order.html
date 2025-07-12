@@ -117,6 +117,7 @@
 
             const locationInput = document.getElementById('location-input');
 
+            // Fix: Removed extra closing curly brace
             const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
 
             const autocompleteElement = new PlaceAutocompleteElement({
@@ -172,8 +173,6 @@
                 if (status === 'OK') {
                     if (results[0]) {
                         document.getElementById('location-input').value = results[0].formatted_address;
-                    } else {
-                        document.getElementById('location-input').value = 'Unknown location';
                     }
                 } else {
                     document.getElementById('location-input').value = 'Error geocoding';
@@ -185,7 +184,7 @@
             {% if form.errors %}
                 let errorMessages = '';
                 {% for field, errors in form.errors.items() %}
-                    errorMessages += '{{ field }}: ' + '{{ errors|join(", ") }}\n';
+                    errorMessages += `{{ field | tojson }}: ${ {{ errors | tojson }} .join(", ") }\n`;
                 {% endfor %}
                 alert('Form Submission Error:\n' + errorMessages);
             {% endif %}
@@ -219,7 +218,7 @@
                     preweddingPackageSection.style.display = 'block';
                     preweddingPackageSelect.disabled = false;
                     eventTimeSection.style.display = 'none'; // Hide for prewedding
-                } else { // For 'event', 'portrait', etc.
+                } else { // For 'event', 'portrait', or other custom services
                     totalPriceSection.style.display = 'block';
                     totalPriceInput.disabled = false;
                 }

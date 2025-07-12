@@ -1,3 +1,28 @@
+.custom-toast {
+    position: absolute; /* Positioned relative to the nearest positioned ancestor */
+    background-color: rgba(0, 0, 0, 0.75); /* Semi-transparent dark background */
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    white-space: nowrap; /* Prevent text wrapping */
+    opacity: 0; /* Start hidden */
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* Smooth transition */
+    transform: translateY(10px); /* Start slightly below */
+    pointer-events: none; /* Allow clicks to pass through */
+    z-index: 1050; /* Ensure it's above other content */
+}
+
+.custom-toast.show {
+    opacity: 1;
+    transform: translateY(0); /* Slide up to position */
+}
+
+.custom-toast.hide {
+    opacity: 0;
+    transform: translateY(10px); /* Slide down to hide */
+}
+
 body {
     font-family: 'Montserrat', sans-serif; /* Modern font */
     background-color: #f0f2f5; /* Light gray background, similar to social media feeds */

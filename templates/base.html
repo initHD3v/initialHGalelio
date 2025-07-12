@@ -13,7 +13,7 @@
     {% endblock %}
     <title>My Portfolio</title>
 </head>
-<body data-is-logged-in="{{ current_user.is_authenticated }}" data-user-role="{{ current_user.role if current_user.is_authenticated else 'guest' }}">
+<body data-is-logged-in="{{ 'true' if current_user.is_authenticated else 'false' }}" data-user-role="{{ current_user.role if current_user.is_authenticated else 'guest' }}">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">ARUNA MOMENT</a>
@@ -55,15 +55,7 @@
                         <a class="nav-link" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
                     </li>
                     {% endif %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ _('Language') }}
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{{ url_for(request.endpoint, lang='en', **request.view_args) }}">{{ _('English') }}</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for(request.endpoint, lang='id', **request.view_args) }}">{{ _('Bahasa Indonesia') }}</a></li>
-                        </ul>
-                    </li>
+                    
                 </ul>
             </div>
         </div>
@@ -95,10 +87,20 @@
     </footer>
     {% endif %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    {% block scripts %}{% endblock %}
     <style>
         body {
             padding-bottom: 80px; /* Adjust this value based on the height of your fixed CTA */
         }
     </style>
+
+    <!-- Custom Toast Notification -->
+    <div id="customToast" class="custom-toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex align-items-center">
+            <div class="toast-body">
+                <!-- Message will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
 </body>
 </html>

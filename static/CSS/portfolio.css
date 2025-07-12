@@ -38,22 +38,30 @@
     gap: 8px;
 }
 
-.like-btn {
-    background: none;
-    border: none;
+.like-btn .fa-heart {
+    font-size: 1.5rem; /* Larger icon */
     cursor: pointer;
-    padding: 0;
-    color: #ff4757;
-    font-size: 1.3rem;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease-in-out, color 0.2s ease;
 }
 
-.like-btn:hover {
-    transform: scale(1.15);
+.like-btn .far.fa-heart {
+    color: #212529; /* Default black/dark color */
 }
 
 .like-btn .fas.fa-heart {
-    font-weight: 900; /* Solid heart for liked state */
+    color: #dc3545; /* Red color for liked state */
+    transform: scale(1.1); /* Slightly larger when liked */
+}
+
+/* The animation class */
+.like-animation {
+    animation: like-pop 0.4s ease;
+}
+
+@keyframes like-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1.1); }
 }
 
 .likes-count {

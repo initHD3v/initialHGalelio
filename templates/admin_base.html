@@ -171,6 +171,18 @@
         <script src="{{ url_for('static', filename='sb-admin-pro/dist/js/scripts.js') }}"></script>
         {% block scripts_extra %}{% endblock %}
         <script>
+            // Function to format timestamp to local time
+            function formatNotificationTimeForDisplay(isoString) {
+                const date = new Date(isoString);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            }
+
             document.addEventListener('DOMContentLoaded', function() {
                 const notificationCountSpan = document.getElementById('notificationCount');
                 const notificationListDiv = document.getElementById('notificationList');
@@ -208,6 +220,9 @@
                                 let link = '#';
                                 let message = notif.message;
 
+                                // Format the timestamp to local time
+                                const displayTime = formatNotificationTimeForDisplay(notif.timestamp);
+
                                 if (notif.type === 'new_order') {
                                     icon = '<i class="fas fa-clipboard-list text-primary"></i>';
                                     link = '{{ url_for('admin.order_list') }}'; // Link to orders list
@@ -226,7 +241,7 @@
                                     <div class="dropdown-alerts-item-content">
                                         <div class="dropdown-alerts-item-icon">${icon}</div>
                                         <div class="dropdown-alerts-item-details">
-                                            <div class="dropdown-alerts-item-details-date">${notif.timestamp}</div>
+                                            <div class="dropdown-alerts-item-details-date">${displayTime}</div>
                                             ${message}
                                         </div>
                                     </div>

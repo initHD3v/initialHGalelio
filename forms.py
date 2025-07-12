@@ -23,6 +23,7 @@ from wtforms.validators import (
 from wtforms_sqlalchemy.fields import QuerySelectField
 from models import User, WeddingPackage, BankAccount # Added BankAccount
 from extensions import db # Added import
+from datetime import datetime # Added datetime import
 
 def get_active_bank_accounts():
     accounts = BankAccount.query.filter_by(is_active=True).order_by(BankAccount.bank_name)
@@ -270,3 +271,102 @@ class BankAccountForm(FlaskForm):
     def validate_account_number(self, account_number):
         if not account_number.data.isdigit():
             raise ValidationError("Nomor Rekening harus berupa angka.")
+
+
+class AdminOrderForm(FlaskForm):
+    service_type = SelectField(
+        "Service Type",
+        choices=[
+            ("wedding", "Wedding"),
+            ("prewedding", "Pre-Wedding"),
+            ("event", "Event"),
+            ("portrait", "Portrait"),
+        ],
+        validators=[DataRequired()],
+    )
+    wedding_package = QuerySelectField(
+        "Wedding Package",
+        query_factory=lambda: WeddingPackage.query.filter_by(category='Wedding').all(),
+        get_label=lambda x: x.name,
+        get_pk=lambda x: x.id,
+        allow_blank=True,
+        blank_text="-- Select a Wedding package --",
+        validators=[Optional()]
+    )
+    prewedding_package = QuerySelectField(
+        "Pre-wedding Package",
+        query_factory=lambda: WeddingPackage.query.filter_by(category='Pre-wedding').all(),
+        get_label=lambda x: x.name,
+        get_pk=lambda x: x.id,
+        allow_blank=True,
+        blank_text="-- Select a Pre-wedding package --",
+        validators=[Optional()]
+    )
+    event_date = DateField("Event Date", format="%Y-%m-%d", validators=[DataRequired()])
+    event_start_time = StringField("Start Time", validators=[Optional()])
+    event_end_time = StringField("End Time", validators=[Optional()])
+    location = StringField("Location", validators=[DataRequired()])
+    latitude = HiddenField()
+    longitude = HiddenField()
+    details = TextAreaField("Details")
+    total_price = FloatField("Total Price", validators=[DataRequired(), NumberRange(min=0.01, message="Price must be greater than zero.")])
+    
+    # Admin-specific fields
+    status = SelectField(
+        "Status",
+        choices=[
+            ("waiting_dp", "Waiting DP"),
+            ("waiting_approval", "Waiting Approval"),
+            ("accepted", "Accepted"),
+            ("rejected", "Rejected"),
+            ("completed", "Completed"),
+        ],
+        validators=[DataRequired()],
+    )
+    bank_account = QuerySelectField(
+        "Bank Account for Payment",
+        query_factory=get_active_bank_accounts,
+        get_label=lambda x: f"{x.bank_name} - {x.account_name} ({x.account_number})",
+        allow_blank=True,
+        blank_text="-- Select a Bank Account --",
+        validators=[Optional()]
+    )
+    
+    submit = SubmitField("Save Changes")
+
+    def validate(self, extra_validators=None):
+        initial_validation = super().validate(extra_validators)
+        if not initial_validation:
+            return False
+
+        # Conditional validation for event_start_time and event_end_time
+        if self.service_type.data != "prewedding":
+            if not self.event_start_time.data:
+                self.event_start_time.errors.append("Start Time is required for this service type.")
+                initial_validation = False
+            if not self.event_end_time.data:
+                self.event_end_time.errors.append("End Time is required for this service type.")
+                initial_validation = False
+            
+            if self.event_start_time.data and self.event_end_time.data:
+                try:
+                    start_time_obj = datetime.strptime(self.event_start_time.data, "%H:%M").time()
+                    end_time_obj = datetime.strptime(self.event_end_time.data, "%H:%M").time()
+                    if start_time_obj >= end_time_obj:
+                        self.event_end_time.errors.append("End Time must be after Start Time.")
+                        initial_validation = False
+                except ValueError:
+                    self.event_start_time.errors.append("Invalid time format. Please use HH:MM.")
+                    self.event_end_time.errors.append("Invalid time format. Please use HH:MM.")
+                    initial_validation = False
+        
+        # Conditional validation for packages
+        if self.service_type.data == "wedding" and not self.wedding_package.data:
+            self.wedding_package.errors.append("Wedding Package is required for Wedding service.")
+            initial_validation = False
+        elif self.service_type.data == "prewedding" and not self.prewedding_package.data:
+            self.prewedding_package.errors.append("Pre-wedding Package is required for Pre-wedding service.")
+            initial_validation = False
+
+        return initial_validation
+

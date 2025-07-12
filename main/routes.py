@@ -239,16 +239,23 @@ def unavailable_dates():
 @login_required # Only logged-in users can like
 def like_image(image_id):
     if current_user.role != "client":
-        return jsonify({"message": "Hanya klien yang dapat memberikan suka."}, 403) # Forbidden
+        return jsonify({"success": False, "message": "Hanya klien yang dapat memberikan suka."}), 403
 
     image = PostImage.query.get_or_404(image_id)
-
-    # Check if user has already liked this image
     existing_like = ImageLike.query.filter_by(
         user_id=current_user.id, post_image_id=image_id
     ).first()
 
     if existing_like:
-        # User already liked this image, do nothing or unlike
-        # For now, let's just return success without changing count
-        return jsonify({"likes": image.likes, "message": "Anda sudah menyukai gambar ini."})
+        # User has already liked, so unlike it
+        db.session.delete(existing_like)
+        image.likes -= 1
+        db.session.commit()
+        return jsonify({"success": True, "likes": image.likes, "liked": False})
+    else:
+        # User has not liked it yet, so add a like
+        new_like = ImageLike(user_id=current_user.id, post_image_id=image_id)
+        db.session.add(new_like)
+        image.likes += 1
+        db.session.commit()
+        return jsonify({"success": True, "likes": image.likes, "liked": True})

@@ -25,14 +25,12 @@
                             <p class="card-text text-muted" style="font-size: 0.75rem;"><small>{{ post.date_posted.strftime('%Y-%m-%d') }}</small></p>
                             
                             <!-- Like Information -->
-                            {% for image in post.images %}
-                                <div class="d-flex align-items-center mb-1" style="font-size: 0.7rem;">
-                                    <i class="fas fa-heart text-danger me-1"></i> {{ image.likes }} likes
-                                    {% if image.liking_users %}
-                                        <span class="ms-2 text-muted">({{ image.liking_users | join(', ') }})</span>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
+                            <div class="d-flex align-items-center mb-1" style="font-size: 0.8rem;">
+                                <i class="fas fa-heart text-danger me-1"></i> {{ post.total_likes }} likes
+                                {% if post.liking_users_list %}
+                                    <a href="#" class="ms-2" data-bs-toggle="modal" data-bs-target="#likersModal-{{ post.id }}" style="font-size: 0.7rem;">Lihat Selengkapnya</a>
+                                {% endif %}
+                            </div>
                             <!-- End Like Information -->
 
                             <div class="mt-auto d-flex justify-content-between pt-2">
@@ -40,6 +38,32 @@
                                 <form action="{{ url_for('admin.delete_portfolio_post', post_id=post.id) }}" method="POST" style="display:inline;">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this post?');" title="Delete"><i class="fas fa-trash-alt"></i></button>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal for Liking Users -->
+                <div class="modal fade" id="likersModal-{{ post.id }}" tabindex="-1" aria-labelledby="likersModalLabel-{{ post.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="likersModalLabel-{{ post.id }}">Disukai oleh</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                {% if post.liking_users_list %}
+                                    <ul class="list-group">
+                                        {% for liker in post.liking_users_list %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ liker.username }}
+                                                <span class="badge bg-secondary">{{ liker.timestamp | datetimeformat }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>Belum ada yang menyukai post ini.</p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

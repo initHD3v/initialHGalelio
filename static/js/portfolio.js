@@ -1,90 +1,117 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const isLoggedIn = document.body.dataset.isLoggedIn === 'True';
-    const userRole = document.body.dataset.userRole;
+    // --- Initial UI Setup ---
+    // Set the initial state for all like buttons when the page loads.
+    document.querySelectorAll('.portfolio-card').forEach(card => {
+        const carousel = card.querySelector('.carousel');
+        
+        // Function to update the like button based on the active slide's data
+        const updateButtonState = () => {
+            const activeSlide = carousel.querySelector('.carousel-item.active');
+            if (!activeSlide) return;
 
-    const setupPortfolioCard = (cardElement) => {
-        const carousel = cardElement.querySelector('.carousel');
-        const likeButton = cardElement.querySelector('.like-btn');
-        const likeIcon = cardElement.querySelector('.like-btn i');
-        const likesCountSpan = cardElement.querySelector('.likes-count');
+            const likes = activeSlide.dataset.likes || 0;
+            const isLiked = activeSlide.dataset.isLiked === 'True'; // Jinja renders True/False
 
-        // This is the single source of truth for updating the UI of this card.
-        const refreshUI = () => {
-            const activeItem = carousel.querySelector('.carousel-item.active');
-            if (!activeItem) return;
+            const likeButton = card.querySelector('.like-btn');
+            const likeIcon = likeButton.querySelector('i');
+            const likesCountSpan = card.querySelector('.likes-count');
 
-            const imageId = activeItem.dataset.imageId;
-            const currentLikes = activeItem.dataset.likes || 0;
-            const isLiked = activeItem.dataset.isLiked === 'True'; // New data attribute
-
-            likesCountSpan.textContent = currentLikes;
-
+            likesCountSpan.textContent = likes;
             if (isLiked) {
                 likeIcon.classList.remove('far');
-                likeIcon.classList.add('fas');
+                likeIcon.classList.add('fas', 'text-danger');
             } else {
-                likeIcon.classList.remove('fas');
+                likeIcon.classList.remove('fas', 'text-danger');
                 likeIcon.classList.add('far');
-            }
-
-            // Disable like button if not logged in or not a client
-            if (!isLoggedIn || userRole !== 'client') {
-                likeButton.disabled = true;
-                likeButton.style.cursor = 'not-allowed';
-                likeIcon.style.color = '#ccc'; // Grey out icon
-            } else {
-                likeButton.disabled = false;
-                likeButton.style.cursor = 'pointer';
-                // Restore original color if not liked, or keep solid if liked
-                if (!isLiked) {
-                    likeIcon.style.color = ''; // Reset to default (from CSS)
-                }
             }
         };
 
-        likeButton.addEventListener('click', () => {
+        // Update the button when the carousel slides
+        carousel.addEventListener('slid.bs.carousel', updateButtonState);
+        // Set the initial state
+        updateButtonState();
+    });
+
+    // --- Event Delegation for Clicks ---
+    // Listen for clicks on the whole document
+    document.body.addEventListener('click', event => {
+        // Check if the clicked element is a like button
+        const likeButton = event.target.closest('.like-btn');
+
+        // If it's not a like button, do nothing
+        if (!likeButton) {
+            return;
+        }
+
+        // We found a like button, prevent default browser action
+        event.preventDefault();
+        
+        console.log('Like button clicked!'); // DEBUG: Check if click is registered
+
+        const isLoggedIn = document.body.dataset.isLoggedIn === 'true';
             if (!isLoggedIn) {
-                alert('Anda harus login untuk menyukai gambar.');
-                return;
-            }
-            if (userRole !== 'client') {
-                alert('Hanya klien yang dapat menyukai gambar.');
-                return;
-            }
+                const customToast = document.getElementById('customToast');
+                const toastBody = customToast.querySelector('.toast-body');
+                toastBody.textContent = 'Anda harus login untuk menyukai gambar.';
 
-            const activeItem = carousel.querySelector('.carousel-item.active');
-            if (!activeItem) return;
+                // Position the toast near the clicked button
+                const rect = likeButton.getBoundingClientRect();
+                customToast.style.left = `${rect.left + window.scrollX}px`;
+                customToast.style.top = `${rect.top + window.scrollY - customToast.offsetHeight - 10}px`; // 10px above button
 
-            const imageId = activeItem.dataset.imageId;
-            const isLiked = activeItem.dataset.isLiked === 'True';
-
-            if (isLiked) {
-                // Already liked, do nothing on client side, server already handled it
+                customToast.classList.add('show');
+                setTimeout(() => {
+                    customToast.classList.remove('show');
+                }, 2000); // Hide after 2 seconds
                 return;
             }
 
-            fetch(`/api/like/image/${imageId}`, { method: 'POST' })
-                .then(res => {
-                    if (res.status === 403) {
-                        alert('Anda tidak memiliki izin untuk menyukai gambar.');
-                        return Promise.reject('Forbidden');
+        // Find the parent card and its active carousel slide
+        const card = likeButton.closest('.portfolio-card');
+        const activeSlide = card.querySelector('.carousel-item.active');
+        
+        if (!activeSlide) {
+            console.error('Could not find active slide.');
+            return;
+        }
+
+        const imageId = activeSlide.dataset.imageId;
+        console.log(`Found active image ID: ${imageId}`); // DEBUG
+
+        fetch(`/api/like/image/${imageId}`, { method: 'POST' })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message || 'Server error'); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received response from server:', data); // DEBUG
+                if (data.success) {
+                    // Update the slide's data attributes so state is saved during sliding
+                    activeSlide.dataset.likes = data.likes;
+                    activeSlide.dataset.isLiked = data.liked ? 'True' : 'False';
+
+                    // Update the UI
+                    const likesCountSpan = card.querySelector('.likes-count');
+                    const likeIcon = likeButton.querySelector('i');
+                    likesCountSpan.textContent = data.likes;
+                    if (data.liked) {
+                        likeIcon.classList.remove('far');
+                        likeIcon.classList.add('fas', 'text-danger');
+                        likeIcon.classList.add('like-animation'); // Add animation class
+                    } else {
+                        likeIcon.classList.remove('fas', 'text-danger');
+                        likeIcon.classList.add('far');
+                        likeIcon.classList.remove('like-animation'); // Remove animation class
                     }
-                    if (!res.ok) {
-                        throw new Error('Server merespons dengan kesalahan.');
-                    }
-                    return res.json();
-                })
-                .then(data => {
-                    activeItem.dataset.likes = data.likes;
-                    activeItem.dataset.isLiked = 'True'; // Mark as liked on client side
-                    refreshUI();
-                })
-                .catch(error => console.error("Gagal menyukai gambar:", error));
-        });
-
-        carousel.addEventListener('slid.bs.carousel', refreshUI);
-        refreshUI();
-    };
-
-    document.querySelectorAll('.portfolio-card').forEach(setupPortfolioCard);
+                } else {
+                    alert(data.message || 'An error occurred.');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                alert('An error occurred: ' + error.message);
+            });
+    });
 });

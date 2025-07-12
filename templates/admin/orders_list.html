@@ -76,19 +76,20 @@
                             {% endif %}
                         </td>
                         <td>
+                            <a href="{{ url_for('admin.edit_order', order_id=order.id) }}" class="btn btn-info btn-sm mb-1">Edit</a>
                             {% if order.status == 'waiting_approval' %}
                             <form action="{{ url_for('admin.approve_order', order_id=order.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                <button type="submit" class="btn btn-success btn-sm mb-1">Approve</button>
                             </form>
                             <form action="{{ url_for('admin.reject_order', order_id=order.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                <button type="submit" class="btn btn-danger btn-sm mb-1">Reject</button>
                             </form>
                             {% elif order.status == 'accepted' %}
                             <form action="{{ url_for('admin.mark_order_completed', order_id=order.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-info btn-sm">Mark as Completed</button>
+                                <button type="submit" class="btn btn-info btn-sm mb-1">Mark as Completed</button>
                             </form>
                             {% else %}
-                            <button class="btn btn-secondary btn-sm" disabled>No Action</button>
+                            <button class="btn btn-secondary btn-sm mb-1" disabled>No Action</button>
                             {% endif %}
                         </td>
                         <td>
