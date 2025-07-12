@@ -126,6 +126,10 @@ class OrderForm(FlaskForm):
     total_price = FloatField("Total Price", validators=[Optional()]) # Still optional, will be calculated
     submit = SubmitField("Place Order")
 
+    def validate_event_date(self, field):
+        if field.data < datetime.utcnow().date() + timedelta(days=1):
+            raise ValidationError("Pemesanan hanya dapat dilakukan paling cepat untuk keesokan hari.")
+
 
 class TestimonialForm(FlaskForm):
     client_name = StringField("Client Name", validators=[DataRequired()])
@@ -342,10 +346,10 @@ class AdminOrderForm(FlaskForm):
         # Conditional validation for event_start_time and event_end_time
         if self.service_type.data != "prewedding":
             if not self.event_start_time.data:
-                self.event_start_time.errors.append("Start Time is required for this service type.")
+                self.event_start_time.errors.append("Waktu Mulai diperlukan untuk jenis layanan ini.")
                 initial_validation = False
             if not self.event_end_time.data:
-                self.event_end_time.errors.append("End Time is required for this service type.")
+                self.event_end_time.errors.append("Waktu Selesai diperlukan untuk jenis layanan ini.")
                 initial_validation = False
             
             if self.event_start_time.data and self.event_end_time.data:
@@ -353,19 +357,19 @@ class AdminOrderForm(FlaskForm):
                     start_time_obj = datetime.strptime(self.event_start_time.data, "%H:%M").time()
                     end_time_obj = datetime.strptime(self.event_end_time.data, "%H:%M").time()
                     if start_time_obj >= end_time_obj:
-                        self.event_end_time.errors.append("End Time must be after Start Time.")
+                        self.event_end_time.errors.append("Waktu Selesai harus setelah Waktu Mulai.")
                         initial_validation = False
                 except ValueError:
-                    self.event_start_time.errors.append("Invalid time format. Please use HH:MM.")
-                    self.event_end_time.errors.append("Invalid time format. Please use HH:MM.")
+                    self.event_start_time.errors.append("Format waktu tidak valid. Mohon gunakan HH:MM.")
+                    self.event_end_time.errors.append("Format waktu tidak valid. Mohon gunakan HH:MM.")
                     initial_validation = False
         
         # Conditional validation for packages
         if self.service_type.data == "wedding" and not self.wedding_package.data:
-            self.wedding_package.errors.append("Wedding Package is required for Wedding service.")
+            self.wedding_package.errors.append("Paket Pernikahan diperlukan untuk layanan Pernikahan.")
             initial_validation = False
         elif self.service_type.data == "prewedding" and not self.prewedding_package.data:
-            self.prewedding_package.errors.append("Pre-wedding Package is required for Pre-wedding service.")
+            self.prewedding_package.errors.append("Paket Pra-pernikahan diperlukan untuk layanan Pra-pernikahan.")
             initial_validation = False
 
         return initial_validation

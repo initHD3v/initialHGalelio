@@ -187,6 +187,30 @@ def admin_panel():
     )
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @admin.route("/admin/order/<int:order_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_order(order_id):
@@ -540,7 +564,9 @@ def approve_order(order_id):
 @login_required
 def reject_order(order_id):
     if current_user.role != "admin":
-        flash("You do not have permission to perform this action.", "danger")
+        flash(
+            "You do not have permission to perform this action.", "danger"
+        )
         return redirect(url_for("main.index"))
     order = Order.query.get_or_404(order_id)
     if order.status not in ["waiting_approval", "cancelled"]:
@@ -564,6 +590,79 @@ def reject_order(order_id):
         order.dp_payment_proof = None  # Clear the proof from DB
     db.session.commit()
     flash("Order rejected successfully!", "success")
+    return redirect(url_for("admin.order_list"))
+
+
+@admin.route("/admin/order/<int:order_id>/approve_cancellation", methods=["POST"])
+@login_required
+def approve_cancellation(order_id):
+    if current_user.role != "admin":
+        flash("You do not have permission to perform this action.", "danger")
+        return redirect(url_for("main.index"))
+    order = Order.query.get_or_404(order_id)
+    if order.cancellation_requested:
+        # Delete associated calendar event first
+        if order.calendar_event:
+            db.session.delete(order.calendar_event)
+
+        order.status = "cancelled"
+        order.cancellation_requested = False  # Clear the flag
+        order.is_notified = False  # Reset notification status
+        db.session.commit()
+        flash("Order cancellation approved and calendar slot released!", "success")
+
+        # --- NOTIFIKASI: Pembatalan Disetujui --- #
+        client_user = order.client
+        package_or_service_name = order.wedding_package.name if order.wedding_package else order.service_type
+        notification_message = f"Pembatalan pesanan {package_or_service_name} Anda telah disetujui. Mohon diperhatikan bahwa DP tidak dapat dikembalikan (hangus) sesuai kebijakan pembatalan. Untuk informasi lebih lanjut, silakan hubungi admin via WhatsApp di +6285740109107."
+        notification = Notification(
+            user_id=client_user.id,
+            type='cancellation_approved',
+            entity_id=order.id,
+            message=notification_message
+        )
+        db.session.add(notification)
+        db.session.commit()
+        # --- END NOTIFIKASI --- #
+
+    else:
+        flash("No cancellation request found for this order.", "warning")
+    return redirect(url_for("admin.order_list"))
+
+
+@admin.route("/admin/order/<int:order_id>/reject_cancellation", methods=["POST"])
+@login_required
+def reject_cancellation(order_id):
+    if current_user.role != "admin":
+        flash("You do not have permission to perform this action.", "danger")
+        return redirect(url_for("main.index"))
+    order = Order.query.get_or_404(order_id)
+    if order.cancellation_requested:
+        # Revert status to previous state, assuming 'accepted' or 'pending'
+        # You might need to store the previous status if more complex logic is needed
+        if order.status == "waiting_cancellation_approval": # Assuming this is the status when cancellation is requested
+            order.status = "accepted" # Or whatever the previous status was
+        order.cancellation_requested = False  # Clear the flag
+        order.is_notified = False  # Reset notification status
+        db.session.commit()
+        flash("Order cancellation request rejected. Order status reverted.", "success")
+
+        # --- NOTIFIKASI: Pembatalan Ditolak --- #
+        client_user = order.client
+        package_or_service_name = order.wedding_package.name if order.wedding_package else order.service_type
+        notification_message = f"Permintaan pembatalan pesanan {package_or_service_name} Anda telah ditolak. Pesanan Anda tidak dapat dibatalkan kembali. Untuk informasi lebih lanjut, silakan hubungi admin via WhatsApp di +6285740109107."
+        notification = Notification(
+            user_id=client_user.id,
+            type='cancellation_rejected',
+            entity_id=order.id,
+            message=notification_message
+        )
+        db.session.add(notification)
+        db.session.commit()
+        # --- END NOTIFIKASI --- #
+
+    else:
+        flash("No cancellation request found for this order.", "warning")
     return redirect(url_for("admin.order_list"))
 
 

@@ -12,74 +12,109 @@
         }
     </style>
 
-    <div class="order-form-container">
-        <div class="order-form-header">
-            <h5 class="modal-title">Book Your Photography Session</h5>
+    <div class="container py-5">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Pesan Sesi Fotografi Anda</h5>
         </div>
-        <div class="order-form-body">
+        <div class="card-body">
             <form method="POST" action="" id="order-form" novalidate>
                 {{ form.hidden_tag() }}
-                <div class="form-group mb-3">
-                    {{ form.service_type.label(class="form-label") }}
-                    {{ form.service_type(class="form-select", id="service_type") }}
-                </div>
-                <div id="wedding-package-section" style="display: none;">
-                    <div class="form-group mb-3">
-                        {{ form.wedding_package.label(class="form-label") }}
-                        {{ form.wedding_package(class="form-select", id="wedding_package") }}
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="form-group">
+                            {{ form.service_type.label(class="form-label") }}
+                            {{ form.service_type(class="form-select", id="service_type") }}
+                        </div>
                     </div>
-                </div>
-                <div id="prewedding-package-section" style="display: none;">
-                    <div class="form-group mb-3">
-                        {{ form.prewedding_package.label(class="form-label") }}
-                        {{ form.prewedding_package(class="form-select", id="prewedding_package") }}
-                    </div>
-                </div>
-                <div class="form-group mb-3">
-                    {{ form.event_date.label(class="form-label") }}
-                    {{ form.event_date(class="form-control", id="event-date-picker") }}
-                </div>
-                <div id="event-time-section">
-                    <div class="form-group mb-3">
-                        {{ form.event_start_time.label(class="form-label") }}
-                        {{ form.event_start_time(class="form-control", id="event-start-time-picker") }}
-                    </div>
-                    <div class="form-group mb-3">
-                        {{ form.event_end_time.label(class="form-label") }}
-                        {{ form.event_end_time(class="form-control", id="event-end-time-picker") }}
-                    </div>
-                </div>
-                <div class="form-group mb-3">
-                    {{ form.location.label(class="form-label") }}
-                    {{ form.location(class="form-control", id="location-input", placeholder="Enter a location") }}
-                    {% for error in form.location.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="form-group mb-3">
-                    <label class="form-label">Select Location on Map:</label>
-                    <div id="map" style="height: 400px; width: 100%; border-radius: 8px;"></div>
-                    {{ form.latitude(id="latitude-input") }}
-                    {% for error in form.latitude.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
-                    {{ form.longitude(id="longitude-input") }}
-                    {% for error in form.longitude.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                <div class="form-group mb-3">
-                    {{ form.details.label(class="form-label") }}
-                    {{ form.details(class="form-control", rows=5) }}
                 </div>
 
-                <div id="total-price-section">
-                    <div class="form-group mb-3">
-                        {{ form.total_price.label(class="form-label") }}
-                        {{ form.total_price(class="form-control", type="number", step="0.01") }}
-                        {% for error in form.total_price.errors %}
-                            <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
+                <div class="row" id="package-selection-row">
+                    <div class="col-md-6 mb-3" id="wedding-package-section" style="display: none;">
+                        <div class="form-group">
+                            {{ form.wedding_package.label(class="form-label") }}
+                            {{ form.wedding_package(class="form-select", id="wedding_package") }}
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3" id="prewedding-package-section" style="display: none;">
+                        <div class="form-group">
+                            {{ form.prewedding_package.label(class="form-label") }}
+                            {{ form.prewedding_package(class="form-select", id="prewedding_package") }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+                            {{ form.event_date.label(class="form-label") }}
+                            {{ form.event_date(class="form-control", id="event-date-picker") }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" id="event-time-section">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+                            {{ form.event_start_time.label(class="form-label") }}
+                            {{ form.event_start_time(class="form-control", id="event-start-time-picker") }}
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="form-group">
+                            {{ form.event_end_time.label(class="form-label") }}
+                            {{ form.event_end_time(class="form-control", id="event-end-time-picker") }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="form-group">
+                            {{ form.location.label(class="form-label") }}
+                            {{ form.location(class="form-control", id="location-input", placeholder="Masukkan lokasi") }}
+                            {% for error in form.location.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="form-group">
+                            <label class="form-label">Pilih Lokasi di Peta:</label>
+                            <div id="map" style="height: 400px; width: 100%; border-radius: 8px;"></div>
+                            {{ form.latitude(id="latitude-input") }}
+                            {% for error in form.latitude.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                            {{ form.longitude(id="longitude-input") }}
+                            {% for error in form.longitude.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="form-group">
+                            {{ form.details.label(class="form-label") }}
+                            {{ form.details(class="form-control", rows=5) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" id="total-price-section">
+                    <div class="col-md-12 mb-3">
+                        <div class="form-group">
+                            {{ form.total_price.label(class="form-label") }}
+                            {{ form.total_price(class="form-control", type="number", step="0.01") }}
+                            {% for error in form.total_price.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
 
@@ -89,6 +124,7 @@
             </form>
         </div>
     </div>
+</div>
 
     <script>
         let map;
@@ -127,7 +163,7 @@
             autocompleteElement.addEventListener("gmp-placechange", () => {
                 const place = autocompleteElement.place;
                 if (!place.geometry) {
-                    window.alert("No details available for input: '" + place.name + "'");
+                    window.alert("Tidak ada detail tersedia untuk input: '" + place.name + "'");
                     return;
                 }
 
@@ -163,7 +199,7 @@
                     document.getElementById('latitude-input').value = results[0].geometry.location.lat();
                     document.getElementById('longitude-input').value = results[0].geometry.location.lng();
                 } else {
-                    alert('Geocode was not successful for the following reason: ' + status);
+                    alert('Geocode tidak berhasil karena alasan berikut: ' + status);
                 }
             });
         }
@@ -175,7 +211,7 @@
                         document.getElementById('location-input').value = results[0].formatted_address;
                     }
                 } else {
-                    document.getElementById('location-input').value = 'Error geocoding';
+                    document.getElementById('location-input').value = 'Kesalahan geocoding';
                 }
             });
         }
@@ -186,7 +222,8 @@
                 {% for field, errors in form.errors.items() %}
                     errorMessages += `{{ field | tojson }}: ${ {{ errors | tojson }} .join(", ") }\n`;
                 {% endfor %}
-                alert('Form Submission Error:\n' + errorMessages);
+                alert('Kesalahan Pengiriman Formulir:
+' + errorMessages);
             {% endif %}
             const serviceTypeSelect = document.getElementById('service_type');
             const weddingPackageSection = document.getElementById('wedding-package-section');
@@ -204,12 +241,14 @@
                 weddingPackageSection.style.display = 'none';
                 preweddingPackageSection.style.display = 'none';
                 totalPriceSection.style.display = 'none';
-                eventTimeSection.style.display = 'block'; // Default to visible
 
                 // Disable all package select fields and total price input initially
                 weddingPackageSelect.disabled = true;
                 preweddingPackageSelect.disabled = true;
                 totalPriceInput.disabled = true;
+
+                // Always show event time section by default, then hide if prewedding
+                eventTimeSection.style.display = 'flex'; // Use flex to maintain row layout
 
                 if (selectedServiceType === 'wedding') {
                     weddingPackageSection.style.display = 'block';
@@ -236,7 +275,7 @@
                 .then(response => response.json())
                 .then(data => {
                     unavailableDates = data;
-                    console.log('Unavailable dates:', unavailableDates);
+                    console.log('Tanggal tidak tersedia:', unavailableDates);
                     initializeFlatpickr();
                 })
                 .catch(error => {
@@ -247,7 +286,7 @@
             function initializeFlatpickr() {
                 flatpickr(eventDatePicker, {
                     dateFormat: "Y-m-d",
-                    minDate: "today",
+                    minDate: new Date().fp_incr(1), // Set minimum date to tomorrow
                     disable: [
                         function(date) {
                             const dateString = flatpickr.formatDate(date, "Y-m-d");
