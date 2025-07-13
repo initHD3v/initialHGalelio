@@ -21,7 +21,7 @@ from models import (
     ImageLike,
     Notification,
     HomepageContent,
-    HeroImage, # Added HeroImage
+    HeroImage,  # Added HeroImage
 )
 from forms import (
     PostForm,
@@ -34,18 +34,13 @@ from forms import (
     HomepageContentForm,
 )
 from extensions import db
+from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 import os
 from datetime import datetime, timedelta
 from flask_babel import _
 from sqlalchemy import or_
 from . import admin
-
-
-
-
-
-
 
 
 @admin.route("/admin/manage_homepage", methods=["GET", "POST"])
@@ -57,7 +52,10 @@ def manage_homepage():
 
     homepage_content = HomepageContent.query.first()
     if not homepage_content:
-        homepage_content = HomepageContent(about_text="Teks default tentang Aruna Moment.", about_image_filename="pp.jpg")
+        homepage_content = HomepageContent(
+            about_text="Teks default tentang Aruna Moment.",
+            about_image_filename="pp.jpg",
+        )
         db.session.add(homepage_content)
         db.session.commit()
 
@@ -87,7 +85,9 @@ def manage_homepage():
                     filename = secure_filename(hero_image_file.filename)
                     filepath = os.path.join(hero_image_dir, filename)
                     hero_image_file.save(filepath)
-                    new_hero_image = HeroImage(filename=filename, order=len(hero_images) + 1)
+                    new_hero_image = HeroImage(
+                        filename=filename, order=len(hero_images) + 1
+                    )
                     db.session.add(new_hero_image)
 
         # Handle existing hero image deletions
@@ -109,7 +109,7 @@ def manage_homepage():
         "admin/manage_homepage.html",
         form=form,
         homepage_content=homepage_content,
-        hero_images=hero_images, # Pass hero_images to template
+        hero_images=hero_images,  # Pass hero_images to template
         title=_("Manage Homepage"),
     )
 
@@ -124,13 +124,15 @@ def admin_panel():
     testimonials = Testimonial.query.all()
     # Fetch calendar events for approved orders or unavailable events
     calendar_events = (
-        CalendarEvent.query.join(Order, CalendarEvent.order_id == Order.id, isouter=True)
+        CalendarEvent.query.join(
+            Order, CalendarEvent.order_id == Order.id, isouter=True
+        )
         .filter(
             or_(
                 # Event is for an order that is not completed or rejected
-                (Order.status.notin_(['completed', 'rejected'])),
+                (Order.status.notin_(["completed", "rejected"])),
                 # Event is a manual unavailability block (no order)
-                (CalendarEvent.order_id.is_(None) & (CalendarEvent.is_available == False))
+                (CalendarEvent.order_id.is_(None) & (not CalendarEvent.is_available)),
             )
         )
         .all()
@@ -192,30 +194,6 @@ def admin_panel():
     )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @admin.route("/admin/order/<int:order_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_order(order_id):
@@ -224,7 +202,7 @@ def edit_order(order_id):
         return redirect(url_for("main.index"))
 
     order = Order.query.get_or_404(order_id)
-    form = AdminOrderForm(obj=order) # Populate form with existing order data
+    form = AdminOrderForm(obj=order)  # Populate form with existing order data
 
     if form.validate_on_submit():
         # Update order details from form data
@@ -237,24 +215,40 @@ def edit_order(order_id):
         order.details = form.details.data
         order.total_price = form.total_price.data
         order.status = form.status.data
-        order.bank_account = form.bank_account.data # Assign the selected BankAccount object
+        order.bank_account = (
+            form.bank_account.data
+        )  # Assign the selected BankAccount object
 
         # Handle event start/end times based on service type
         if form.service_type.data == "prewedding":
-            order.event_start_time = datetime.combine(form.event_date.data, datetime.min.time())
-            order.event_end_time = datetime.combine(form.event_date.data, datetime.max.time())
+            order.event_start_time = datetime.combine(
+                form.event_date.data, datetime.min.time()
+            )
+            order.event_end_time = datetime.combine(
+                form.event_date.data, datetime.max.time()
+            )
         else:
             # Convert string times to datetime objects
-            order.event_start_time = datetime.combine(form.event_date.data, datetime.strptime(form.event_start_time.data, "%H:%M").time())
-            order.event_end_time = datetime.combine(form.event_date.data, datetime.strptime(form.event_end_time.data, "%H:%M").time())
+            order.event_start_time = datetime.combine(
+                form.event_date.data,
+                datetime.strptime(form.event_start_time.data, "%H:%M").time(),
+            )
+            order.event_end_time = datetime.combine(
+                form.event_date.data,
+                datetime.strptime(form.event_end_time.data, "%H:%M").time(),
+            )
 
         # Handle wedding/prewedding packages
         if form.service_type.data == "wedding":
             order.wedding_package = form.wedding_package.data
-            order.prewedding_package = None # Clear prewedding package if service type changes
+            order.prewedding_package = (
+                None  # Clear prewedding package if service type changes
+            )
         elif form.service_type.data == "prewedding":
             order.prewedding_package = form.prewedding_package.data
-            order.wedding_package = None # Clear wedding package if service type changes
+            order.wedding_package = (
+                None  # Clear wedding package if service type changes
+            )
         else:
             order.wedding_package = None
             order.prewedding_package = None
@@ -270,7 +264,11 @@ def edit_order(order_id):
         if order.event_end_time:
             form.event_end_time.data = order.event_end_time.strftime("%H:%M")
 
-    return render_template("admin/create_edit_order.html", form=form, order=order, title="Edit Order")
+    return render_template(
+        "admin/create_edit_order.html", form=form, order=order, title="Edit Order"
+    )
+
+
 @login_required
 def get_dashboard_summary():
     if current_user.role != "admin":
@@ -299,79 +297,64 @@ def get_dashboard_summary():
             order.event_date, order.event_start_time.time()
         )
         time_remaining = event_datetime - datetime.utcnow()
-        
+
         # Format time_remaining for JSON
         days = time_remaining.days
         hours = time_remaining.seconds // 3600
         minutes = (time_remaining.seconds % 3600) // 60
 
-        upcoming_orders_data.append({
-            "client_name": order.client.full_name,
-            "service_type": order.service_type,
-            "event_date": order.event_date.strftime("%Y-%m-%d"),
-            "event_start_time": order.event_start_time.strftime("%H:%M"),
-            "time_remaining": {"days": days, "hours": hours, "minutes": minutes}
-        })
+        upcoming_orders_data.append(
+            {
+                "client_name": order.client.full_name,
+                "service_type": order.service_type,
+                "event_date": order.event_date.strftime("%Y-%m-%d"),
+                "event_start_time": order.event_start_time.strftime("%H:%M"),
+                "time_remaining": {"days": days, "hours": hours, "minutes": minutes},
+            }
+        )
 
-    return jsonify({
-        "total_clients": total_clients,
-        "total_orders": total_orders,
-        "pending_orders": pending_orders,
-        "approved_orders": approved_orders,
-        "rejected_orders": rejected_orders,
-        "total_wedding_packages": total_wedding_packages,
-        "upcoming_orders": upcoming_orders_data,
-    })
+    return jsonify(
+        {
+            "total_clients": total_clients,
+            "total_orders": total_orders,
+            "pending_orders": pending_orders,
+            "approved_orders": approved_orders,
+            "rejected_orders": rejected_orders,
+            "total_wedding_packages": total_wedding_packages,
+            "upcoming_orders": upcoming_orders_data,
+        }
+    )
+
+
 @login_required
 def manage_portfolio():
     if current_user.role != "admin":
         flash("You do not have access to this page.", "danger")
         return redirect(url_for("main.index"))
-    
+
     posts = Post.query.all()
 
     for post in posts:
         # Calculate total likes for the post
         post.total_likes = sum(image.likes for image in post.images)
-        
+
         # Collect unique users who liked any image in the post
         liking_users_list = []
         for image in post.images:
             for like in image.image_likes:
-                liking_users_list.append({
-                    'username': like.user.username,
-                    'timestamp': like.timestamp # Pass raw datetime object
-                })
+                liking_users_list.append(
+                    {
+                        "username": like.user.username,
+                        "timestamp": like.timestamp,  # Pass raw datetime object
+                    }
+                )
         # Sort by timestamp (newest first) and then by username
-        post.liking_users_list = sorted(liking_users_list, key=lambda x: (x['timestamp'], x['username']), reverse=True)
-    
-    return render_template("admin/manage_portfolio.html", posts=posts)
+        post.liking_users_list = sorted(
+            liking_users_list,
+            key=lambda x: (x["timestamp"], x["username"]),
+            reverse=True,
+        )
 
-
-@admin.route("/admin/manage_portfolio")
-@login_required
-def manage_portfolio():
-    if current_user.role != "admin":
-        flash("You do not have access to this page.", "danger")
-        return redirect(url_for("main.index"))
-    
-    posts = Post.query.all()
-
-    for post in posts:
-        # Calculate total likes for the post
-        post.total_likes = sum(image.likes for image in post.images)
-        
-        # Collect unique users who liked any image in the post
-        liking_users_list = []
-        for image in post.images:
-            for like in image.image_likes:
-                liking_users_list.append({
-                    'username': like.user.username,
-                    'timestamp': like.timestamp # Pass raw datetime object
-                })
-        # Sort by timestamp (newest first) and then by username
-        post.liking_users_list = sorted(liking_users_list, key=lambda x: (x['timestamp'], x['username']), reverse=True)
-    
     return render_template("admin/manage_portfolio.html", posts=posts)
 
 
@@ -569,9 +552,7 @@ def approve_order(order_id):
 @login_required
 def reject_order(order_id):
     if current_user.role != "admin":
-        flash(
-            "You do not have permission to perform this action.", "danger"
-        )
+        flash("You do not have permission to perform this action.", "danger")
         return redirect(url_for("main.index"))
     order = Order.query.get_or_404(order_id)
     if order.status not in ["waiting_approval", "cancelled"]:
@@ -618,13 +599,20 @@ def approve_cancellation(order_id):
 
         # --- NOTIFIKASI: Pembatalan Disetujui --- #
         client_user = order.client
-        package_or_service_name = order.wedding_package.name if order.wedding_package else order.service_type
-        notification_message = f"Pembatalan pesanan {package_or_service_name} Anda telah disetujui. Mohon diperhatikan bahwa DP tidak dapat dikembalikan (hangus) sesuai kebijakan pembatalan. Untuk informasi lebih lanjut, silakan hubungi admin via WhatsApp di +6285740109107."
+        package_or_service_name = (
+            order.wedding_package.name if order.wedding_package else order.service_type
+        )
+        notification_message = (
+            f"Pembatalan pesanan {package_or_service_name} Anda telah disetujui. "
+            f"Mohon diperhatikan bahwa DP tidak dapat dikembalikan (hangus) "
+            f"sesuai kebijakan pembatalan. Untuk informasi lebih lanjut, "
+            f"silakan hubungi admin via WhatsApp di +6285740109107."
+        )
         notification = Notification(
             user_id=client_user.id,
-            type='cancellation_approved',
+            type="cancellation_approved",
             entity_id=order.id,
-            message=notification_message
+            message=notification_message,
         )
         db.session.add(notification)
         db.session.commit()
@@ -645,8 +633,10 @@ def reject_cancellation(order_id):
     if order.cancellation_requested:
         # Revert status to previous state, assuming 'accepted' or 'pending'
         # You might need to store the previous status if more complex logic is needed
-        if order.status == "waiting_cancellation_approval": # Assuming this is the status when cancellation is requested
-            order.status = "accepted" # Or whatever the previous status was
+        if (
+            order.status == "waiting_cancellation_approval"
+        ):  # Assuming this is the status when cancellation is requested
+            order.status = "accepted"  # Or whatever the previous status was
         order.cancellation_requested = False  # Clear the flag
         order.is_notified = False  # Reset notification status
         db.session.commit()
@@ -654,13 +644,20 @@ def reject_cancellation(order_id):
 
         # --- NOTIFIKASI: Pembatalan Ditolak --- #
         client_user = order.client
-        package_or_service_name = order.wedding_package.name if order.wedding_package else order.service_type
-        notification_message = f"Permintaan pembatalan pesanan {package_or_service_name} Anda telah ditolak. Pesanan Anda tidak dapat dibatalkan kembali. Untuk informasi lebih lanjut, silakan hubungi admin via WhatsApp di +6285740109107."
+        package_or_service_name = (
+            order.wedding_package.name if order.wedding_package else order.service_type
+        )
+        notification_message = (
+            f"Permintaan pembatalan pesanan {package_or_service_name} Anda telah "
+            f"ditolak. Pesanan Anda tidak dapat dibatalkan kembali. Untuk "
+            f"informasi lebih lanjut, silakan hubungi admin via WhatsApp di "
+            f"+6285740109107."
+        )
         notification = Notification(
             user_id=client_user.id,
-            type='cancellation_rejected',
+            type="cancellation_rejected",
             entity_id=order.id,
-            message=notification_message
+            message=notification_message,
         )
         db.session.add(notification)
         db.session.commit()
@@ -681,7 +678,10 @@ def download_ics(order_id):
     order = Order.query.get_or_404(order_id)
 
     if not order.event_start_time or not order.event_end_time:
-        flash("Cannot generate ICS file because event start or end time is not set.", "danger")
+        flash(
+            "Cannot generate ICS file because event start or end time is not set.",
+            "danger",
+        )
         return redirect(url_for("admin.order_list"))
 
     # Format dates for iCalendar
@@ -689,8 +689,7 @@ def download_ics(order_id):
     dtend = order.event_end_time.strftime("%Y%m%dT%H%M%S")
 
     # Create iCalendar content
-    ics_content = (
-        f'''BEGIN:VCALENDAR
+    ics_content = f"""BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Your Photography Portfolio//NONSGML v1.0//EN
 "
@@ -710,8 +709,7 @@ DTEND:{dtend}
         f"DESCRIPTION:Details: {order.details or 'N/A'}. Client WhatsApp: "
         f"{order.client.whatsapp_number}
 END:VEVENT
-END:VCALENDAR'''
-    )
+END:VCALENDAR"""
 
     # Create a temporary file to serve
     from io import BytesIO
@@ -754,8 +752,9 @@ def new_portfolio_post():
             not images or not images[0].filename
         ):  # Check if any file is actually uploaded
             return (
-                jsonify({"success": False,
-                         "message": "Please upload at least one image."}),
+                jsonify(
+                    {"success": False, "message": "Please upload at least one image."}
+                ),
                 400,
             )
 
@@ -817,7 +816,7 @@ def edit_portfolio_post(post_id):
                     current_app.root_path, "static/images", safe_filename
                 )
                 if os.path.exists(image_path):
-                    os.remove(file_path)
+                    os.remove(image_path)
                 # Delete from database
                 db.session.delete(image_to_delete)
         db.session.commit()
@@ -896,9 +895,7 @@ def delete_portfolio_post(post_id):
     # Delete associated images from filesystem
     for image in post.images:
         safe_filename = secure_filename(image.filename)
-        image_path = os.path.join(
-            current_app.root_path, "static/images", safe_filename
-        )
+        image_path = os.path.join(current_app.root_path, "static/images", safe_filename)
         if os.path.exists(image_path):
             os.remove(image_path)
     db.session.delete(post)  # Cascade delete will handle PostImage entries
@@ -1080,7 +1077,7 @@ def reject_testimonial(testimonial_id):
 @admin.route("/admin/bank_accounts")
 @login_required
 def bank_account_list():
-    
+
     if current_user.role != "admin":
         flash("You do not have access to this page.", "danger")
         return redirect(url_for("main.index"))
@@ -1089,7 +1086,8 @@ def bank_account_list():
     return render_template("admin/bank_accounts.html", accounts=accounts)
 
 
-from sqlalchemy.exc import IntegrityError # Added import
+from sqlalchemy.exc import IntegrityError  # Added import
+
 
 @admin.route("/admin/bank_accounts/new", methods=["GET", "POST"])
 @login_required
@@ -1112,7 +1110,10 @@ def new_bank_account():
             return redirect(url_for("admin.bank_account_list"))
         except IntegrityError:
             db.session.rollback()
-            flash("Nomor Rekening ini sudah terdaftar. Mohon gunakan nomor lain.", "danger")
+            flash(
+                "Nomor Rekening ini sudah terdaftar. Mohon gunakan nomor lain.",
+                "danger",
+            )
     return render_template(
         "admin/create_edit_bank_account.html", form=form, title="New Bank Account"
     )
@@ -1168,7 +1169,14 @@ def view_invoice_admin(order_id):
 
     order = Order.query.get_or_404(order_id)
     # bank_accounts = BankAccount.query.filter_by(is_active=True).all() # Removed
-    return render_template('invoice.html', order=order, timedelta=timedelta, bank_account=order.bank_account)
+    return render_template(
+        "invoice.html",
+        order=order,
+        timedelta=timedelta,
+        bank_account=order.bank_account,
+    )
+
+
 @admin.route("/admin/wedding_packages")
 @login_required
 def wedding_package_list():
@@ -1258,18 +1266,25 @@ def get_unread_notifications_count():
 def get_notifications():
     if current_user.role != "admin":
         return jsonify({"notifications": []}), 403
-    
-    notifications = Notification.query.filter_by(user_id=current_user.id, is_read=False).order_by(Notification.timestamp.desc()).limit(10).all()
-    
+
+    notifications = (
+        Notification.query.filter_by(user_id=current_user.id, is_read=False)
+        .order_by(Notification.timestamp.desc())
+        .limit(10)
+        .all()
+    )
+
     formatted_notifications = []
     for notif in notifications:
-        formatted_notifications.append({
-            "id": notif.id,
-            "type": notif.type,
-            "message": notif.message,
-            "timestamp": notif.timestamp, # Pass raw datetime object
-            "is_read": notif.is_read
-        })
+        formatted_notifications.append(
+            {
+                "id": notif.id,
+                "type": notif.type,
+                "message": notif.message,
+                "timestamp": notif.timestamp,  # Pass raw datetime object
+                "is_read": notif.is_read,
+            }
+        )
     return jsonify({"notifications": formatted_notifications})
 
 
@@ -1278,11 +1293,14 @@ def get_notifications():
 def mark_notification_read(notification_id):
     if current_user.role != "admin":
         return jsonify({"success": False}), 403
-    
+
     notification = Notification.query.get_or_404(notification_id)
     if notification.user_id != current_user.id:
-        return jsonify({"success": False}), 403 # Ensure admin can only mark their own notifications as read
-    
+        return (
+            jsonify({"success": False}),
+            403,
+        )  # Ensure admin can only mark their own notifications as read
+
     notification.is_read = True
     db.session.commit()
     return jsonify({"success": True})

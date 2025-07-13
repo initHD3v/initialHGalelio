@@ -21,13 +21,16 @@ from wtforms.validators import (
     Optional,
 )
 from wtforms_sqlalchemy.fields import QuerySelectField
-from models import User, WeddingPackage, BankAccount # Added BankAccount
-from extensions import db # Added import
-from datetime import datetime # Added datetime import
+from models import User, WeddingPackage, BankAccount  # Added BankAccount
+from extensions import db  # Added import
+from datetime import datetime, timedelta  # Added datetime import
+
 
 def get_active_bank_accounts():
-    accounts = BankAccount.query.filter_by(is_active=True).order_by(BankAccount.bank_name)
-    print(f"DEBUG: Active bank accounts query: {accounts.all()}") # Added debug print
+    accounts = BankAccount.query.filter_by(is_active=True).order_by(
+        BankAccount.bank_name
+    )
+    print(f"DEBUG: Active bank accounts query: {accounts.all()}")  # Added debug print
     return accounts
 
 
@@ -100,21 +103,23 @@ class OrderForm(FlaskForm):
     )
     wedding_package = QuerySelectField(
         "Wedding Package",
-        query_factory=lambda: WeddingPackage.query.filter_by(category='Wedding').all(),
+        query_factory=lambda: WeddingPackage.query.filter_by(category="Wedding").all(),
         get_label=lambda x: x.name,
         get_pk=lambda x: x.id,
         allow_blank=True,
         blank_text="-- Select a Wedding package --",
-        validators=[Optional()] # Make optional, will be required conditionally
+        validators=[Optional()],  # Make optional, will be required conditionally
     )
     prewedding_package = QuerySelectField(
         "Pre-wedding Package",
-        query_factory=lambda: WeddingPackage.query.filter_by(category='Pre-wedding').all(),
+        query_factory=lambda: WeddingPackage.query.filter_by(
+            category="Pre-wedding"
+        ).all(),
         get_label=lambda x: x.name,
         get_pk=lambda x: x.id,
         allow_blank=True,
         blank_text="-- Select a Pre-wedding package --",
-        validators=[Optional()] # Make optional, will be required conditionally
+        validators=[Optional()],  # Make optional, will be required conditionally
     )
     event_date = DateField("Event Date", format="%Y-%m-%d", validators=[DataRequired()])
     event_start_time = StringField("Start Time", validators=[Optional()])
@@ -123,12 +128,16 @@ class OrderForm(FlaskForm):
     latitude = HiddenField()
     longitude = HiddenField()
     details = TextAreaField("Details")
-    total_price = FloatField("Total Price", validators=[Optional()]) # Still optional, will be calculated
+    total_price = FloatField(
+        "Total Price", validators=[Optional()]
+    )  # Still optional, will be calculated
     submit = SubmitField("Place Order")
 
     def validate_event_date(self, field):
         if field.data < datetime.utcnow().date() + timedelta(days=1):
-            raise ValidationError("Pemesanan hanya dapat dilakukan paling cepat untuk keesokan hari.")
+            raise ValidationError(
+                "Pemesanan hanya dapat dilakukan paling cepat untuk keesokan hari."
+            )
 
 
 class TestimonialForm(FlaskForm):
@@ -190,9 +199,15 @@ class UserEditForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     whatsapp_number = StringField("Nomor WhatsApp", validators=[DataRequired()])
     company_name = StringField("Nama Perusahaan (Admin Saja)", validators=[Optional()])
-    company_address = TextAreaField("Alamat Perusahaan (Admin Saja)", validators=[Optional()])
-    company_email = StringField("Email Perusahaan (Admin Saja)", validators=[Optional(), Email()])
-    company_phone = StringField("Telepon Perusahaan (Admin Saja)", validators=[Optional()])
+    company_address = TextAreaField(
+        "Alamat Perusahaan (Admin Saja)", validators=[Optional()]
+    )
+    company_email = StringField(
+        "Email Perusahaan (Admin Saja)", validators=[Optional(), Email()]
+    )
+    company_phone = StringField(
+        "Telepon Perusahaan (Admin Saja)", validators=[Optional()]
+    )
     password = PasswordField("New Password (leave blank to keep current)")
     confirm_password = PasswordField(
         "Confirm New Password",
@@ -228,7 +243,7 @@ class DPPaymentForm(FlaskForm):
         query_factory=get_active_bank_accounts,
         get_label=lambda x: f"{x.bank_name} - {x.account_name} ({x.account_number})",
         allow_blank=False,
-        validators=[DataRequired()]
+        validators=[DataRequired()],
     )
     payment_proof = FileField("Upload Bukti Pembayaran", validators=[DataRequired()])
     submit = SubmitField("Kirim Bukti Pembayaran")
@@ -259,8 +274,12 @@ class WeddingPackageForm(FlaskForm):
     )
     category = SelectField(
         "Category",
-        choices=[('Wedding', 'Wedding'), ('Pre-wedding', 'Pre-wedding'), ('Event', 'Event')],
-        validators=[DataRequired()]
+        choices=[
+            ("Wedding", "Wedding"),
+            ("Pre-wedding", "Pre-wedding"),
+            ("Event", "Event"),
+        ],
+        validators=[DataRequired()],
     )
     submit = SubmitField("Save Package")
 
@@ -290,21 +309,23 @@ class AdminOrderForm(FlaskForm):
     )
     wedding_package = QuerySelectField(
         "Wedding Package",
-        query_factory=lambda: WeddingPackage.query.filter_by(category='Wedding').all(),
+        query_factory=lambda: WeddingPackage.query.filter_by(category="Wedding").all(),
         get_label=lambda x: x.name,
         get_pk=lambda x: x.id,
         allow_blank=True,
         blank_text="-- Select a Wedding package --",
-        validators=[Optional()]
+        validators=[Optional()],
     )
     prewedding_package = QuerySelectField(
         "Pre-wedding Package",
-        query_factory=lambda: WeddingPackage.query.filter_by(category='Pre-wedding').all(),
+        query_factory=lambda: WeddingPackage.query.filter_by(
+            category="Pre-wedding"
+        ).all(),
         get_label=lambda x: x.name,
         get_pk=lambda x: x.id,
         allow_blank=True,
         blank_text="-- Select a Pre-wedding package --",
-        validators=[Optional()]
+        validators=[Optional()],
     )
     event_date = DateField("Event Date", format="%Y-%m-%d", validators=[DataRequired()])
     event_start_time = StringField("Start Time", validators=[Optional()])
@@ -313,8 +334,14 @@ class AdminOrderForm(FlaskForm):
     latitude = HiddenField()
     longitude = HiddenField()
     details = TextAreaField("Details")
-    total_price = FloatField("Total Price", validators=[DataRequired(), NumberRange(min=0.01, message="Price must be greater than zero.")])
-    
+    total_price = FloatField(
+        "Total Price",
+        validators=[
+            DataRequired(),
+            NumberRange(min=0.01, message="Price must be greater than zero."),
+        ],
+    )
+
     # Admin-specific fields
     status = SelectField(
         "Status",
@@ -333,9 +360,9 @@ class AdminOrderForm(FlaskForm):
         get_label=lambda x: f"{x.bank_name} - {x.account_name} ({x.account_number})",
         allow_blank=True,
         blank_text="-- Select a Bank Account --",
-        validators=[Optional()]
+        validators=[Optional()],
     )
-    
+
     submit = SubmitField("Save Changes")
 
     def validate(self, extra_validators=None):
@@ -346,30 +373,50 @@ class AdminOrderForm(FlaskForm):
         # Conditional validation for event_start_time and event_end_time
         if self.service_type.data != "prewedding":
             if not self.event_start_time.data:
-                self.event_start_time.errors.append("Waktu Mulai diperlukan untuk jenis layanan ini.")
+                self.event_start_time.errors.append(
+                    "Waktu Mulai diperlukan untuk jenis layanan ini."
+                )
                 initial_validation = False
             if not self.event_end_time.data:
-                self.event_end_time.errors.append("Waktu Selesai diperlukan untuk jenis layanan ini.")
+                self.event_end_time.errors.append(
+                    "Waktu Selesai diperlukan untuk jenis layanan ini."
+                )
                 initial_validation = False
-            
+
             if self.event_start_time.data and self.event_end_time.data:
                 try:
-                    start_time_obj = datetime.strptime(self.event_start_time.data, "%H:%M").time()
-                    end_time_obj = datetime.strptime(self.event_end_time.data, "%H:%M").time()
+                    start_time_obj = datetime.strptime(
+                        self.event_start_time.data, "%H:%M"
+                    ).time()
+                    end_time_obj = datetime.strptime(
+                        self.event_end_time.data, "%H:%M"
+                    ).time()
                     if start_time_obj >= end_time_obj:
-                        self.event_end_time.errors.append("Waktu Selesai harus setelah Waktu Mulai.")
+                        self.event_end_time.errors.append(
+                            "Waktu Selesai harus setelah Waktu Mulai."
+                        )
                         initial_validation = False
                 except ValueError:
-                    self.event_start_time.errors.append("Format waktu tidak valid. Mohon gunakan HH:MM.")
-                    self.event_end_time.errors.append("Format waktu tidak valid. Mohon gunakan HH:MM.")
+                    self.event_start_time.errors.append(
+                        "Format waktu tidak valid. Mohon gunakan HH:MM."
+                    )
+                    self.event_end_time.errors.append(
+                        "Format waktu tidak valid. Mohon gunakan HH:MM."
+                    )
                     initial_validation = False
-        
+
         # Conditional validation for packages
         if self.service_type.data == "wedding" and not self.wedding_package.data:
-            self.wedding_package.errors.append("Paket Pernikahan diperlukan untuk layanan Pernikahan.")
+            self.wedding_package.errors.append(
+                "Paket Pernikahan diperlukan untuk layanan Pernikahan."
+            )
             initial_validation = False
-        elif self.service_type.data == "prewedding" and not self.prewedding_package.data:
-            self.prewedding_package.errors.append("Paket Pra-pernikahan diperlukan untuk layanan Pra-pernikahan.")
+        elif (
+            self.service_type.data == "prewedding" and not self.prewedding_package.data
+        ):
+            self.prewedding_package.errors.append(
+                "Paket Pra-pernikahan diperlukan untuk layanan Pra-pernikahan."
+            )
             initial_validation = False
 
         return initial_validation
@@ -378,5 +425,7 @@ class AdminOrderForm(FlaskForm):
 class HomepageContentForm(FlaskForm):
     about_text = TextAreaField("Teks Tentang Aruna Moment", validators=[DataRequired()])
     about_image = FileField("Gambar Profil/Studio (Opsional)")
-    hero_images = FileField("Unggah Gambar Hero Baru (Bisa Lebih Dari Satu)", render_kw={'multiple': True})
+    hero_images = FileField(
+        "Unggah Gambar Hero Baru (Bisa Lebih Dari Satu)", render_kw={"multiple": True}
+    )
     submit = SubmitField("Simpan Perubahan Homepage")

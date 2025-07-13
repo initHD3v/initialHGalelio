@@ -5,10 +5,18 @@ from flask import (
     flash,
     request,
     current_app,
-    send_file
+    send_file,
 )
 from flask_login import login_required, current_user
-from models import Order, Testimonial, db, BankAccount, Notification, User
+from models import (
+    Order,
+    Testimonial,
+    db,
+    BankAccount,
+    Notification,
+    User,
+    CalendarEvent,
+)
 from forms import (
     TestimonialSubmissionForm,
     TestimonialEditForm,
@@ -16,13 +24,13 @@ from forms import (
     DPPaymentForm,
 )
 from werkzeug.security import generate_password_hash
-from werkzeug.utils import secure_filename # Added import
+from werkzeug.utils import secure_filename  # Added import
 import os
-from datetime import datetime, timedelta # Added timedelta
-import pytz # Added pytz
+from datetime import datetime, timedelta  # Added timedelta
+import pytz  # Added pytz
 from client import client
 
-JAKARTA_TZ = pytz.timezone('Asia/Jakarta')
+JAKARTA_TZ = pytz.timezone("Asia/Jakarta")
 
 
 @client.app_template_global("get_testimonial_for_order")
@@ -37,13 +45,32 @@ def get_testimonial_for_order(order_id):
 def dashboard():
     orders = Order.query.filter_by(client_id=current_user.id).all()
     now = datetime.utcnow()
-    upcoming_orders = [order for order in orders if order.status not in ["completed", "rejected", "expired", "cancelled"]]
-    history_orders = [order for order in orders if order.status in ["completed", "rejected", "expired", "cancelled"]]
-    
-    # Fetch notifications for the current user
-    notifications = Notification.query.filter_by(user_id=current_user.id, is_read=False).order_by(Notification.timestamp.desc()).all()
+    upcoming_orders = [
+        order
+        for order in orders
+        if order.status not in ["completed", "rejected", "expired", "cancelled"]
+    ]
+    history_orders = [
+        order
+        for order in orders
+        if order.status in ["completed", "rejected", "expired", "cancelled"]
+    ]
 
-    return render_template("client/dashboard.html", orders=orders, now=now, upcoming_orders=upcoming_orders, history_orders=history_orders, notifications=notifications)
+    # Fetch notifications for the current user
+    notifications = (
+        Notification.query.filter_by(user_id=current_user.id, is_read=False)
+        .order_by(Notification.timestamp.desc())
+        .all()
+    )
+
+    return render_template(
+        "client/dashboard.html",
+        orders=orders,
+        now=now,
+        upcoming_orders=upcoming_orders,
+        history_orders=history_orders,
+        notifications=notifications,
+    )
 
 
 @client.route("/submit_testimonial/<int:order_id>", methods=["GET", "POST"])
@@ -89,13 +116,16 @@ def submit_testimonial(order_id):
         db.session.commit()
 
         # --- NOTIFICATION: New Testimonial --- #
-        admins = User.query.filter_by(role='admin').all()
+        admins = User.query.filter_by(role="admin").all()
         for admin_user in admins:
             notification = Notification(
                 user_id=admin_user.id,
-                type='new_testimonial',
+                type="new_testimonial",
                 entity_id=testimonial.id,
-                message=f"Testimoni baru dari {current_user.username} menunggu persetujuan."
+                message=(
+                    f"Testimoni baru dari {current_user.username} menunggu "
+                    "persetujuan."
+                ),
             )
             db.session.add(notification)
         db.session.commit()
@@ -209,25 +239,35 @@ def request_cancellation(order_id):
     # (Implementasi konfirmasi di frontend)
 
     order.status = "cancellation_requested"
-    order.cancellation_reason = request.form.get('cancellation_reason', 'Tidak ada alasan diberikan.')
-    order.cancellation_requested = True # Set the flag
+    order.cancellation_reason = request.form.get(
+        "cancellation_reason", "Tidak ada alasan diberikan."
+    )
+    order.cancellation_requested = True  # Set the flag
     db.session.commit()
 
     # --- NOTIFIKASI: Permintaan Pembatalan --- #
-    admins = User.query.filter_by(role='admin').all()
+    admins = User.query.filter_by(role="admin").all()
     for admin_user in admins:
-        package_or_service_name = order.wedding_package.name if order.wedding_package else order.service_type
+        package_or_service_name = (
+            order.wedding_package.name if order.wedding_package else order.service_type
+        )
         notification = Notification(
             user_id=admin_user.id,
-            type='cancellation_request',
+            type="cancellation_request",
             entity_id=order.id,
-            message=f"Permintaan pembatalan pesanan {package_or_service_name} dari {current_user.username}."
+            message=(
+                f"Permintaan pembatalan pesanan {package_or_service_name} dari "
+                f"{current_user.username}."
+            ),
         )
         db.session.add(notification)
     db.session.commit()
     # --- END NOTIFIKASI --- #
 
-    flash("Permintaan pembatalan Anda telah diajukan. Admin akan segera meninjaunya.", "success")
+    flash(
+        "Permintaan pembatalan Anda telah diajukan. Admin akan segera meninjaunya.",
+        "success",
+    )
     return redirect(url_for("client.dashboard"))
 
 
@@ -244,35 +284,69 @@ def request_reschedule(order_id):
     # (Informasi ini akan ditampilkan di frontend)
 
     # Ambil data dari form modal
-    new_event_date_str = request.form.get('new_event_date')
-    new_event_start_time_str = request.form.get('new_event_start_time')
-    new_event_end_time_str = request.form.get('new_event_end_time')
-    reschedule_reason = request.form.get('reschedule_reason', 'Tidak ada alasan diberikan.')
+    new_event_date_str = request.form.get("new_event_date")
+    new_event_start_time_str = request.form.get("new_event_start_time")
+    new_event_end_time_str = request.form.get("new_event_end_time")
+    reschedule_reason = request.form.get(
+        "reschedule_reason", "Tidak ada alasan diberikan."
+    )
 
     # Konversi tanggal dan waktu ke objek datetime
-    new_event_date = datetime.strptime(new_event_date_str, '%Y-%m-%d').date() if new_event_date_str else None
-    new_start_time = datetime.strptime(new_event_start_time_str, '%H:%M').time() if new_event_start_time_str else None
-    new_end_time = datetime.strptime(new_event_end_time_str, '%H:%M').time() if new_event_end_time_str else None
+    new_event_date = (
+        datetime.strptime(new_event_date_str, "%Y-%m-%d").date()
+        if new_event_date_str
+        else None
+    )
+    new_start_time = (
+        datetime.strptime(new_event_start_time_str, "%H:%M").time()
+        if new_event_start_time_str
+        else None
+    )
+    new_end_time = (
+        datetime.strptime(new_event_end_time_str, "%H:%M").time()
+        if new_event_end_time_str
+        else None
+    )
 
     # Gabungkan tanggal dan waktu menjadi objek datetime lengkap
-    full_new_start_datetime = datetime.combine(new_event_date, new_start_time) if new_event_date and new_start_time else None
-    full_new_end_datetime = datetime.combine(new_event_date, new_end_time) if new_event_date and new_end_time else None
+    full_new_start_datetime = (
+        datetime.combine(new_event_date, new_start_time)
+        if new_event_date and new_start_time
+        else None
+    )
+    full_new_end_datetime = (
+        datetime.combine(new_event_date, new_end_time)
+        if new_event_date and new_end_time
+        else None
+    )
 
     # Periksa ketersediaan slot baru (logika sederhana, bisa diperluas)
     # Asumsi: jika prewedding, tidak perlu cek waktu
-    if order.service_type != "prewedding" and (not full_new_start_datetime or not full_new_end_datetime):
-        flash("Mohon lengkapi tanggal dan waktu baru untuk penjadwalan ulang.", "danger")
+    if order.service_type != "prewedding" and (
+        not full_new_start_datetime
+        or not full_new_end_datetime
+    ):
+        flash(
+            "Mohon lengkapi tanggal dan waktu baru untuk penjadwalan ulang.",
+            "danger",
+        )
         return redirect(url_for("client.dashboard"))
 
-    # Periksa tumpang tindih dengan event kalender lain (kecuali event order ini sendiri)
+    # Periksa tumpang tindih dengan event kalender lain (
+    # kecuali event order ini sendiri
+    # )
     overlapping_event = CalendarEvent.query.filter(
-        CalendarEvent.order_id != order.id, # Exclude current order's event
-        (CalendarEvent.start_time < full_new_end_datetime) & 
-        (CalendarEvent.end_time > full_new_start_datetime)
+        CalendarEvent.order_id != order.id,  # Exclude current order's event
+        (CalendarEvent.start_time < full_new_end_datetime)
+        & (CalendarEvent.end_time > full_new_start_datetime),
     ).first()
 
     if overlapping_event:
-        flash("Tanggal dan waktu yang diminta tidak tersedia. Mohon pilih tanggal/waktu lain.", "danger")
+        flash(
+            "Tanggal dan waktu yang diminta tidak tersedia. Mohon pilih tanggal/waktu "
+            "lain.",
+            "danger",
+        )
         return redirect(url_for("client.dashboard"))
 
     order.status = "reschedule_requested"
@@ -283,20 +357,29 @@ def request_reschedule(order_id):
     db.session.commit()
 
     # --- NOTIFIKASI: Permintaan Penjadwalan Ulang --- #
-    admins = User.query.filter_by(role='admin').all()
+    admins = User.query.filter_by(role="admin").all()
     for admin_user in admins:
-        package_or_service_name = order.wedding_package.name if order.wedding_package else order.service_type
+        package_or_service_name = (
+            order.wedding_package.name if order.wedding_package else order.service_type
+        )
         notification = Notification(
             user_id=admin_user.id,
-            type='reschedule_request',
+            type="reschedule_request",
             entity_id=order.id,
-            message=f"Permintaan penjadwalan ulang pesanan {package_or_service_name} dari {current_user.username}."
+            message=(
+                f"Permintaan penjadwalan ulang pesanan {package_or_service_name} "
+                f"dari {current_user.username}."
+            ),
         )
         db.session.add(notification)
     db.session.commit()
     # --- END NOTIFIKASI --- #
 
-    flash("Permintaan penjadwalan ulang Anda telah diajukan. Admin akan segera meninjaunya.", "success")
+    flash(
+            "Permintaan penjadwalan ulang Anda telah diajukan. "
+            "Admin akan segera meninjaunya.",
+            "success",
+        )
     return redirect(url_for("client.dashboard"))
 
 
@@ -312,7 +395,10 @@ def dp_payment(order_id):
 
     # Allow payment/re-upload only if status is 'waiting_dp' or 'rejected'
     if order.status not in ["waiting_dp", "rejected"]:
-        flash(f"This order is not awaiting DP payment (status: {order.status}).", "warning")
+        flash(
+            f"This order is not awaiting DP payment (status: {order.status}).",
+            "warning",
+        )
         return redirect(url_for("client.dashboard"))
 
     # --- Timeout Logic ---
@@ -330,13 +416,21 @@ def dp_payment(order_id):
         # If rejected, the deadline is 1 hour from rejection timestamp.
         # If dp_rejection_timestamp is somehow None for a rejected order,
         # give a fresh 1-hour window from now to allow re-upload.
-        base_time_utc = (order.dp_rejection_timestamp if order.dp_rejection_timestamp else datetime.utcnow()).replace(tzinfo=pytz.utc)
+        base_time_utc = (
+            order.dp_rejection_timestamp
+            if order.dp_rejection_timestamp
+            else datetime.utcnow()
+        ).replace(tzinfo=pytz.utc)
         deadline_utc = base_time_utc + timedelta(hours=1)
 
     if deadline_utc and now_utc > deadline_utc:
         order.status = "expired"
         db.session.commit()
-        flash("This order has expired because the DP was not paid within the allowed time.", "danger")
+        flash(
+            "This order has expired because the DP was not paid "
+            "within the allowed time.",
+            "danger",
+        )
         return redirect(url_for("client.dashboard"))
     elif deadline_utc:
         time_remaining = deadline_utc - now_utc
@@ -345,7 +439,7 @@ def dp_payment(order_id):
 
     # --- Form Processing (moved from pay_dp) ---
     if form.validate_on_submit():
-        order.bank_account_id = form.bank_account.data.id # Save selected bank account
+        order.bank_account_id = form.bank_account.data.id  # Save selected bank account
         if form.payment_proof.data:
             # Save the uploaded file
             filename = secure_filename(form.payment_proof.data.filename)
@@ -362,7 +456,8 @@ def dp_payment(order_id):
         order.dp_rejection_timestamp = None  # Clear timestamp on new submission
         db.session.commit()
         flash(
-            "DP payment proof submitted successfully! Your order is now awaiting admin approval.",
+            "DP payment proof submitted successfully! Your order is now "
+            "awaiting admin approval.",
             "success",
         )
         return redirect(url_for("client.dashboard"))
@@ -397,7 +492,12 @@ def view_invoice_client(order_id):
         return redirect(url_for("client.dashboard"))
 
     # bank_accounts = BankAccount.query.filter_by(is_active=True).all() # Removed
-    return render_template('invoice.html', order=order, timedelta=timedelta, bank_account=order.bank_account)
+    return render_template(
+        "invoice.html",
+        order=order,
+        timedelta=timedelta,
+        bank_account=order.bank_account,
+    )
 
 
 @client.route("/profile", methods=["GET", "POST"])

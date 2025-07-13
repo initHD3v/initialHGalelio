@@ -8,7 +8,6 @@ from flask_babel import _
 from . import auth
 
 
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -50,13 +49,13 @@ def register():
         db.session.commit()
 
         # --- NOTIFICATION: New Client Registration --- #
-        admins = User.query.filter_by(role='admin').all()
+        admins = User.query.filter_by(role="admin").all()
         for admin_user in admins:
             notification = Notification(
                 user_id=admin_user.id,
-                type='new_client',
+                type="new_client",
                 entity_id=user.id,
-                message=f"Klien baru mendaftar: {user.username} ({user.email})."
+                message=f"Klien baru mendaftar: {user.username} ({user.email}).",
             )
             db.session.add(notification)
         db.session.commit()

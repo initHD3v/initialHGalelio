@@ -43,15 +43,19 @@ class PostImage(db.Model):
 
 class ImageLike(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    post_image_id = db.Column(db.Integer, db.ForeignKey('post_image.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    post_image_id = db.Column(
+        db.Integer, db.ForeignKey("post_image.id"), nullable=False
+    )
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Ensure a user can only like a specific image once
-    __table_args__ = (db.UniqueConstraint('user_id', 'post_image_id', name='_user_image_uc'),)
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "post_image_id", name="_user_image_uc"),
+    )
 
-    user = db.relationship('User', backref='image_likes')
-    post_image = db.relationship('PostImage', backref='image_likes')
+    user = db.relationship("User", backref="image_likes")
+    post_image = db.relationship("PostImage", backref="image_likes")
 
 
 class Order(db.Model):
@@ -72,14 +76,17 @@ class Order(db.Model):
     )  # Path to the uploaded proof file
     status = db.Column(
         db.String(50), default="waiting_dp", nullable=False
-    )  # e.g., waiting_dp, waiting_approval, accepted, rejected, completed, cancellation_requested, cancelled, reschedule_requested
+    )  # e.g., waiting_dp, waiting_approval, accepted, rejected, completed,
+    # cancellation_requested, cancelled, reschedule_requested
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )
     dp_rejection_timestamp = db.Column(db.DateTime, nullable=True)
     cancellation_reason = db.Column(db.Text, nullable=True)
-    cancellation_requested = db.Column(db.Boolean, default=False, nullable=False) # New field
+    cancellation_requested = db.Column(
+        db.Boolean, default=False, nullable=False
+    )  # New field
     reschedule_reason = db.Column(db.Text, nullable=True)
     requested_event_date = db.Column(db.DateTime, nullable=True)
     requested_start_time = db.Column(db.DateTime, nullable=True)
@@ -94,7 +101,9 @@ class Order(db.Model):
         db.Integer, db.ForeignKey("wedding_package.id"), nullable=True
     )
     wedding_package = db.relationship("WeddingPackage", backref="orders")
-    bank_account_id = db.Column(db.Integer, db.ForeignKey("bank_account.id"), nullable=True)
+    bank_account_id = db.Column(
+        db.Integer, db.ForeignKey("bank_account.id"), nullable=True
+    )
     bank_account = db.relationship("BankAccount", backref="orders")
     calendar_event = db.relationship(
         "CalendarEvent", backref="order", uselist=False, cascade="all, delete-orphan"
@@ -138,7 +147,7 @@ class WeddingPackage(db.Model):
     name = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text, nullable=True)
     price = db.Column(db.Float, nullable=False)
-    category = db.Column(db.String(50), nullable=True, default='Wedding') # New field
+    category = db.Column(db.String(50), nullable=True, default="Wedding")  # New field
 
 
 class BankAccount(db.Model):
@@ -154,14 +163,18 @@ class BankAccount(db.Model):
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # Admin user
-    type = db.Column(db.String(50), nullable=False) # e.g., 'new_order', 'new_client', 'new_testimonial'
-    entity_id = db.Column(db.Integer, nullable=False) # ID of the related entity
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), nullable=False
+    )  # Admin user
+    type = db.Column(
+        db.String(50), nullable=False
+    )  # e.g., 'new_order', 'new_client', 'new_testimonial'
+    entity_id = db.Column(db.Integer, nullable=False)  # ID of the related entity
     message = db.Column(db.String(255), nullable=False)
     is_read = db.Column(db.Boolean, default=False, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    user = db.relationship('User', backref='notifications')
+    user = db.relationship("User", backref="notifications")
 
     def __repr__(self):
         return f"<Notification {self.type} - {self.message[:20]}...>"
@@ -183,5 +196,3 @@ class HeroImage(db.Model):
 
     def __repr__(self):
         return f"<HeroImage {self.filename}>"
-
-

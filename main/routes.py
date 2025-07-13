@@ -1,4 +1,17 @@
-from models import Post, Order, db, CalendarEvent, Testimonial, WeddingPackage, PostImage, ImageLike, Notification, User, HomepageContent, HeroImage
+from models import (
+    Post,
+    Order,
+    db,
+    CalendarEvent,
+    Testimonial,
+    WeddingPackage,
+    PostImage,
+    ImageLike,
+    Notification,
+    User,
+    HomepageContent,
+    HeroImage,
+)
 from flask import (
     render_template,
     redirect,
@@ -8,7 +21,6 @@ from flask import (
     request,
 )
 from datetime import datetime
-from models import Post, Order, db, CalendarEvent, Testimonial, WeddingPackage
 from forms import OrderForm
 from flask_login import login_required, current_user
 from sqlalchemy import or_, func
@@ -20,23 +32,41 @@ def index():
     hero_images = HeroImage.query.order_by(HeroImage.order.asc()).all()
     # Calculate total likes for each post and order by it
     # This query will return (Post object, total_likes) tuples
-    posts_with_total_likes = db.session.query(
-        Post,
-        func.sum(PostImage.likes).label('total_likes')
-    ).join(PostImage).group_by(Post).order_by(func.sum(PostImage.likes).desc()).limit(3).all()
+    posts_with_total_likes = (
+        db.session.query(Post, func.sum(PostImage.likes).label("total_likes"))
+        .join(PostImage)
+        .group_by(Post)
+        .order_by(func.sum(PostImage.likes).desc())
+        .limit(3)
+        .all()
+    )
 
     featured_posts = []
     for post, total_likes in posts_with_total_likes:
-        post.total_likes = total_likes # Attach total_likes to the post object
+        post.total_likes = total_likes  # Attach total_likes to the post object
         featured_posts.append(post)
-    testimonials = Testimonial.query.filter_by(is_approved=True).order_by(Testimonial.id.desc()).limit(3).all()
+    testimonials = (
+        Testimonial.query.filter_by(is_approved=True)
+        .order_by(Testimonial.id.desc())
+        .limit(3)
+        .all()
+    )
     homepage_content = HomepageContent.query.first()
     if not homepage_content:
         # Create a default entry if none exists
-        homepage_content = HomepageContent(about_text="Teks default tentang Aruna Moment.", about_image_filename="pp.jpg")
+        homepage_content = HomepageContent(
+            about_text="Teks default tentang Aruna Moment.",
+            about_image_filename="pp.jpg",
+        )
         db.session.add(homepage_content)
         db.session.commit()
-    return render_template("index.html", hero_images=hero_images, featured_posts=featured_posts, testimonials=testimonials, homepage_content=homepage_content)
+    return render_template(
+        "index.html",
+        hero_images=hero_images,
+        featured_posts=featured_posts,
+        testimonials=testimonials,
+        homepage_content=homepage_content,
+    )
 
 
 @main.route("/about")
@@ -48,12 +78,15 @@ def about():
 def portfolio():
     posts = Post.query.order_by(Post.date_posted.desc()).all()
 
-    if current_user.is_authenticated and current_user.role == 'client':
+    if current_user.is_authenticated and current_user.role == "client":
         for post in posts:
             for image in post.images:
-                image.is_liked_by_current_user = ImageLike.query.filter_by(
-                    user_id=current_user.id, post_image_id=image.id
-                ).first() is not None
+                image.is_liked_by_current_user = (
+                    ImageLike.query.filter_by(
+                        user_id=current_user.id, post_image_id=image.id
+                    ).first()
+                    is not None
+                )
     else:
         # For non-logged-in users or non-clients, set all to False
         for post in posts:
@@ -76,7 +109,9 @@ def contact():
 
 @main.route("/pricelist")
 def pricelist():
-    packages = WeddingPackage.query.order_by(WeddingPackage.category, WeddingPackage.price).all()
+    packages = WeddingPackage.query.order_by(
+        WeddingPackage.category, WeddingPackage.price
+    ).all()
     # Group packages by category
     categorized_packages = {}
     for pkg in packages:
@@ -96,18 +131,18 @@ def order():
 
     # Pre-fill form based on query parameters
     if request.method == "GET":
-        service_type = request.args.get('service_type')
-        package_id = request.args.get('package_id', type=int)
+        service_type = request.args.get("service_type")
+        package_id = request.args.get("package_id", type=int)
 
         if service_type:
             form.service_type.data = service_type
-        
+
         if package_id:
             package = WeddingPackage.query.get(package_id)
             if package:
-                if service_type == 'wedding':
+                if service_type == "wedding":
                     form.wedding_package.data = package
-                elif service_type == 'prewedding':
+                elif service_type == "prewedding":
                     form.prewedding_package.data = package
 
     if form.validate_on_submit():
@@ -124,13 +159,18 @@ def order():
         else:
             # For other services, require time input
             if not form.event_start_time.data or not form.event_end_time.data:
-                flash("Mohon berikan waktu mulai dan berakhir untuk jenis layanan ini.", "danger")
+                flash(
+                    "Mohon berikan waktu mulai dan berakhir untuk jenis layanan ini.",
+                    "danger",
+                )
                 return render_template("order.html", form=form)
             try:
                 start_time_obj = datetime.strptime(
                     form.event_start_time.data, "%H:%M"
                 ).time()
-                end_time_obj = datetime.strptime(form.event_end_time.data, "%H:%M").time()
+                end_time_obj = datetime.strptime(
+                    form.event_end_time.data, "%H:%M"
+                ).time()
             except (ValueError, TypeError):
                 flash("Format waktu tidak valid. Mohon gunakan HH:MM.", "danger")
                 return render_template("order.html", form=form)
@@ -177,9 +217,12 @@ def order():
             else:
                 flash("Mohon pilih paket Pra-pernikahan.", "danger")
                 return render_template("order.html", form=form)
-        else: # For 'event', 'portrait', or other custom services
+        else:  # For 'event', 'portrait', or other custom services
             if form.total_price.data is None or form.total_price.data <= 0:
-                flash("Mohon masukkan total harga yang valid untuk jenis layanan ini.", "danger")
+                flash(
+                    "Mohon masukkan total harga yang valid untuk jenis layanan ini.",
+                    "danger",
+                )
                 return render_template("order.html", form=form)
             order_total_price = form.total_price.data
 
@@ -216,63 +259,16 @@ def order():
             db.session.commit()
 
         # --- NOTIFICATION: New Order --- #
-        admins = User.query.filter_by(role='admin').all()
+        admins = User.query.filter_by(role="admin").all()
         for admin_user in admins:
             notification = Notification(
                 user_id=admin_user.id,
-                type='new_order',
+                type="new_order",
                 entity_id=order.id,
-                message=f"Pesanan baru dari {current_user.username} untuk {service_type} pada {requested_date.strftime('%Y-%m-%d')}."
+                message=(
+                    f"Pesanan baru dari {current_user.username} untuk {service_type} "
+                    f"pada {requested_date.strftime('%Y-%m-%d')}."
+                )
             )
             db.session.add(notification)
-        db.session.commit()
-        # --- END NOTIFICATION --- #
-
-        flash(
-            "Pesanan Anda berhasil dibuat! Mohon lanjutkan ke pembayaran DP.",
-            "success",
-        )
-        return redirect(
-            url_for("client.dp_payment", order_id=order.id)
-        )
-    return render_template("order.html", form=form)
-
-
-@main.route("/api/unavailable_dates")
-def unavailable_dates():
-    # Fetch dates that are already booked or marked as unavailable
-    booked_events = CalendarEvent.query.filter(
-        or_(not CalendarEvent.is_available, CalendarEvent.order_id.isnot(None))
-    ).all()
-
-    unavailable_dates_list = []
-    for event in booked_events:
-        # Assuming single-day bookings for simplicity in date picker
-        unavailable_dates_list.append(event.start_time.strftime("%Y-%m-%d"))
-
-    return jsonify(unavailable_dates_list)
-
-@main.route("/api/like/image/<int:image_id>", methods=["POST"])
-@login_required # Only logged-in users can like
-def like_image(image_id):
-    if current_user.role != "client":
-        return jsonify({"success": False, "message": "Hanya klien yang dapat memberikan suka."}), 403
-
-    image = PostImage.query.get_or_404(image_id)
-    existing_like = ImageLike.query.filter_by(
-        user_id=current_user.id, post_image_id=image_id
-    ).first()
-
-    if existing_like:
-        # User has already liked, so unlike it
-        db.session.delete(existing_like)
-        image.likes -= 1
-        db.session.commit()
-        return jsonify({"success": True, "likes": image.likes, "liked": False})
-    else:
-        # User has not liked it yet, so add a like
-        new_like = ImageLike(user_id=current_user.id, post_image_id=image_id)
-        db.session.add(new_like)
-        image.likes += 1
-        db.session.commit()
-        return jsonify({"success": True, "likes": image.likes, "liked": True})
+            db.session.commit()
