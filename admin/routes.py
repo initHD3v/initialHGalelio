@@ -43,6 +43,59 @@ from sqlalchemy import or_
 from . import admin
 
 
+@admin.route("/admin/chat")
+@login_required
+def chat():
+    if current_user.role != "admin":
+        flash("You do not have access to this page.", "danger")
+        return redirect(url_for("main.index"))
+    return render_template("admin/chat.html")
+
+@admin.route("/admin/conversations")
+@login_required
+def get_conversations():
+    if current_user.role != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    # Find all distinct users (clients) who have either sent a message to the admin
+    # or received a message from the admin.
+    # Exclude the admin's own ID from the list of conversation partners.
+    involved_users = db.session.query(User).join(ChatMessage,
+        or_(
+            (User.id == ChatMessage.sender_id) & (ChatMessage.recipient_id == current_user.id),
+            (User.id == ChatMessage.recipient_id) & (ChatMessage.sender_id == current_user.id)
+        )
+    ).filter(User.id != current_user.id).distinct().all()
+
+    # Debugging print
+    print(f"DEBUG: Admin {current_user.id} - Found conversations with user IDs: {[u.id for u in involved_users]}")
+
+    return jsonify({"conversations": [{"user_id": u.id, "username": u.username} for u in involved_users]})
+    
+    return jsonify({"conversations": [{"user_id": u.id, "username": u.username} for u in conversations]})
+
+@admin.route("/admin/chat_history/<int:user_id>")
+@login_required
+def get_chat_history(user_id):
+    if current_user.role != "admin":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    messages = ChatMessage.query.filter(
+        ((ChatMessage.sender_id == current_user.id) & (ChatMessage.recipient_id == user_id)) |
+        ((ChatMessage.sender_id == user_id) & (ChatMessage.recipient_id == current_user.id))
+    ).order_by(ChatMessage.timestamp.asc()).all()
+
+    return jsonify({"messages": [
+        {
+            "sender_id": msg.sender_id,
+            "recipient_id": msg.recipient_id,
+            "message": msg.message,
+            "timestamp": msg.timestamp.isoformat()
+        } for msg in messages
+    ]})
+
+
+
 @admin.route("/admin/manage_homepage", methods=["GET", "POST"])
 @login_required
 def manage_homepage():

@@ -72,12 +72,18 @@ class Order(db.Model):
     )  # Path to the uploaded proof file
     status = db.Column(
         db.String(50), default="waiting_dp", nullable=False
-    )  # e.g., waiting_dp, waiting_approval, accepted, rejected, completed
+    )  # e.g., waiting_dp, waiting_approval, accepted, rejected, completed, cancellation_requested, cancelled, reschedule_requested
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )
     dp_rejection_timestamp = db.Column(db.DateTime, nullable=True)
+    cancellation_reason = db.Column(db.Text, nullable=True)
+    cancellation_requested = db.Column(db.Boolean, default=False, nullable=False) # New field
+    reschedule_reason = db.Column(db.Text, nullable=True)
+    requested_event_date = db.Column(db.DateTime, nullable=True)
+    requested_start_time = db.Column(db.DateTime, nullable=True)
+    requested_end_time = db.Column(db.DateTime, nullable=True)
     is_notified = db.Column(
         db.Boolean, default=False, nullable=False
     )  # New field for notification
@@ -177,3 +183,5 @@ class HeroImage(db.Model):
 
     def __repr__(self):
         return f"<HeroImage {self.filename}>"
+
+

@@ -11,6 +11,7 @@
         <link rel="icon" type="image/x-xicon" href="{{ url_for('static', filename='sb-admin-pro/dist/assets/img/favicon.png') }}" />
         <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
         {% block head_extra %}{% endblock %}
     </head>
     <body class="nav-fixed">
@@ -72,13 +73,6 @@
                             <a class="nav-link {% if request.endpoint == 'admin.admin_panel' %}active{% endif %}" href="{{ url_for('admin.admin_panel') }}">
                                 <div class="nav-link-icon"><i data-feather="activity"></i></div>
                                 Dashboard
-                            </a>
-                            <!-- Sidenav Menu Heading (Management)-->
-                            <div class="sidenav-menu-heading">Management</div>
-                            <!-- Sidenav Link (Portfolio)-->
-                            <a class="nav-link {% if request.endpoint == 'admin.manage_portfolio' or request.endpoint == 'admin.new_portfolio_post' or request.endpoint == 'admin.edit_portfolio_post' %}active{% endif %}" href="{{ url_for('admin.manage_portfolio') }}">
-                                <div class="nav-link-icon"><i data-feather="image"></i></div>
-                                Portfolio
                             </a>
                             <!-- Sidenav Link (Orders)-->
                             <a class="nav-link {% if request.endpoint == 'admin.order_list' %}active{% endif %}" href="{{ url_for('admin.order_list') }}">
