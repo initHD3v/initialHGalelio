@@ -118,7 +118,7 @@
         <div class="invoice-header">
             <h1>FAKTUR</h1>
             <div class="invoice-meta">
-                Faktur #: <strong>{{ order.id }}</strong><br>
+                Faktur #: <strong>INV-{{ order.created_at.strftime('%Y') }}-{{ '%05d' | format(order.id) }}</strong><br>
                 Tanggal: {{ order.created_at.strftime('%d %B %Y') }}<br>
                 {% if order.status == 'waiting_dp' %}
                     Jatuh Tempo: {{ (order.created_at + timedelta(hours=1)).strftime('%d %B %Y %H:%M') }}
@@ -162,10 +162,6 @@
             <tbody>
                 <tr>
                     <td>{{ order.service_type.capitalize() }} {% if order.wedding_package %}({{ order.wedding_package.name }}){% endif %}</td>
-                    <td>{{ order.event_date.strftime('%d %B %Y') }}</td>
-                    <td>{{ order.event_start_time.strftime('%H:%M') }} - {{ order.event_end_time.strftime('%H:%M') }}</td>
-                    <td>{{ order.location }}</td>
-                    <td>{{ order.details if order.details else 'N/A' }}</td>
                 </tr>
             </tbody>
         </table>

@@ -11,14 +11,24 @@ from datetime import datetime
 from models import Post, Order, db, CalendarEvent, Testimonial, WeddingPackage
 from forms import OrderForm
 from flask_login import login_required, current_user
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from . import main
 
 
 @main.route("/")
 def index():
     hero_images = HeroImage.query.order_by(HeroImage.order.asc()).all()
-    featured_gallery_images = PostImage.query.order_by(PostImage.likes.desc()).limit(8).all()
+    # Calculate total likes for each post and order by it
+    # This query will return (Post object, total_likes) tuples
+    posts_with_total_likes = db.session.query(
+        Post,
+        func.sum(PostImage.likes).label('total_likes')
+    ).join(PostImage).group_by(Post).order_by(func.sum(PostImage.likes).desc()).limit(3).all()
+
+    featured_posts = []
+    for post, total_likes in posts_with_total_likes:
+        post.total_likes = total_likes # Attach total_likes to the post object
+        featured_posts.append(post)
     testimonials = Testimonial.query.filter_by(is_approved=True).order_by(Testimonial.id.desc()).limit(3).all()
     homepage_content = HomepageContent.query.first()
     if not homepage_content:
@@ -26,7 +36,7 @@ def index():
         homepage_content = HomepageContent(about_text="Teks default tentang Aruna Moment.", about_image_filename="pp.jpg")
         db.session.add(homepage_content)
         db.session.commit()
-    return render_template("index.html", hero_images=hero_images, featured_gallery_images=featured_gallery_images, testimonials=testimonials, homepage_content=homepage_content)
+    return render_template("index.html", hero_images=hero_images, featured_posts=featured_posts, testimonials=testimonials, homepage_content=homepage_content)
 
 
 @main.route("/about")
@@ -80,7 +90,7 @@ def pricelist():
 @login_required
 def order():
     if current_user.role == "admin":
-        flash("Admin users cannot place orders.", "danger")
+        flash("Pengguna admin tidak dapat membuat pesanan.", "danger")
         return redirect(url_for("admin.admin_panel"))
     form = OrderForm()
 
@@ -114,7 +124,7 @@ def order():
         else:
             # For other services, require time input
             if not form.event_start_time.data or not form.event_end_time.data:
-                flash("Please provide start and end times for this service type.", "danger")
+                flash("Mohon berikan waktu mulai dan berakhir untuk jenis layanan ini.", "danger")
                 return render_template("order.html", form=form)
             try:
                 start_time_obj = datetime.strptime(
@@ -122,7 +132,7 @@ def order():
                 ).time()
                 end_time_obj = datetime.strptime(form.event_end_time.data, "%H:%M").time()
             except (ValueError, TypeError):
-                flash("Invalid time format. Please use HH:MM.", "danger")
+                flash("Format waktu tidak valid. Mohon gunakan HH:MM.", "danger")
                 return render_template("order.html", form=form)
 
             full_start_datetime = datetime.combine(requested_date, start_time_obj)
@@ -138,8 +148,8 @@ def order():
 
         if existing_event:
             flash(
-                "This date and time slot is already booked or unavailable. "
-                "Please choose another time.",
+                "Slot tanggal dan waktu ini sudah dipesan atau tidak tersedia. "
+                "Mohon pilih waktu lain.",
                 "danger",
             )
             return render_template("order.html", form=form)
@@ -156,7 +166,7 @@ def order():
                 order_total_price = selected_package.price
                 selected_wedding_package_id = selected_package.id
             else:
-                flash("Please select a Wedding package.", "danger")
+                flash("Mohon pilih paket Pernikahan.", "danger")
                 return render_template("order.html", form=form)
         elif service_type == "prewedding":
             if form.prewedding_package.data:
@@ -165,11 +175,11 @@ def order():
                 selected_wedding_package_id = selected_package.id
                 dp_amount = order_total_price * 0.15  # 15% DP for prewedding
             else:
-                flash("Please select a Pre-wedding package.", "danger")
+                flash("Mohon pilih paket Pra-pernikahan.", "danger")
                 return render_template("order.html", form=form)
         else: # For 'event', 'portrait', or other custom services
             if form.total_price.data is None or form.total_price.data <= 0:
-                flash("Please enter a valid total price for this service type.", "danger")
+                flash("Mohon masukkan total harga yang valid untuk jenis layanan ini.", "danger")
                 return render_template("order.html", form=form)
             order_total_price = form.total_price.data
 
@@ -219,7 +229,7 @@ def order():
         # --- END NOTIFICATION --- #
 
         flash(
-            "Your order has been placed successfully! Please proceed to DP payment.",
+            "Pesanan Anda berhasil dibuat! Mohon lanjutkan ke pembayaran DP.",
             "success",
         )
         return redirect(

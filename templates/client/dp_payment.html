@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow-sm">
@@ -16,7 +16,6 @@
                             <p class="mb-0">Batas waktu untuk unggah ulang: <strong>{{ deadline.strftime('%d %B %Y, %H:%M:%S') }}</strong></p>
                             <p>Sisa waktu: <strong id="countdown"></strong></p>
                         </div>
-                        {% if time_remaining %}
                         <script>
                             // Set the date we're counting down to
                             var countDownDate = new Date("{{ deadline.isoformat() }}").getTime();
@@ -43,21 +42,58 @@
                                 if (distance < 0) {
                                     clearInterval(x);
                                     document.getElementById("countdown").innerHTML = "WAKTU HABIS";
-                                    // Optionally, disable the form
+                                    // Optionally, hide the form
                                     document.querySelector('form').style.display = 'none';
                                 }
                             }, 1000);
                         </script>
-                        {% endif %}
                     {% else %}
-                        <p class="lead">Pesanan Anda (ID: <strong>{{ order.id }}</strong>) telah berhasil dibuat. Silakan lakukan pembayaran DP untuk melanjutkan pemesanan.</p>
+                        <p class="lead">Pesanan Anda (Paket: <strong>{{ package_name }}</strong>) telah berhasil dibuat. Silakan lakukan pembayaran DP untuk melanjutkan pemesanan.</p>
+                        <p>Batas waktu pembayaran DP: <strong>{{ deadline.strftime('%d %B %Y, %H:%M:%S') }}</strong></p>
+                        <p>Sisa waktu: <strong id="countdown"></strong></p>
+                        <script>
+                            // Set the date we're counting down to
+                            var countDownDate = new Date("{{ deadline.isoformat() }}").getTime();
+
+                            // Update the count down every 1 second
+                            var x = setInterval(function() {
+
+                                // Get today's date and time
+                                var now = new Date().getTime();
+
+                                // Find the distance between now and the count down date
+                                var distance = countDownDate - now;
+
+                                // Time calculations for days, hours, minutes and seconds
+                                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                                // Display the result in the element with id="countdown"
+                                document.getElementById("countdown").innerHTML = hours + " jam "
+                                + minutes + " menit " + seconds + " detik ";
+
+                                // If the count down is finished, write some text
+                                if (distance < 0) {
+                                    clearInterval(x);
+                                    document.getElementById("countdown").innerHTML = "WAKTU HABIS";
+                                    // Optionally, hide the form
+                                    document.querySelector('form').style.display = 'none';
+                                }
+                            }, 1000);
+                        </script>
                     {% endif %}
                     <hr>
                     
                     <h4>Detail Pesanan</h4>
                     <dl class="row">
+                        <dt class="col-sm-4">Nomor Invoice:</dt>
+                        <dd class="col-sm-8">INV-{{ order.created_at.strftime('%Y') }}-{{ '%05d' | format(order.id) }}</dd>
                         <dt class="col-sm-4">Jenis Layanan:</dt>
                         <dd class="col-sm-8">{{ order.service_type.capitalize() }}</dd>
+
+                        <dt class="col-sm-4">Paket Dipilih:</dt>
+                        <dd class="col-sm-8">{{ package_name }}</dd>
 
                         <dt class="col-sm-4">Tanggal Acara:</dt>
                         <dd class="col-sm-8">{{ order.event_date.strftime('%d %B %Y') }}</dd>

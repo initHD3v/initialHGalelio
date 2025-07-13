@@ -48,6 +48,7 @@
                         <th>Status</th>
                         <th>Payment Proof</th>
                         <th>Actions</th>
+                        <th>Alasan</th>
                         <th>Invoice</th>
                         <th>Delete</th>
                     </tr>
@@ -66,9 +67,18 @@
                         <td>Rp {{ "{:,.2f}".format(order.dp_paid) }}</td>
                         <td>Rp {{ "{:,.2f}".format(order.total_price - order.dp_paid) }}</td>
                         <td>
-                            <span class="badge {% if order.status == 'waiting_dp' %}bg-info{% elif order.status == 'waiting_approval' %}bg-warning text-dark{% elif order.status == 'accepted' %}bg-success{% elif order.status == 'rejected' %}bg-danger{% elif order.status == 'completed' %}bg-primary{% elif order.status == 'cancelled' %}bg-secondary{% endif %}">
-                                {{ order.status.capitalize().replace('Dp', 'DP').replace('Approval', 'Approval') }}
+                            <span class="badge {% if order.status == 'waiting_dp' %}bg-info{% elif order.status == 'waiting_approval' %}bg-warning text-dark{% elif order.status == 'accepted' %}bg-success{% elif order.status == 'rejected' %}bg-danger{% elif order.status == 'completed' %}bg-primary{% elif order.status == 'cancelled' %}bg-secondary{% elif order.status == 'cancellation_requested' %}bg-danger{% elif order.status == 'reschedule_requested' %}bg-warning text-dark{% endif %}">
+                                {{ order.status.capitalize().replace('Dp', 'DP').replace('Approval', 'Approval').replace('Cancellation_requested', 'Pembatalan Diminta').replace('Reschedule_requested', 'Jadwal Ulang Diminta') }}
                             </span>
+                        </td>
+                        <td>
+                            {% if order.cancellation_reason %}
+                                <small>{{ order.cancellation_reason }}</small>
+                            {% elif order.reschedule_reason %}
+                                <small>{{ order.reschedule_reason }}</small>
+                            {% else %}
+                                -
+                            {% endif %}
                         </td>
                         <td>
                             {% if order.dp_payment_proof %}
@@ -87,6 +97,20 @@
                             </form>
                             <form action="{{ url_for('admin.reject_order', order_id=order.id) }}" method="POST" style="display:inline;">
                                 <button type="submit" class="btn btn-danger btn-sm mb-1">Reject</button>
+                            </form>
+                            {% elif order.cancellation_requested %}
+                            <form action="{{ url_for('admin.approve_cancellation', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menyetujui pembatalan pesanan ini?');">
+                                <button type="submit" class="btn btn-success btn-sm mb-1">Setujui Pembatalan</button>
+                            </form>
+                            <form action="{{ url_for('admin.reject_cancellation', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menolak pembatalan pesanan ini?');">
+                                <button type="submit" class="btn btn-danger btn-sm mb-1">Tolak Pembatalan</button>
+                            </form>
+                            {% elif order.status == 'reschedule_requested' %}
+                            <form action="{{ url_for('admin.approve_reschedule', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menyetujui penjadwalan ulang pesanan ini?');">
+                                <button type="submit" class="btn btn-success btn-sm mb-1">Setujui Jadwal Ulang</button>
+                            </form>
+                            <form action="{{ url_for('admin.reject_reschedule', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menolak penjadwalan ulang pesanan ini?');">
+                                <button type="submit" class="btn btn-danger btn-sm mb-1">Tolak Jadwal Ulang</button>
                             </form>
                             {% elif order.status == 'accepted' %}
                             <form action="{{ url_for('admin.mark_order_completed', order_id=order.id) }}" method="POST" style="display:inline;">
