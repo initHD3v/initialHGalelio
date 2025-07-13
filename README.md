@@ -1,7 +1,7 @@
 
 # 📸 Aruna Moment — Aplikasi Pemesanan Jasa Fotografi
 
-**Aruna Moment** adalah platform pemesanan jasa fotografi profesional berbasis web, dirancang khusus untuk mengelola layanan fotografi seperti **wedding, pre-wedding, event**, dan lainnya.  
+**Aruna Moment** adalah platform pemesanan jasa fotografi profesional berbasis web, dirancang khusus untuk mengelola layanan fotografi seperti **wedding, pre-wedding.  
 Dikembangkan menggunakan **Python (Flask)**, aplikasi ini menyediakan sistem autentikasi peran, live chat, manajemen pemesanan, sistem pembayaran DP, invoice otomatis, dan kalender terintegrasi.
 
 ---
@@ -121,8 +121,6 @@ Buka di browser: `http://127.0.0.1:8000`
 - [ ] WebSocket untuk chat live
 - [ ] Multi-role admin (Staff, Superadmin)
 - [ ] Laporan bulanan (PDF/Excel)
-
----
 
 
 ## 📃 Lisensi
