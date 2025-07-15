@@ -1,0 +1,45 @@
+/* Kontainer utama untuk slider di halaman utama */
+.home-slider-container {
+    width: 100%;
+    height: 400px; /* Tinggi slider */
+    overflow: hidden; /* Menyembunyikan bagian gambar yang meluap */
+    mask-image: linear-gradient(to right, transparent, #fff 10% 90%, transparent); /* Efek mask */
+    margin-bottom: 50px; /* Jarak bawah */
+}
+
+/* Jalur (track) tempat semua slide berada */
+.home-slider-track {
+    display: flex; /* Menggunakan Flexbox untuk menata slide secara horizontal */
+    width: fit-content; /* Lebar akan disesuaikan oleh JavaScript */
+    height: 100%; /* Tinggi penuh dari .home-slider-container */
+    animation: slide-home 30s linear infinite; /* Animasi geser tak terbatas */
+}
+
+/* Setiap gambar individu dalam slider */
+.home-slide {
+    height: 400px; /* Tinggi tetap untuk setiap slide */
+    width: calc(400px * 4 / 3); /* Rasio aspek 4:3 (tinggi * 4 / 3) */
+    flex-shrink: 0; /* Mencegah slide menyusut */
+    position: relative; /* Memungkinkan penempatan elemen anak secara absolut di dalam slide */
+    margin-right: 15px; /* Jarak antar thumbnail */
+}
+
+/* Gambar di dalam setiap slide */
+.home-slide img {
+    width: 100%; /* Lebar penuh dari slide */
+    height: 100%; /* Tinggi penuh dari slide */
+    object-fit: cover; /* Memastikan gambar menutupi area slide tanpa terdistorsi */
+    filter: brightness(60%); /* Meredupkan gambar untuk keterbacaan teks */
+    transition: filter 0.3s ease; /* Transisi halus untuk efek filter */
+}
+
+/* Kelas untuk membuat gambar menjadi abu-abu */
+.home-slide img.grayscale {
+    filter: grayscale(100%) brightness(50%); /* Mengubah gambar menjadi abu-abu dan meredupkannya */
+}
+
+/* Keyframes untuk animasi geser */
+@keyframes slide-home {
+    from { transform: translateX(-50%); } /* Mulai dari tengah track yang diduplikasi */
+    to { transform: translateX(0); } /* Bergerak ke awal track yang diduplikasi (ke kanan) */
+}

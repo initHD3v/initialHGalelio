@@ -1,0 +1,76 @@
+/* Kontainer utama untuk bagian hero daftar harga */
+.pricelist-hero {
+    position: relative; /* Memungkinkan penempatan elemen anak secara absolut */
+    width: 100%; /* Lebar penuh */
+    height: 500px; /* Tinggi keseluruhan bagian hero */
+    overflow: hidden; /* Menyembunyikan konten yang meluap */
+    display: flex; /* Menggunakan Flexbox untuk tata letak */
+    align-items: center; /* Pusatkan item secara vertikal */
+    justify-content: center; /* Pusatkan item secara horizontal */
+}
+
+/* Kontainer untuk slider gambar */
+.slider-container {
+    position: absolute; /* Posisi absolut di dalam .pricelist-hero */
+    width: 100%; /* Lebar penuh */
+    height: 400px; /* Tinggi slider itu sendiri */
+    overflow: hidden; /* Menyembunyikan bagian gambar yang meluap */
+    /* Efek mask untuk membuat gambar memudar di tepi kiri dan kanan */
+    mask-image: linear-gradient(to right, transparent, #fff 10% 90%, transparent);
+}
+
+/* Jalur (track) tempat semua slide berada */
+.slider-track {
+    display: flex; /* Menggunakan Flexbox untuk menata slide secara horizontal */
+    width: fit-content; /* Lebar akan disesuaikan oleh JavaScript */
+    height: 100%; /* Tinggi penuh dari .slider-container */
+    animation: slide 30s linear infinite; /* Animasi geser tak terbatas */
+}
+
+/* Setiap gambar individu dalam slider */
+.slide {
+    height: 400px; /* Tinggi tetap untuk setiap slide */
+    width: calc(400px * 4 / 3); /* Rasio aspek 4:3 (tinggi * 4 / 3) */
+    flex-shrink: 0; /* Mencegah slide menyusut */
+    position: relative; /* Memungkinkan penempatan elemen anak secara absolut di dalam slide */
+    margin-right: 15px; /* Jarak antar thumbnail */
+}
+
+/* Gambar di dalam setiap slide */
+.slide img {
+    width: 100%; /* Lebar penuh dari slide */
+    height: 100%; /* Tinggi penuh dari slide */
+    object-fit: cover; /* Memastikan gambar menutupi area slide tanpa terdistorsi */
+    filter: brightness(60%); /* Meredupkan gambar untuk keterbacaan teks */
+    transition: filter 0.3s ease; /* Transisi halus untuk efek filter */
+}
+
+/* Kelas untuk membuat gambar menjadi abu-abu */
+.slide img.grayscale {
+    filter: grayscale(100%) brightness(50%); /* Mengubah gambar menjadi abu-abu dan meredupkannya */
+}
+
+/* Konten teks yang berada di atas slider */
+.hero-content {
+    position: relative; /* Posisi relatif agar berada di atas slider */
+    z-index: 10; /* Memastikan konten ini berada di atas slider */
+    color: white; /* Warna teks putih */
+    text-align: center; /* Teks rata tengah */
+}
+
+/* Judul di dalam hero-content */
+.hero-content h1 {
+    font-size: 3.5rem; /* Ukuran font besar untuk judul */
+    margin-bottom: 1rem; /* Jarak bawah setelah judul */
+}
+
+/* Paragraf di dalam hero-content */
+.hero-content p {
+    font-size: 1.25rem; /* Ukuran font untuk paragraf */
+}
+
+/* Keyframes untuk animasi geser */
+@keyframes slide {
+    from { transform: translateX(-50%); } /* Mulai dari tengah track yang diduplikasi */
+    to { transform: translateX(0); } /* Bergerak ke awal track yang diduplikasi (ke kanan) */
+}

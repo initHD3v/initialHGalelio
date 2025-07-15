@@ -1,11 +1,4 @@
-.pricelist-hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/A7E00269.jpeg') no-repeat center center;
-    background-size: cover;
-    color: white;
-    padding: 100px 0;
-    text-align: center;
-    margin-bottom: 50px;
-}
+
 
 .pricelist-hero h1 {
     font-size: 3.5rem;

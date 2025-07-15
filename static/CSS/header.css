@@ -1,43 +1,51 @@
-/* Styles for the transparent header on the homepage */
+/* Gaya untuk header transparan di halaman beranda */
 .navbar.navbar-dark {
-    transition: background-color 0.3s ease;
-    background-color: transparent !important;
+    transition: background-color 0.3s ease; /* Transisi halus untuk perubahan warna latar belakang */
+    background-color: transparent !important; /* Latar belakang transparan */
     padding-top: 15px; /* Menambahkan padding atas */
 }
 
+/* Gaya untuk header saat digulir ke bawah (scrolled) */
 .navbar.navbar-dark.scrolled {
-    background-color: white !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: white !important; /* Latar belakang putih saat digulir */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Bayangan tipis di bawah header */
 }
 
+/* Warna tautan navigasi di header gelap */
 .navbar-dark .navbar-nav .nav-link {
-    color: #FFFFFF !important; /* Warna putih cerah */
+    color: #FFFFFF !important; /* Warna putih cerah untuk tautan navigasi */
 }
 
+/* Warna tautan navigasi di header gelap saat digulir */
 .navbar-dark.scrolled .navbar-nav .nav-link {
-    color: black;
+    color: rgb(255, 255, 255); /* Warna hitam untuk tautan navigasi saat digulir */
 }
 
+/* Warna merek (brand) di header gelap */
 .navbar-dark .navbar-brand {
-    color: #FFFFFF !important; /* Warna putih cerah */
+    color: #FFFFFF !important; /* Warna putih cerah untuk merek */
 }
 
+/* Warna merek (brand) di header gelap saat digulir */
 .navbar-dark.scrolled .navbar-brand {
-    color: black !important;
+    color: black !important; /* Warna hitam untuk merek saat digulir */
 }
 
+/* Penyesuaian padding dan margin untuk merek di header gelap */
 .navbar.navbar-dark .navbar-brand {
     margin-left: 15px !important; /* Padding kiri kustom */
     padding-left: 0 !important;
     margin-right: 0 !important;
 }
 
+/* Penyesuaian padding dan margin untuk item navigasi terakhir di header gelap */
 .navbar.navbar-dark .navbar-nav:last-child {
     margin-right: 15px !important; /* Padding kanan kustom */
     padding-right: 0 !important;
     margin-left: 0 !important;
 }
 
+/* Penyesuaian lebar dan padding untuk kontainer fluid di header gelap */
 .navbar.navbar-dark .container-fluid {
     max-width: 100% !important; /* Mengambil lebar penuh */
     padding-left: 0 !important; /* Hapus padding bawaan container-fluid */

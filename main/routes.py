@@ -1,3 +1,4 @@
+import os
 from models import (
     Post,
     Order,
@@ -19,6 +20,7 @@ from flask import (
     flash,
     jsonify,
     request,
+    current_app
 )
 from datetime import datetime
 from forms import OrderForm
@@ -118,7 +120,12 @@ def pricelist():
         if pkg.category not in categorized_packages:
             categorized_packages[pkg.category] = []
         categorized_packages[pkg.category].append(pkg)
-    return render_template("pricelist.html", categorized_packages=categorized_packages)
+
+    # Get list of images for the slider from the database
+    portfolio_images = PostImage.query.all()
+    images = [img.filename for img in portfolio_images]
+
+    return render_template("pricelist.html", categorized_packages=categorized_packages, images=images)
 
 
 @main.route("/order", methods=["GET", "POST"])

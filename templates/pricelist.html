@@ -3,13 +3,25 @@
 {% block head %}
     <title>Daftar Harga Paket Fotografi</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/pricelist.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/pricelist_slider.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="pricelist-hero">
-    <div class="container">
-        <h1>Abadikan Momen Berharga Anda</h1>
-        <p class="lead">Kami menawarkan paket fotografi profesional untuk mengabadikan setiap detik momen spesial Anda. Pilih paket yang paling sesuai dengan kebutuhan Anda.</p>
+    <div class="slider-container">
+        <div class="slider-track">
+            {% for image in images %}
+            <div class="slide">
+                <img src="{{ url_for('static', filename='images/' + image) }}" alt="Portfolio Image">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="hero-content">
+        <div class="container">
+            <h1>Abadikan Momen Berharga Anda</h1>
+            <p class="lead">Kami menawarkan paket fotografi profesional untuk mengabadikan setiap detik momen spesial Anda. Pilih paket yang paling sesuai dengan kebutuhan Anda.</p>
+        </div>
     </div>
 </div>
 
@@ -67,4 +79,9 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/pricelist_slider.js') }}"></script>
 {% endblock %}
