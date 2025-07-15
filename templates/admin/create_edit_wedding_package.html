@@ -21,22 +21,8 @@
             {{ form.hidden_tag() }}
             <div class="form-group mb-3">
                 {{ form.name.label(class="form-label") }}
-                {{ form.name(class="form-control", placeholder="e.g., Silver Package") }}
+                {{ form.name(class="form-control", placeholder="e.g., Paket Silver") }}
                 {% for error in form.name.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="form-group mb-3">
-                {{ form.description.label(class="form-label") }}
-                {{ form.description(class="form-control", rows=7, placeholder="e.g., Includes 8 hours of coverage, 2 photographers, online gallery...") }}
-                {% for error in form.description.errors %}
-                    <span class="text-danger">{{ error %}</span>
-                {% endfor %}
-            </div>
-            <div class="form-group mb-3">
-                {{ form.price.label(class="form-label") }}
-                {{ form.price(class="form-control", type="number", step="0.01", placeholder="e.g., 15000000.00 (Enter without Rp or commas)") }}
-                {% for error in form.price.errors %}
                     <span class="text-danger">{{ error }}</span>
                 {% endfor %}
             </div>
@@ -47,8 +33,22 @@
                     <span class="text-danger">{{ error }}</span>
                 {% endfor %}
             </div>
+            <div class="form-group mb-3">
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-control", rows=7, placeholder="e.g., Termasuk 8 jam liputan, 2 fotografer, galeri online...") }}
+                {% for error in form.description.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="form-group mb-3">
+                {{ form.price.label(class="form-label") }}
+                {{ form.price(class="form-control", type="number", step="0.01", placeholder="e.g., 15000000.00 (Masukkan tanpa Rp atau koma)") }}
+                {% for error in form.price.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            </div>
             <div class="d-flex justify-content-between mt-4">
-                <a href="{{ url_for('admin.wedding_package_list') }}" class="btn btn-secondary">Cancel</a>
+                <a href="{{ url_for('admin.wedding_package_list') }}" class="btn btn-secondary">Batal</a>
                 {{ form.submit(class="btn btn-primary") }}
             </div>
         </form>

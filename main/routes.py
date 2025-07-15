@@ -128,24 +128,46 @@ def order():
         flash("Pengguna admin tidak dapat membuat pesanan.", "danger")
         return redirect(url_for("admin.admin_panel"))
     form = OrderForm()
+    selected_package = None
+    all_wedding_packages = WeddingPackage.query.filter_by(category="wedding").all()
+    all_prewedding_packages = WeddingPackage.query.filter_by(category="prewedding").all()
 
-    # Pre-fill form based on query parameters
+    # Handle pre-filling form based on query parameters (from pricelist or initial selection)
     if request.method == "GET":
-        service_type = request.args.get("service_type")
-        package_id = request.args.get("package_id", type=int)
+        service_type_arg = request.args.get("service_type")
+        package_id_arg = request.args.get("package_id", type=int)
 
-        if service_type:
-            form.service_type.data = service_type
+        if package_id_arg:
+            selected_package = WeddingPackage.query.get(package_id_arg)
+            if selected_package:
+                form.service_type.data = selected_package.category
+                if selected_package.category == "wedding":
+                    form.wedding_package.data = selected_package
+                elif selected_package.category == "prewedding":
+                    form.prewedding_package.data = selected_package
+            else:
+                flash("Paket yang dipilih tidak ditemukan.", "danger")
+        elif service_type_arg: # If only service_type is provided, but no specific package
+            form.service_type.data = service_type_arg
 
-        if package_id:
-            package = WeddingPackage.query.get(package_id)
+    # Handle form submission (POST request)
+    if request.method == "POST":
+        print(f"DEBUG: Request form data: {request.form}")
+        # If a package was selected via hidden input, retrieve the object and set it to the form field
+        selected_wedding_package_id = request.form.get("wedding_package")
+        selected_prewedding_package_id = request.form.get("prewedding_package")
+
+        if selected_wedding_package_id:
+            package = WeddingPackage.query.get(selected_wedding_package_id)
             if package:
-                if service_type == "wedding":
-                    form.wedding_package.data = package
-                elif service_type == "prewedding":
-                    form.prewedding_package.data = package
+                form.wedding_package.data = package
+        elif selected_prewedding_package_id:
+            package = WeddingPackage.query.get(selected_prewedding_package_id)
+            if package:
+                form.prewedding_package.data = package
 
     if form.validate_on_submit():
+        print("DEBUG: Form validated successfully!")
         requested_date = form.event_date.data
         service_type = form.service_type.data
 
@@ -226,6 +248,7 @@ def order():
                 return render_template("order.html", form=form)
             order_total_price = form.total_price.data
 
+        print("DEBUG: About to create order object.")
         order = Order(
             client_id=current_user.id,
             service_type=service_type,
@@ -271,4 +294,59 @@ def order():
                 )
             )
             db.session.add(notification)
-            db.session.commit()
+        db.session.commit()
+        print("DEBUG: Order and notifications created. Redirecting...")
+        flash("Pesanan Anda berhasil dibuat! Silakan lanjutkan ke pembayaran DP.", "success")
+        return redirect(url_for("client.dp_payment", order_id=order.id))
+    else:
+        print(f"DEBUG: Form validation failed. Errors: {form.errors}")
+        return render_template(
+            "order.html",
+            form=form,
+            selected_package=selected_package,
+            all_wedding_packages=all_wedding_packages,
+            all_prewedding_packages=all_prewedding_packages,
+        )
+
+
+@main.route("/unavailable_dates")
+def unavailable_dates():
+    # Get all calendar events that are not available or have an order_id
+    unavailable_events = CalendarEvent.query.filter(
+        or_(CalendarEvent.is_available == False, CalendarEvent.order_id.isnot(None))
+    ).all()
+
+    # Extract unique dates from these events
+    dates = set()
+    for event in unavailable_events:
+        if event.start_time:
+            dates.add(event.start_time.strftime("%Y-%m-%d"))
+        if event.end_time:
+            dates.add(event.end_time.strftime("%Y-%m-%d")) # Also add end_time date if different
+
+    return jsonify(list(dates))
+
+
+@main.route("/like_image/<int:image_id>", methods=["POST"])
+@login_required
+def like_image(image_id):
+    if current_user.role != "client":
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+    image = PostImage.query.get_or_404(image_id)
+    existing_like = ImageLike.query.filter_by(user_id=current_user.id, post_image_id=image.id).first()
+
+    if existing_like:
+        db.session.delete(existing_like)
+        image.likes -= 1
+        message = "Like removed."
+        liked = False
+    else:
+        new_like = ImageLike(user_id=current_user.id, post_image_id=image.id)
+        db.session.add(new_like)
+        image.likes += 1
+        message = "Image liked!"
+        liked = True
+
+    db.session.commit()
+    return jsonify({"success": True, "message": message, "likes": image.likes, "liked": liked})

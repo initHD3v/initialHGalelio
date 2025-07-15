@@ -10,7 +10,7 @@
         <link href="{{ url_for('static', filename='sb-admin-pro/dist/css/styles.css') }}" rel="stylesheet" />
         <link rel="icon" type="image/x-xicon" href="{{ url_for('static', filename='sb-admin-pro/dist/assets/img/favicon.png') }}" />
         <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" crossorigin="anonymous"></script>
+        
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
         {% block head_extra %}{% endblock %}
     </head>
@@ -71,57 +71,62 @@
                             <div class="sidenav-menu-heading">Core</div>
                             <!-- Sidenav Accordion (Dashboard)-->
                             <a class="nav-link {% if request.endpoint == 'admin.admin_panel' %}active{% endif %}" href="{{ url_for('admin.admin_panel') }}">
-                                <div class="nav-link-icon"><i data-feather="activity"></i></div>
+                                <div class="nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
+                            </a>
+                            <!-- Sidenav Link (Manage Portfolio)-->
+                            <a class="nav-link {% if request.endpoint == 'admin.manage_portfolio' %}active{% endif %}" href="{{ url_for('admin.manage_portfolio') }}">
+                                <div class="nav-link-icon"><i class="fas fa-camera"></i></div>
+                                Kelola Portofolio
                             </a>
                             <!-- Sidenav Link (Orders)-->
                             <a class="nav-link {% if request.endpoint == 'admin.order_list' %}active{% endif %}" href="{{ url_for('admin.order_list') }}">
-                                <div class="nav-link-icon"><i data-feather="clipboard"></i></div>
-                                Orders
+                                <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                                Kelola Orders
                             </a>
                             <!-- Sidenav Link (Clients)-->
                             <a class="nav-link {% if request.endpoint == 'admin.client_list' %}active{% endif %}" href="{{ url_for('admin.client_list') }}">
-                                <div class="nav-link-icon"><i data-feather="users"></i></div>
+                                <div class="nav-link-icon"><i class="fas fa-users"></i></div>
                                 Clients
                             </a>
                             <!-- Sidenav Link (Calendar)-->
                             <a class="nav-link {% if request.endpoint == 'admin.calendar' %}active{% endif %}" href="{{ url_for('admin.calendar') }}">
-                                <div class="nav-link-icon"><i data-feather="calendar"></i></div>
+                                <div class="nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
                                 Calendar
                             </a>
                             <!-- Sidenav Link (Testimonials)-->
                             <a class="nav-link {% if request.endpoint == 'admin.testimonials_admin' %}active{% endif %}" href="{{ url_for('admin.testimonials_admin') }}">
-                                <div class="nav-link-icon"><i data-feather="message-square"></i></div>
+                                <div class="nav-link-icon"><i class="fas fa-comments"></i></div>
                                 Testimonials
                             </a>
                             <!-- Sidenav Link (Wedding Packages)-->
                             <a class="nav-link {% if request.endpoint == 'admin.wedding_package_list' %}active{% endif %}" href="{{ url_for('admin.wedding_package_list') }}">
-                                <div class="nav-link-icon"><i data-feather="gift"></i></div>
-                                Wedding Packages
+                                <div class="nav-link-icon"><i class="fas fa-tags"></i></div>
+                                Kelola Price List
                             </a>
                             <!-- Sidenav Link (Bank Accounts)-->
                             <a class="nav-link {% if 'bank_account' in request.endpoint %}active{% endif %}" href="{{ url_for('admin.bank_account_list') }}">
-                                <div class="nav-link-icon"><i data-feather="credit-card"></i></div>
-                                Bank Accounts
+                                <div class="nav-link-icon"><i class="fas fa-university"></i></div>
+                                Rekening
                             </a>
                             <!-- Sidenav Link (Manage Homepage)-->
                             <a class="nav-link {% if request.endpoint == 'admin.manage_homepage' %}active{% endif %}" href="{{ url_for('admin.manage_homepage') }}">
-                                <div class="nav-link-icon"><i data-feather="layout"></i></div>
+                                <div class="nav-link-icon"><i class="fas fa-home"></i></div>
                                 Kelola Homepage
                             </a>
                             <!-- Sidenav Link (Edit Profile)-->
                             <a class="nav-link {% if request.endpoint == 'admin.edit_profile_admin' %}active{% endif %}" href="{{ url_for('admin.edit_profile_admin') }}">
-                                <div class="nav-link-icon"><i data-feather="user"></i></div>
+                                <div class="nav-link-icon"><i class="fas fa-user-edit"></i></div>
                                 Edit Profile
                             </a>
                             <!-- Sidenav Link (Home Page)-->
                             <a class="nav-link" href="{{ url_for('main.index') }}">
-                                <div class="nav-link-icon"><i data-feather="home"></i></div>
+                                <div class="nav-link-icon"><i class="fas fa-globe"></i></div>
                                 Home Page
                             </a>
                             <!-- Sidenav Link (Logout)-->
                             <a class="nav-link" href="{{ url_for('auth.logout') }}">
-                                <div class="nav-link-icon"><i data-feather="log-out"></i></div>
+                                <div class="nav-link-icon"><i class="fas fa-sign-out-alt"></i></div>
                                 Logout
                             </a>
                         </div>

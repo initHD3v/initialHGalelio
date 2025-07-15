@@ -1,0 +1,203 @@
+body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .invoice-container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+        }
+        .invoice-header {
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Align items to start for better vertical spacing */
+        }
+        .invoice-header h1 {
+            color: #007bff;
+            font-weight: 700;
+            margin: 0;
+        }
+        .invoice-header .invoice-meta {
+            text-align: right;
+            font-size: 0.95em;
+        }
+        .invoice-section-title {
+            font-size: 1.3em;
+            color: #007bff;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .info-block p {
+            margin-bottom: 5px;
+        }
+        .table th, .table td {
+            padding: 12px;
+            vertical-align: middle;
+        }
+        .table thead th {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+        .table tbody tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+        .table tfoot td {
+            font-weight: 600;
+            border-top: 2px solid #e9ecef;
+        }
+        .total-row {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #007bff;
+        }
+        .status-badge {
+            padding: 0.4em 0.7em;
+            border-radius: 0.25rem;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #fff;
+        }
+        .status-waiting_dp { background-color: #17a2b8; } /* info */
+        .status-waiting_approval { background-color: #ffc107; color: #343a40; } /* warning */
+        .status-accepted { background-color: #28a745; } /* success */
+        .status-rejected { background-color: #dc3545; } /* danger */
+        .status-completed { background-color: #007bff; } /* primary */
+        .status-expired { background-color: #6c757d; } /* secondary */
+
+        .bank-details-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+        .bank-details-section .bank-item {
+            background-color: #e9f7ff;
+            border: 1px solid #b3e0ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .bank-details-section .bank-item p {
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+        .bank-details-section .bank-item strong {
+            color: #0056b3;
+        }
+        .invoice-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+            text-align: center;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        /* Responsive Table Styling (Removed as service details are now info-block) */
+        @media screen and (max-width: 768px) {
+            .table-responsive table {
+                border: 0;
+            }
+
+            .table-responsive thead {
+                display: none;
+            }
+
+            .table-responsive tr {
+                display: block;
+                margin-bottom: .625em;
+                border: 1px solid #dee2e6;
+                border-radius: .25rem;
+            }
+
+            .table-responsive td {
+                display: block;
+                text-align: right;
+                font-size: .8em;
+                border-bottom: 1px dotted #dee2e6;
+            }
+
+            .table-responsive td::before {
+                content: attr(data-label);
+                float: left;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+
+            .table-responsive td:last-child {
+                border-bottom: 0;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0.5cm; /* Minimal margin for printing */
+            }
+            body {
+                padding: 0;
+                margin: 0;
+                font-size: 9pt; /* Even smaller base font size for print */
+                line-height: 1.1; /* Further reduced line height */
+                -webkit-print-color-adjust: exact; /* Ensure background colors are printed */
+                print-color-adjust: exact;
+            }
+            .invoice-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+                max-width: 100%;
+                width: 100%;
+            }
+            .invoice-header {
+                padding-bottom: 5px;
+                margin-bottom: 10px;
+                flex-direction: row; /* Ensure header elements stay in a row */
+                align-items: flex-start;
+            }
+            .invoice-header h1 {
+                font-size: 1.2em;
+            }
+            .invoice-section-title {
+                font-size: 0.9em;
+                padding-bottom: 3px;
+                margin-bottom: 8px;
+            }
+            .info-block p, .bank-details-section p, .invoice-footer p {
+                font-size: 8pt;
+                margin-bottom: 0 !important; /* Aggressively remove bottom margin */
+                line-height: 1.1; /* Very tight line height */
+            }
+            .table th, .table td {
+                padding: 5px;
+                font-size: 8pt;
+            }
+            .bank-details-section {
+                margin-top: 15px;
+                padding-top: 8px;
+            }
+            .bank-details-section .bank-item {
+                padding: 8px;
+                margin-bottom: 8px;
+            }
+            .invoice-footer {
+                margin-top: 15px;
+                padding-top: 8px;
+            }
+            /* Ensure no page breaks within critical sections */
+            .invoice-container, .invoice-section-title, .table, .bank-details-section, .info-block {
+                page-break-inside: avoid;
+            }
+        }

@@ -1,3 +1,4 @@
+from wtforms.widgets import Select
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField,
@@ -10,7 +11,8 @@ from wtforms import (
     DateTimeField,
     BooleanField,
     HiddenField,
-    FloatField,  # Moved FloatField to top
+    FloatField,
+    DecimalField,
 )
 from wtforms.validators import (
     DataRequired,
@@ -24,13 +26,48 @@ from wtforms_sqlalchemy.fields import QuerySelectField
 from models import User, WeddingPackage, BankAccount  # Added BankAccount
 from extensions import db  # Added import
 from datetime import datetime, timedelta  # Added datetime import
+from wtforms.widgets import Select # Import Select widget
+
+class CustomQuerySelectField(QuerySelectField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.widget = Select() # Ensure it uses the Select widget
+
+    def iter_choices(self):
+        if self.allow_blank:
+            yield ("", self.blank_text, self.data is None, {})
+        print(f"DEBUG: CustomQuerySelectField - Querying for choices...")
+        objects = self.get_object_list()
+        print(f"DEBUG: CustomQuerySelectField - Found {len(objects)} objects.")
+        for obj in objects:
+            value = self.get_pk(obj)
+            label = self.get_label(obj)
+            selected = self.data == obj
+            print(f"DEBUG: CustomQuerySelectField - Yielding choice: (value={value}, label={label}, selected={selected})")
+            yield (value, label, selected, {})
+
+    def get_object_list(self):
+        # This method is called by iter_choices to get the list of objects
+        # It should execute the query_factory
+        return self.query_factory().all()
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            if self.allow_blank and valuelist[0] == "":
+                self.data = None
+            else:
+                try:
+                    pk = int(valuelist[0])
+                    obj = self.query_factory().filter_by(id=pk).first()
+                    self.data = obj
+                except (ValueError, TypeError):
+                    self.data = None
 
 
 def get_active_bank_accounts():
     accounts = BankAccount.query.filter_by(is_active=True).order_by(
         BankAccount.bank_name
     )
-    print(f"DEBUG: Active bank accounts query: {accounts.all()}")  # Added debug print
     return accounts
 
 
@@ -101,20 +138,20 @@ class OrderForm(FlaskForm):
         ],
         validators=[DataRequired()],
     )
-    wedding_package = QuerySelectField(
+    wedding_package = CustomQuerySelectField(
         "Wedding Package",
-        query_factory=lambda: WeddingPackage.query.filter_by(category="Wedding").all(),
+        query_factory=lambda: WeddingPackage.query.filter_by(category="wedding"),
         get_label=lambda x: x.name,
         get_pk=lambda x: x.id,
         allow_blank=True,
         blank_text="-- Select a Wedding package --",
         validators=[Optional()],  # Make optional, will be required conditionally
     )
-    prewedding_package = QuerySelectField(
+    prewedding_package = CustomQuerySelectField(
         "Pre-wedding Package",
         query_factory=lambda: WeddingPackage.query.filter_by(
-            category="Pre-wedding"
-        ).all(),
+            category="prewedding"
+        ),
         get_label=lambda x: x.name,
         get_pk=lambda x: x.id,
         allow_blank=True,
@@ -238,12 +275,9 @@ class UserEditForm(FlaskForm):
 
 
 class DPPaymentForm(FlaskForm):
-    bank_account = QuerySelectField(
+    bank_account = SelectField(
         "Pilih Rekening Bank Tujuan",
-        query_factory=get_active_bank_accounts,
-        get_label=lambda x: f"{x.bank_name} - {x.account_name} ({x.account_number})",
-        allow_blank=False,
-        validators=[DataRequired()],
+        validators=[DataRequired()]
     )
     payment_proof = FileField("Upload Bukti Pembayaran", validators=[DataRequired()])
     submit = SubmitField("Kirim Bukti Pembayaran")
@@ -263,25 +297,15 @@ class CalendarEventForm(FlaskForm):
 
 
 class WeddingPackageForm(FlaskForm):
-    name = StringField("Package Name", validators=[DataRequired()])
-    description = TextAreaField("Description")
-    price = FloatField(
-        "Price",
-        validators=[
-            DataRequired(),
-            NumberRange(min=0.01, message="Price must be greater than zero."),
-        ],
-    )
+    name = StringField("Nama Paket", validators=[DataRequired()])
+    description = TextAreaField("Deskripsi", validators=[DataRequired()])
+    price = DecimalField("Harga", validators=[DataRequired(), NumberRange(min=0)])
     category = SelectField(
-        "Category",
-        choices=[
-            ("Wedding", "Wedding"),
-            ("Pre-wedding", "Pre-wedding"),
-            ("Event", "Event"),
-        ],
+        "Kategori",
+        choices=[("wedding", "Wedding"), ("prewedding", "Prewedding")],
         validators=[DataRequired()],
     )
-    submit = SubmitField("Save Package")
+    submit = SubmitField("Simpan Paket")
 
 
 class BankAccountForm(FlaskForm):
@@ -307,20 +331,20 @@ class AdminOrderForm(FlaskForm):
         ],
         validators=[DataRequired()],
     )
-    wedding_package = QuerySelectField(
+    wedding_package = CustomQuerySelectField(
         "Wedding Package",
-        query_factory=lambda: WeddingPackage.query.filter_by(category="Wedding").all(),
+        query_factory=lambda: WeddingPackage.query.filter_by(category="Wedding"),
         get_label=lambda x: x.name,
         get_pk=lambda x: x.id,
         allow_blank=True,
         blank_text="-- Select a Wedding package --",
         validators=[Optional()],
     )
-    prewedding_package = QuerySelectField(
+    prewedding_package = CustomQuerySelectField(
         "Pre-wedding Package",
         query_factory=lambda: WeddingPackage.query.filter_by(
             category="Pre-wedding"
-        ).all(),
+        ),
         get_label=lambda x: x.name,
         get_pk=lambda x: x.id,
         allow_blank=True,
@@ -357,10 +381,12 @@ class AdminOrderForm(FlaskForm):
     bank_account = QuerySelectField(
         "Bank Account for Payment",
         query_factory=get_active_bank_accounts,
+        get_pk=lambda x: x.id,
         get_label=lambda x: f"{x.bank_name} - {x.account_name} ({x.account_number})",
-        allow_blank=True,
+        allow_blank=False,
         blank_text="-- Select a Bank Account --",
         validators=[Optional()],
+        widget=Select()
     )
 
     submit = SubmitField("Save Changes")
@@ -404,6 +430,12 @@ class AdminOrderForm(FlaskForm):
                         "Format waktu tidak valid. Mohon gunakan HH:MM."
                     )
                     initial_validation = False
+        elif self.service_type.data == "prewedding":
+            if not self.event_start_time.data:
+                self.event_start_time.errors.append(
+                    "Waktu Mulai diperlukan untuk jenis layanan ini."
+                )
+                initial_validation = False
 
         # Conditional validation for packages
         if self.service_type.data == "wedding" and not self.wedding_package.data:

@@ -37,7 +37,7 @@ from extensions import db
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from flask_babel import _
 from sqlalchemy import or_
 from . import admin
@@ -96,8 +96,8 @@ def manage_homepage():
             if request.form.get(delete_checkbox_name):
                 # Delete from filesystem
                 filepath = os.path.join(hero_image_dir, image.filename)
-                if os.path.exists(filepath):
-                    os.remove(filepath)
+                if os.path.exists(image_path):
+                    os.remove(image_path)
                 # Delete from database
                 db.session.delete(image)
 
@@ -160,7 +160,7 @@ def admin_panel():
     upcoming_orders = (
         Order.query.filter(
             Order.status == "accepted",
-            Order.event_date >= datetime.utcnow().date(),  # Only future events
+            Order.event_date >= datetime.now(UTC).date(),  # Only future events
             Order.event_start_time.isnot(None),
         )
         .order_by(Order.event_date.asc())
@@ -285,7 +285,7 @@ def get_dashboard_summary():
     upcoming_orders = (
         Order.query.filter(
             Order.status == "accepted",
-            Order.event_date >= datetime.utcnow().date(),
+            Order.event_date >= datetime.now(UTC).date(),  # Only future events
             Order.event_start_time.isnot(None),
         )
         .order_by(Order.event_date.asc())
@@ -326,6 +326,7 @@ def get_dashboard_summary():
     )
 
 
+@admin.route("/admin/portfolio")
 @login_required
 def manage_portfolio():
     if current_user.role != "admin":
@@ -548,6 +549,69 @@ def approve_order(order_id):
     return redirect(url_for("admin.order_list"))
 
 
+@admin.route("/admin/order/<int:order_id>/approve_reschedule", methods=["POST"])
+@login_required
+def approve_reschedule(order_id):
+    if current_user.role != "admin":
+        flash("You do not have permission to perform this action.", "danger")
+        return redirect(url_for("main.index"))
+    order = Order.query.get_or_404(order_id)
+
+    if order.status != "reschedule_requested":
+        flash("Order is not in 'reschedule_requested' status.", "danger")
+        return redirect(url_for("admin.order_list"))
+
+    # Update order status
+    order.status = "accepted"  # Or 'rescheduled' if you have that status
+    order.is_notified = False  # Reset notification status
+    db.session.commit()
+
+    # Create notification for client
+    notification = Notification(
+        user_id=order.client_id,
+        type="reschedule_approved",
+        entity_id=order.id,
+        message=f"Permintaan penjadwalan ulang pesanan Anda ({order.wedding_package.name if order.wedding_package else order.service_type}) telah disetujui."
+    )
+    db.session.add(notification)
+    db.session.commit()
+
+    flash("Permintaan penjadwalan ulang disetujui!", "success")
+    return redirect(url_for("admin.order_list"))
+
+
+@admin.route("/admin/order/<int:order_id>/reject_reschedule", methods=["POST"])
+@login_required
+def reject_reschedule(order_id):
+    if current_user.role != "admin":
+        flash("You do not have permission to perform this action.", "danger")
+        return redirect(url_for("main.index"))
+    order = Order.query.get_or_404(order_id)
+
+    if order.status != "reschedule_requested":
+        flash("Order is not in 'reschedule_requested' status.", "danger")
+        return redirect(url_for("admin.order_list"))
+
+    # Update order status
+    # Revert to previous status or set to a specific rejected status
+    order.status = "accepted"  # Revert to accepted, or set to 'reschedule_rejected'
+    order.is_notified = False  # Reset notification status
+    db.session.commit()
+
+    # Create notification for client
+    notification = Notification(
+        user_id=order.client_id,
+        type="reschedule_rejected",
+        entity_id=order.id,
+        message=f"Permintaan penjadwalan ulang pesanan Anda ({order.wedding_package.name if order.wedding_package else order.service_type}) telah ditolak."
+    )
+    db.session.add(notification)
+    db.session.commit()
+
+    flash("Permintaan penjadwalan ulang ditolak!", "success")
+    return redirect(url_for("admin.order_list"))
+
+
 @admin.route("/admin/order/<int:order_id>/reject", methods=["POST"])
 @login_required
 def reject_order(order_id):
@@ -564,7 +628,7 @@ def reject_order(order_id):
         return redirect(url_for("admin.order_list"))
     order.status = "rejected"
     order.is_notified = False  # Reset notification status
-    order.dp_rejection_timestamp = datetime.utcnow()  # Set rejection timestamp
+    order.dp_rejection_timestamp = datetime.now(UTC)  # Set rejection timestamp
     # Delete payment proof if exists
     if order.dp_payment_proof:
         safe_filename = secure_filename(order.dp_payment_proof)
@@ -696,7 +760,7 @@ PRODID:-//Your Photography Portfolio//NONSGML v1.0//EN
         f"BEGIN:VEVENT
 UID:{order.id}@yourportfolio.com
 "
-        f"DTSTAMP:{datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")}
+        f"DTSTAMP:{datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")}"
 "
         f"DTSTART:{dtstart}
 DTEND:{dtend}
@@ -805,22 +869,6 @@ def edit_portfolio_post(post_id):
     post = Post.query.get_or_404(post_id)
     form = PostForm()
     if request.method == "POST":
-        # Handle image deletions
-        images_to_delete_ids = request.form.getlist("delete_images")
-        for img_id in images_to_delete_ids:
-            image_to_delete = PostImage.query.get(img_id)
-            if image_to_delete:
-                # Delete from filesystem
-                safe_filename = secure_filename(image_to_delete.filename)
-                image_path = os.path.join(
-                    current_app.root_path, "static/images", safe_filename
-                )
-                if os.path.exists(image_path):
-                    os.remove(image_path)
-                # Delete from database
-                db.session.delete(image_to_delete)
-        db.session.commit()
-
         # Handle new image uploads
         new_images = request.files.getlist("image")
         uploaded_new_images = [img for img in new_images if img.filename != ""]
@@ -886,6 +934,37 @@ def edit_portfolio_post(post_id):
     return render_template(
         "admin_post_form.html", form=form, title="Edit Portfolio Post", post=post
     )
+
+
+@admin.route("/admin/portfolio/image/<int:image_id>/delete", methods=["POST"])
+@login_required
+def delete_portfolio_image(image_id):
+    if current_user.role != "admin":
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+    image_to_delete = PostImage.query.get(image_id)
+    if not image_to_delete:
+        return jsonify({"success": False, "message": "Image not found"}), 404
+
+    try:
+        # Ensure there's at least one image remaining if this is the last one
+        post = image_to_delete.post
+        if len(post.images) == 1:
+            return jsonify({"success": False, "message": "A post must have at least one image."}), 400
+
+        # Delete from filesystem
+        safe_filename = secure_filename(image_to_delete.filename)
+        image_path = os.path.join(current_app.root_path, "static/images", safe_filename)
+        if os.path.exists(image_path):
+            os.remove(image_path)
+
+        # Delete from database
+        db.session.delete(image_to_delete)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Image deleted successfully!"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": f"Error deleting image: {str(e)}"}), 500
 
 
 @admin.route("/admin/portfolio/<int:post_id>/delete", methods=["POST"])
@@ -1096,7 +1175,10 @@ def new_bank_account():
         flash("You do not have access to this page.", "danger")
         return redirect(url_for("main.index"))
     form = BankAccountForm()
+    print(f"DEBUG: Form created: {form}")
     if form.validate_on_submit():
+        print(f"DEBUG: Form is submitted and valid.")
+        print(f"DEBUG: Form errors: {form.errors}")
         try:
             account = BankAccount(
                 bank_name=form.bank_name.data,
@@ -1206,7 +1288,7 @@ def new_wedding_package():
         flash("Wedding package created successfully!", "success")
         return redirect(url_for("admin.wedding_package_list"))
     return render_template(
-        "admin/create_edit_wedding_package.html", form=form, title="New Wedding Package"
+        "admin/create_edit_wedding_package.html", form=form, title="Tambah Paket Baru"
     )
 
 

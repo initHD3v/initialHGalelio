@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, UTC
 from extensions import db
 
 
@@ -17,7 +17,7 @@ class User(db.Model, UserMixin):
     company_address = db.Column(db.String(200), nullable=True)
     company_email = db.Column(db.String(150), nullable=True)
     company_phone = db.Column(db.String(20), nullable=True)
-    date_registered = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date_registered = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(UTC))
     orders = db.relationship("Order", backref="client", lazy=True)
 
 
@@ -78,9 +78,9 @@ class Order(db.Model):
         db.String(50), default="waiting_dp", nullable=False
     )  # e.g., waiting_dp, waiting_approval, accepted, rejected, completed,
     # cancellation_requested, cancelled, reschedule_requested
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(UTC))
     updated_at = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+        db.DateTime, nullable=False, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
     )
     dp_rejection_timestamp = db.Column(db.DateTime, nullable=True)
     cancellation_reason = db.Column(db.Text, nullable=True)
@@ -172,7 +172,7 @@ class Notification(db.Model):
     entity_id = db.Column(db.Integer, nullable=False)  # ID of the related entity
     message = db.Column(db.String(255), nullable=False)
     is_read = db.Column(db.Boolean, default=False, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(UTC))
 
     user = db.relationship("User", backref="notifications")
 

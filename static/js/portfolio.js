@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imageId = activeSlide.dataset.imageId;
         console.log(`Found active image ID: ${imageId}`); // DEBUG
 
-        fetch(`/api/like/image/${imageId}`, { method: 'POST' })
+        fetch(`/like_image/${imageId}`, { method: 'POST' })
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(err => { throw new Error(err.message || 'Server error'); });

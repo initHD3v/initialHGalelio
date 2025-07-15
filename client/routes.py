@@ -44,7 +44,7 @@ def get_testimonial_for_order(order_id):
 @login_required
 def dashboard():
     orders = Order.query.filter_by(client_id=current_user.id).all()
-    now = datetime.utcnow()
+    now = datetime.now(pytz.utc)
     upcoming_orders = [
         order
         for order in orders
@@ -438,8 +438,14 @@ def dp_payment(order_id):
         deadline = deadline_utc.astimezone(JAKARTA_TZ)
 
     # --- Form Processing (moved from pay_dp) ---
+    bank_accounts = BankAccount.query.filter_by(is_active=True).all()
+    form.bank_account.choices = [
+        (str(acc.id), f"{acc.bank_name} - {acc.account_name} ({acc.account_number})")
+        for acc in bank_accounts
+    ]
+
     if form.validate_on_submit():
-        order.bank_account_id = form.bank_account.data.id  # Save selected bank account
+        order.bank_account_id = int(form.bank_account.data)  # Save selected bank account
         if form.payment_proof.data:
             # Save the uploaded file
             filename = secure_filename(form.payment_proof.data.filename)
@@ -464,7 +470,6 @@ def dp_payment(order_id):
 
     # --- Data for Template ---
     dp_amount = order.total_price * 0.15
-    bank_accounts = BankAccount.query.filter_by(is_active=True).all()
 
     package_name = "N/A"
     if order.wedding_package:
@@ -526,3 +531,14 @@ def edit_profile_client():
     return render_template(
         "edit_profile.html", form=form, user=current_user, title="Edit Client Profile"
     )
+
+
+@client.route("/api/notifications/mark_read/<int:notification_id>", methods=["POST"])
+@login_required
+def mark_notification_as_read(notification_id):
+    notification = Notification.query.get(notification_id)
+    if notification and notification.user_id == current_user.id:
+        notification.is_read = True
+        db.session.commit()
+        return jsonify(success=True)
+    return jsonify(success=False), 400

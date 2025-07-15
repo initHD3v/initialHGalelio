@@ -48,20 +48,21 @@
                     </label>
                     <input type="file" id="image-upload" name="image" accept="image/*" multiple style="display: none;">
 
+                    <div id="new-image-thumbnails" class="row row-cols-3 g-2 mt-3">
+                        <!-- New image thumbnails will be appended here -->
+                    </div>
+
                     {% if post and post.images %}
                         <h6 class="mt-4 mb-2 text-gray-800">Gambar yang Ada:</h6>
-                        <div class="row row-cols-3 g-2">
+                        <div class="row row-cols-3 g-2 existing-images-container">
                             {% for image in post.images %}
-                                <div class="col">
+                                <div class="col" id="existing-image-{{ image.id }}">
                                     <div class="card h-100 border-0">
                                         <img src="{{ url_for('static', filename='images/' + image.filename) }}" class="card-img-top" alt="Existing Image" style="height: 80px; object-fit: cover;">
                                         <div class="card-body p-1 text-center">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="delete_images" value="{{ image.id }}" id="deleteImage{{ image.id }}">
-                                                <label class="form-check-label small" for="deleteImage{{ image.id }}">
-                                                    Hapus
-                                                </label>
-                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-image-btn" data-image-id="{{ image.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -106,39 +107,76 @@
         const imageUpload = document.getElementById('image-upload');
         const imagePreviewCarousel = document.getElementById('image-preview-carousel');
         const carouselInner = imagePreviewCarousel.querySelector('.carousel-inner');
-        // Initial check for existing images to show/hide placeholder
-        function updateCarouselPlaceholder() {
-            if (carouselInner.children.length === 0 || (carouselInner.children.length === 1 && carouselInner.children[0].classList.contains('d-flex') && carouselInner.children[0].querySelector('p').innerText === 'Tidak ada gambar yang dipilih')) {
+        const existingImagesContainer = document.querySelector('.existing-images-container');
+        const newImageThumbnailsContainer = document.getElementById('new-image-thumbnails');
+        let newFiles = []; // To store files selected by the user
+
+        // Function to update the carousel with current images (existing + new)
+        function updateCarousel() {
+            carouselInner.innerHTML = ''; // Clear existing carousel items
+            const allImages = [];
+
+            // Add existing images to the list (if any)
+            if (existingImagesContainer) {
+                existingImagesContainer.querySelectorAll('.card img').forEach(img => {
+                    allImages.push(img.src);
+                });
+            }
+
+            // Add newly selected images to the list
+            newFiles.forEach(file => {
+                allImages.push(URL.createObjectURL(file));
+            });
+
+            if (allImages.length > 0) {
+                allImages.forEach((src, index) => {
+                    const carouselItem = document.createElement('div');
+                    carouselItem.classList.add('carousel-item');
+                    if (index === 0) {
+                        carouselItem.classList.add('active');
+                    }
+                    carouselItem.innerHTML = `<img src="${src}" class="d-block w-100" alt="..." style="object-fit: contain; max-height: 400px;">`;
+                    carouselInner.appendChild(carouselItem);
+                });
+                // Re-initialize carousel
+                new bootstrap.Carousel(imagePreviewCarousel);
+            } else {
+                // Show placeholder if no images
                 carouselInner.innerHTML = '<div class="carousel-item active d-flex align-items-center justify-content-center" style="min-height: 400px;"><p class="text-muted">Tidak ada gambar yang dipilih</p></div>';
             }
         }
-        updateCarouselPlaceholder();
+
+        // Initial call to populate carousel
+        updateCarousel();
 
         imageUpload.addEventListener('change', function(event) {
-            carouselInner.innerHTML = ''; // Clear existing previews
+            newImageThumbnailsContainer.innerHTML = ''; // Clear previous new image previews
+            newFiles = []; // Reset new files array
 
             if (this.files && this.files.length > 0) {
                 Array.from(this.files).forEach((file, index) => {
+                    newFiles.push(file); // Add file to our array
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        const carouselItem = document.createElement('div');
-                        carouselItem.classList.add('carousel-item');
-                        if (index === 0) {
-                            carouselItem.classList.add('active');
-                        }
-                        carouselItem.innerHTML = `<img src="${e.target.result}" class="d-block w-100" alt="..." style="object-fit: contain; max-height: 250px;">`;
-                        carouselInner.appendChild(carouselItem);
+                        const colDiv = document.createElement('div');
+                        colDiv.classList.add('col');
+                        colDiv.dataset.fileIndex = index; // Store index to identify for deletion
+                        colDiv.innerHTML = `
+                            <div class="card h-100 border-0">
+                                <img src="${e.target.result}" class="card-img-top" alt="New Image" style="height: 80px; object-fit: cover;">
+                                <div class="card-body p-1 text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-new-image-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        newImageThumbnailsContainer.appendChild(colDiv);
                     };
                     reader.readAsDataURL(file);
                 });
-                // Re-initialize carousel only if new images are added
-                if (this.files.length > 0) {
-                    new bootstrap.Carousel(imagePreviewCarousel);
-                }
-            } else {
-                // If no new files are selected, and there are no existing images, show placeholder
-                updateCarouselPlaceholder();
             }
+            updateCarousel(); // Update carousel after new files are selected
         });
 
         // Handle form submission with AJAX
@@ -147,10 +185,10 @@
             e.preventDefault();
 
             const formData = new FormData(postForm);
-            const newImages = imageUpload.files;
-            for (let i = 0; i < newImages.length; i++) {
-                formData.append('image', newImages[i]);
-            }
+            // Append only the currently selected new files
+            newFiles.forEach(file => {
+                formData.append('image', file);
+            });
 
             fetch(postForm.action, {
                 method: 'POST',
@@ -169,6 +207,74 @@
                 console.error('Error:', error);
                 alert('An error occurred. Please try again.');
             });
+        });
+
+        // Handle delete existing image button click
+        if (existingImagesContainer) {
+            existingImagesContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('delete-image-btn') || e.target.closest('.delete-image-btn')) {
+                    const button = e.target.closest('.delete-image-btn');
+                    const imageId = button.dataset.imageId;
+                    if (confirm('Are you sure you want to delete this image?')) {
+                        fetch(`/admin/portfolio/image/${imageId}/delete`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message);
+                                document.getElementById(`existing-image-${imageId}`).remove();
+                                updateCarousel(); // Update carousel after deletion
+                            } else {
+                                alert(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting the image.');
+                        });
+                    }
+                }
+            });
+        }
+
+        // Handle delete new image button click
+        newImageThumbnailsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-new-image-btn') || e.target.closest('.delete-new-image-btn')) {
+                const button = e.target.closest('.delete-new-image-btn');
+                const colDiv = button.closest('.col');
+                const fileIndex = parseInt(colDiv.dataset.fileIndex);
+
+                // Remove file from our array
+                newFiles.splice(fileIndex, 1);
+
+                // Re-render thumbnails to update indices and remove the deleted one
+                newImageThumbnailsContainer.innerHTML = '';
+                newFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const newColDiv = document.createElement('div');
+                        newColDiv.classList.add('col');
+                        newColDiv.dataset.fileIndex = index; // Update index
+                        newColDiv.innerHTML = `
+                            <div class="card h-100 border-0">
+                                <img src="${e.target.result}" class="card-img-top" alt="New Image" style="height: 80px; object-fit: cover;">
+                                <div class="card-body p-1 text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-new-image-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        newImageThumbnailsContainer.appendChild(newColDiv);
+                    };
+                    reader.readAsDataURL(file);
+                });
+                updateCarousel(); // Update carousel after new files are deleted
+            }
         });
     });
 </script>
