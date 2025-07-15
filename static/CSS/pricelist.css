@@ -1,140 +1,129 @@
-
-.pricelist-container {
-    padding: 40px 0;
-    background-color: #f8f9fa;
-}
-
-.pricelist-category-title {
+.pricelist-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../images/A7E00269.jpeg') no-repeat center center;
+    background-size: cover;
+    color: white;
+    padding: 100px 0;
     text-align: center;
-    margin-bottom: 30px;
-    color: #343a40;
-    font-weight: 700;
-    font-size: 2.5rem;
-    position: relative;
+    margin-bottom: 50px;
 }
 
-.pricelist-category-title::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -10px;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
-    background-color: #007bff; /* Primary color */
-    border-radius: 2px;
+.pricelist-hero h1 {
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
-.pricelist-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    padding: 20px;
-    max-width: 1200px;
+.pricelist-hero p {
+    font-size: 1.25rem;
+    max-width: 800px;
     margin: 0 auto;
 }
 
+.nav-pills .nav-link {
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+    border-radius: 50rem;
+    padding: 0.5rem 1.5rem;
+    margin: 0 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+.nav-pills .nav-link:hover {
+    background-color: #e9ecef;
+}
+.nav-pills .nav-link.active {
+    color: #fff;
+    background-color: #0d6efd;
+}
 .pricelist-card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: none; /* Remove default card border */
+    border-radius: 15px; /* More rounded corners */
+    overflow: hidden; /* Ensures content respects border-radius */
 }
-
 .pricelist-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1) !important; /* Stronger shadow on hover */
 }
-
-.pricelist-card-header {
-    background-color: #007bff; /* Primary color */
-    color: #ffffff;
-    padding: 20px;
-    text-align: center;
-    font-size: 1.8rem;
-    font-weight: 600;
-}
-
-.pricelist-card-body {
-    padding: 25px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.pricelist-card-price {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #28a745; /* Success color */
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-.pricelist-card-description {
-    font-size: 1rem;
-    color: #6c757d;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    flex-grow: 1;
-}
-
-.pricelist-card-features ul {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 20px;
-}
-
-.pricelist-card-features li {
-    margin-bottom: 10px;
-    color: #495057;
-    font-size: 0.95rem;
-}
-
-.pricelist-card-features li::before {
-    content: '✓';
-    color: #007bff;
-    margin-right: 10px;
+.pricelist-card .card-header {
+    background-color: #0d6efd; /* Primary color for header */
+    color: white;
+    font-size: 1.25rem;
     font-weight: bold;
+    padding: 1.5rem;
+    border-bottom: none;
 }
-
-.pricelist-card-footer {
-    text-align: center;
-    padding-top: 20px;
-    border-top: 1px solid #e9ecef;
+.pricelist-card .card-body {
+    padding: 2rem;
 }
-
-.pricelist-card-button {
-    background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 1.1rem;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
+.pricelist-card .display-5 {
+    color: #0d6efd; /* Primary color for price */
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
 }
-
-.pricelist-card-button:hover {
-    background-color: #0056b3;
+.package-description ul {
+    list-style: none;
+    padding-left: 0;
+    text-align: left;
+    margin-bottom: 2rem;
+}
+.package-description ul li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    color: #495057;
+    font-size: 1.05rem;
+}
+.package-description ul li::before {
+    content: '\f00c'; /* Font Awesome check icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    color: #28a745; /* Success color for checkmark */
+    font-size: 1.1em;
+    line-height: 1;
+    margin-right: 0.75rem;
+}
+.btn-outline-primary {
+    border-width: 2px;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50rem;
+    transition: all 0.3s ease;
+}
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .pricelist-category-title {
+    .pricelist-hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .pricelist-hero p {
+        font-size: 1rem;
+    }
+
+    .nav-pills .nav-link {
+        padding: 0.4rem 1rem;
+        margin: 0 0.2rem;
+        font-size: 0.9rem;
+    }
+
+    .pricelist-card .card-header {
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+
+    .pricelist-card .display-5 {
         font-size: 2rem;
     }
-    .pricelist-cards-grid {
-        grid-template-columns: 1fr;
-        padding: 15px;
+
+    .pricelist-card .card-body {
+        padding: 1.5rem;
     }
-    .pricelist-card-header {
-        font-size: 1.5rem;
-    }
-    .pricelist-card-price {
-        font-size: 2rem;
+
+    .package-description ul li {
+        font-size: 0.95rem;
     }
 }

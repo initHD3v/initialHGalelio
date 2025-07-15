@@ -5,13 +5,22 @@
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <!-- Section Header -->
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold">Abadikan Momen Berharga Anda</h1>
-        <p class="lead text-muted">Kami menawarkan paket fotografi profesional untuk mengabadikan setiap detik momen spesial Anda. Pilih paket yang paling sesuai dengan kebutuhan Anda.</p>
-    </div>
+{% extends 'base.html' %}
 
+{% block head %}
+    <title>Daftar Harga Paket Fotografi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/pricelist.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="pricelist-hero">
+    <div class="container">
+        <h1>Abadikan Momen Berharga Anda</h1>
+        <p class="lead">Kami menawarkan paket fotografi profesional untuk mengabadikan setiap detik momen spesial Anda. Pilih paket yang paling sesuai dengan kebutuhan Anda.</p>
+    </div>
+</div>
+
+<div class="container py-5">
     {% if categorized_packages %}
         <!-- Tab Navigation -->
         <ul class="nav nav-pills justify-content-center mb-4" id="pricelistTab" role="tablist">
@@ -31,8 +40,8 @@
                     <div class="row justify-content-center g-4">
                         {% for package in packages %}
                             <div class="col-lg-4 col-md-6">
-                                <div class="card h-100 shadow border-0 rounded-lg pricelist-card">
-                                    <div class="card-header text-center bg-primary text-white border-0 rounded-top-lg">
+                                <div class="card h-100 shadow pricelist-card">
+                                    <div class="card-header text-center">
                                         <h5 class="mb-0">{{ package.name }}</h5>
                                     </div>
                                     <div class="card-body p-4 d-flex flex-column">
@@ -65,65 +74,4 @@
         </div>
     {% endif %}
 </div>
-
-<style>
-    body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-    .container.my-5 {
-        flex-grow: 1;
-    }
-    .nav-pills .nav-link {
-        color: #0d6efd;
-        border: 1px solid #0d6efd;
-        border-radius: 50rem;
-        padding: 0.5rem 1.5rem;
-        margin: 0 0.5rem;
-        transition: all 0.2s ease-in-out;
-    }
-    .nav-pills .nav-link:hover {
-        background-color: #e9ecef;
-    }
-    .nav-pills .nav-link.active {
-        color: #fff;
-        background-color: #0d6efd;
-    }
-    .pricelist-card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-    .pricelist-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    }
-    .package-description ul {
-        list-style: none;
-        padding-left: 0;
-        text-align: left;
-    }
-    .package-description ul li {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 0.75rem;
-        color: #495057;
-    }
-    .package-description ul li::before {
-        content: '\2022'; /* Bullet dot */
-        color: #0d6efd; /* Primary color */
-        font-size: 1.2em;
-        line-height: 1;
-        margin-right: 0.75rem;
-    }
-    .fw-bold {
-        font-weight: 700 !important;
-    }
-    .rounded-lg {
-        border-radius: 0.75rem !important;
-    }
-    .rounded-top-lg {
-        border-top-left-radius: 0.75rem !important;
-        border-top-right-radius: 0.75rem !important;
-    }
-</style>
 {% endblock %}
