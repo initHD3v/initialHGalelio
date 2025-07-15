@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pembaruan Status Pesanan Anda</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { width: 80%; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .header { background-color: #f4f4f4; padding: 10px 20px; text-align: center; border-bottom: 1px solid #ddd; }
+        .content { padding: 20px; }
+        .footer { background-color: #f4f4f4; padding: 10px 20px; text-align: center; border-top: 1px solid #ddd; font-size: 0.9em; color: #777; }
+        .button { display: inline-block; background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+        .status-waiting_dp { color: #ffc107; font-weight: bold; }
+        .status-waiting_approval { color: #17a2b8; font-weight: bold; }
+        .status-accepted { color: #28a745; font-weight: bold; }
+        .status-rejected { color: #dc3545; font-weight: bold; }
+        .status-completed { color: #6c757d; font-weight: bold; }
+        .status-cancelled { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Pembaruan Status Pesanan Anda di Aruna Moment</h2>
+        </div>
+        <div class="content">
+            <p>Yth. Bapak/Ibu {{ client_name }},</p>
+            <p>Dengan hormat, kami memberitahukan bahwa status pesanan Anda untuk layanan <strong>{{ order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type) }}</strong> telah diperbarui.</p>
+
+            <h3>Detail Pesanan:</h3>
+            <ul>
+                <li><strong>Jenis Layanan:</strong> {{ order.service_type.replace('_', ' ').title() }}</li>
+                <li><strong>Paket:</strong> {{ order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else 'N/A') }}</li>
+                <li><strong>Tanggal Acara:</strong> {{ order.event_date.strftime('%d %B %Y') }}</li>
+                {% if order.event_start_time and order.event_end_time %}
+                <li><strong>Waktu Acara:</strong> {{ order.event_start_time }} - {{ order.event_end_time }}</li>
+                {% endif %}
+                <li><strong>Lokasi:</strong> {{ order.location }}</li>
+                <li><strong>Total Harga:</strong> Rp {{ "{:,.0f}".format(order.total_price) }}</li>
+            </ul>
+
+            <h3>Status Terbaru: <span class="status-{{ order.status }}">{{ order.status.replace('_', ' ').title() }}</span></h3>
+
+            {% if order.status == 'waiting_dp' %}
+            <p>Pesanan Anda telah berhasil dibuat dan saat ini menunggu pembayaran Down Payment (DP). Mohon segera lakukan pembayaran sesuai instruksi yang telah kami berikan.</p>
+            <p>Anda dapat meninjau detail pembayaran lebih lanjut melalui halaman pesanan Anda.</p>
+            {% elif order.status == 'waiting_approval' %}
+            <p>Pesanan Anda sedang dalam proses peninjauan oleh tim kami. Kami akan segera memberikan pembaruan mengenai status pesanan Anda.</p>
+            {% elif order.status == 'accepted' %}
+            <p>Selamat! Pesanan Anda telah <strong>diterima</strong>. Tim kami akan segera menghubungi Anda untuk koordinasi lebih lanjut terkait persiapan acara Anda.</p>
+            <p>Kami sangat antusias untuk bekerja sama dengan Anda dalam mengabadikan momen spesial ini!</p>
+            {% elif order.status == 'rejected' %}
+            <p>Mohon maaf, pesanan Anda telah <strong>ditolak</strong>. Untuk informasi lebih lanjut atau jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi kami.</p>
+            {% elif order.status == 'completed' %}
+            <p>Pesanan Anda telah <strong>selesai</strong>. Kami mengucapkan terima kasih atas kepercayaan Anda kepada Aruna Moment untuk mengabadikan momen spesial Anda.</p>
+            <p>Kami berharap Anda puas dengan layanan kami. Jika berkenan, kami sangat menghargai jika Anda dapat memberikan testimoni.</p>
+            {% elif order.status == 'cancelled' %}
+            <p>Pesanan Anda telah <strong>dibatalkan</strong>. Jika Anda memiliki pertanyaan atau memerlukan klarifikasi lebih lanjut, silakan hubungi kami.</p>
+            {% endif %}
+
+            <p>Anda dapat meninjau detail lengkap pesanan Anda kapan saja dengan masuk ke akun Anda dan mengunjungi halaman pesanan:</p>
+            <p><a href="{{ url_for('client.view_invoice_client', order_id=order.id, _external=True) }}" class="button">Lihat Detail Pesanan</a></p>
+
+            <p>Terima kasih atas kepercayaan Anda kepada Aruna Moment.</p>
+            <p>Hormat kami,<br>Tim Aruna Moment</p>
+        </div>
+        <div class="footer">
+            <p>Email ini dikirim secara otomatis. Mohon tidak membalas email ini.</p>
+            <p>&copy; {{ current_year }} Aruna Moment. Semua hak dilindungi.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pembatalan Pesanan Anda di Aruna Moment</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { width: 80%; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .header { background-color: #f4f4f4; padding: 10px 20px; text-align: center; border-bottom: 1px solid #ddd; }
+        .content { padding: 20px; }
+        .footer { background-color: #f4f4f4; padding: 10px 20px; text-align: center; border-top: 1px solid #ddd; font-size: 0.9em; color: #777; }
+        .button { display: inline-block; background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Pembatalan Pesanan Anda di Aruna Moment</h2>
+        </div>
+        <div class="content">
+            <p>Yth. Bapak/Ibu {{ client_name }},</p>
+            <p>Dengan hormat, kami memberitahukan bahwa pesanan Anda untuk layanan <strong>{{ order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type) }}</strong> pada tanggal <strong>{{ order.event_date.strftime('%d %B %Y') }}</strong> telah <strong>dibatalkan</strong>.</p>
+
+            {% if cancellation_reason %}
+            <p><strong>Alasan Pembatalan:</strong> {{ cancellation_reason }}</p>
+            {% endif %}
+
+            <p>Jika Anda memiliki pertanyaan lebih lanjut atau ingin mendiskusikan opsi lain, jangan ragu untuk menghubungi tim kami.</p>
+
+            <p>Anda dapat meninjau detail lengkap pesanan Anda kapan saja dengan masuk ke akun Anda dan mengunjungi halaman pesanan:</p>
+            <p><a href="{{ url_for('client.view_invoice_client', order_id=order.id, _external=True) }}" class="button">Lihat Detail Pesanan</a></p>
+
+            <p>Terima kasih atas perhatian dan pengertian Anda.</p>
+            <p>Hormat kami,<br>Tim Aruna Moment</p>
+        </div>
+        <div class="footer">
+            <p>Email ini dikirim secara otomatis. Mohon tidak membalas email ini.</p>
+            <p>&copy; {{ current_year }} Aruna Moment. Semua hak dilindungi.</p>
+        </div>
+    </div>
+</body>
+</html>

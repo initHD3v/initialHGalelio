@@ -27,6 +27,7 @@ from forms import OrderForm
 from flask_login import login_required, current_user
 from sqlalchemy import or_, func
 from . import main
+from client.routes import send_new_order_notification_to_admin
 
 
 @main.route("/")
@@ -288,20 +289,14 @@ def order():
             db.session.add(calendar_event)
             db.session.commit()
 
-        # --- NOTIFICATION: New Order --- #
-        admins = User.query.filter_by(role="admin").all()
-        for admin_user in admins:
-            notification = Notification(
-                user_id=admin_user.id,
-                type="new_order",
-                entity_id=order.id,
-                message=(
-                    f"Pesanan baru dari {current_user.username} untuk {service_type} "
-                    f"pada {requested_date.strftime('%Y-%m-%d')}."
-                )
-            )
-            db.session.add(notification)
         db.session.commit()
+
+        # Send new order notification to admin
+        try:
+            send_new_order_notification_to_admin(order)
+        except Exception as e:
+            current_app.logger.error(f"Failed to send new order notification email to admin for order {order.id}: {e}")
+
         print("DEBUG: Order and notifications created. Redirecting...")
         flash("Pesanan Anda berhasil dibuat! Silakan lanjutkan ke pembayaran DP.", "success")
         return redirect(url_for("client.dp_payment", order_id=order.id))

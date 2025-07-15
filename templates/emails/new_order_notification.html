@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pesanan Baru Ditempatkan!</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { width: 80%; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .header { background-color: #f4f4f4; padding: 10px 20px; text-align: center; border-bottom: 1px solid #ddd; }
+        .content { padding: 20px; }
+        .footer { background-color: #f4f4f4; padding: 10px 20px; text-align: center; border-top: 1px solid #ddd; font-size: 0.9em; color: #777; }
+        .button { display: inline-block; background-color: #007bff; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Pesanan Baru Ditempatkan di Aruna Moment!</h2>
+        </div>
+        <div class="content">
+            <p>Yth. Admin,</p>
+            <p>Seorang klien baru saja menempatkan pesanan. Berikut adalah detail pesanan yang perlu Anda tinjau:</p>
+
+            <h3>Detail Pesanan:</h3>
+            <ul>
+                <li><strong>Pesanan:</strong> {{ order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type) }}</li>
+                <li><strong>Nama Klien:</strong> {{ order.client.full_name }}</li>
+                <li><strong>Email Klien:</strong> {{ order.client.email }}</li>
+                <li><strong>WhatsApp Klien:</strong> {{ order.client.whatsapp_number }}</li>
+                <li><strong>Jenis Layanan:</strong> {{ order.service_type.replace('_', ' ').title() }}</li>
+                <li><strong>Paket:</strong> {{ order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else 'N/A') }}</li>
+                <li><strong>Tanggal Acara:</strong> {{ order.event_date.strftime('%d %B %Y') }}</li>
+                {% if order.event_start_time and order.event_end_time %}
+                <li><strong>Waktu Acara:</strong> {{ order.event_start_time }} - {{ order.event_end_time }}</li>
+                {% endif %}
+                <li><strong>Lokasi:</strong> {{ order.location }}</li>
+                <li><strong>Total Harga:</strong> Rp {{ "{:,.0f}".format(order.total_price) }}</li>
+                <li><strong>Status:</strong> {{ order.status.replace('_', ' ').title() }}</li>
+                <li><strong>Detail Tambahan:</strong> {{ order.details if order.details else 'Tidak ada' }}</li>
+            </ul>
+
+            <p>Mohon segera tinjau pesanan ini melalui panel admin Anda.</p>
+            <p><a href="{{ url_for('admin.edit_order', order_id=order.id, _external=True) }}" class="button">Tinjau Pesanan</a></p>
+
+            <p>Hormat kami,<br>Sistem Notifikasi Aruna Moment</p>
+        </div>
+        <div class="footer">
+            <p>Email ini dikirim secara otomatis. Mohon tidak membalas email ini.</p>
+            <p>&copy; {{ current_year }} Aruna Moment. Semua hak dilindungi.</p>
+        </div>
+    </div>
+</body>
+</html>

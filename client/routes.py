@@ -8,6 +8,8 @@ from flask import (
     send_file,
 )
 from flask_login import login_required, current_user
+from flask_mail import Message
+from extensions import mail
 from models import (
     Order,
     Testimonial,
@@ -17,6 +19,7 @@ from models import (
     User,
     CalendarEvent,
 )
+from admin.routes import send_cancellation_email_to_client, send_cancellation_notification_to_admin, send_reschedule_email_to_client, send_reschedule_notification_to_admin
 from forms import (
     TestimonialSubmissionForm,
     TestimonialEditForm,
@@ -31,6 +34,23 @@ import pytz  # Added pytz
 from client import client
 
 JAKARTA_TZ = pytz.timezone("Asia/Jakarta")
+
+def send_new_order_notification_to_admin(order):
+    try:
+        admins = User.query.filter_by(role="admin").all()
+        for admin_user in admins:
+            msg = Message(
+                f"Pesanan Baru Ditempatkan: {order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type)}",
+                recipients=[admin_user.email]
+            )
+            msg.html = render_template(
+                'emails/new_order_notification.html',
+                order=order,
+                current_year=datetime.now().year
+            )
+            mail.send(msg)
+    except Exception as e:
+        current_app.logger.error(f"Failed to send new order notification email for order {order.id}: {e}")
 
 
 @client.app_template_global("get_testimonial_for_order")
@@ -268,6 +288,14 @@ def request_cancellation(order_id):
         "Permintaan pembatalan Anda telah diajukan. Admin akan segera meninjaunya.",
         "success",
     )
+
+    # Send email notification to admin
+    cancellation_reason_admin = f"Permintaan pembatalan pesanan {order.id} dari {order.client.full_name} telah diajukan. Alasan: {order.cancellation_reason or 'Tidak ada alasan diberikan.'}"
+    try:
+        send_cancellation_notification_to_admin(order, cancellation_reason_admin)
+    except Exception as e:
+        current_app.logger.error(f"Failed to send cancellation request notification to admin for order {order.id}: {e}")
+
     return redirect(url_for("client.dashboard"))
 
 
@@ -380,6 +408,20 @@ def request_reschedule(order_id):
             "Admin akan segera meninjaunya.",
             "success",
         )
+
+    # Send email notification to admin
+    try:
+        send_reschedule_notification_to_admin(
+            order,
+            new_event_date,
+            new_start_time,
+            new_end_time,
+            reschedule_reason,
+            "requested"
+        )
+    except Exception as e:
+        current_app.logger.error(f"Failed to send reschedule request notification to admin for order {order.id}: {e}")
+
     return redirect(url_for("client.dashboard"))
 
 

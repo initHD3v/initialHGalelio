@@ -9,6 +9,8 @@ from flask import (
     jsonify,
 )
 from flask_login import login_required, current_user
+from flask_mail import Message
+from extensions import mail # Import mail object
 from models import (
     Post,
     Order,
@@ -41,6 +43,103 @@ from datetime import datetime, timedelta, UTC
 from flask_babel import _
 from sqlalchemy import or_
 from . import admin
+
+def send_order_status_email(order):
+    try:
+        client_name = order.client.full_name
+        msg = Message(
+            f"Pembaruan Status Pesanan Anda: {order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type)}",
+            recipients=[order.client.email]
+        )
+        msg.html = render_template(
+            'emails/order_status_update.html',
+            order=order,
+            client_name=client_name,
+            current_year=datetime.now().year
+        )
+        mail.send(msg)
+    except Exception as e:
+        current_app.logger.error(f"Failed to send order status email for order {order.id}: {e}")
+
+def send_cancellation_email_to_client(order, cancellation_reason):
+    try:
+        client_name = order.client.full_name
+        msg = Message(
+            f"Pembatalan Pesanan Anda: {order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type)}",
+            recipients=[order.client.email]
+        )
+        msg.html = render_template(
+            'emails/order_cancellation_client.html',
+            order=order,
+            client_name=client_name,
+            cancellation_reason=cancellation_reason,
+            current_year=datetime.now().year
+        )
+        mail.send(msg)
+    except Exception as e:
+        current_app.logger.error(f"Failed to send cancellation email to client for order {order.id}: {e}")
+
+def send_cancellation_notification_to_admin(order, cancellation_reason):
+    try:
+        admins = User.query.filter_by(role="admin").all()
+        for admin_user in admins:
+            msg = Message(
+                f"Notifikasi Pembatalan Pesanan: {order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type)}",
+                recipients=[admin_user.email]
+            )
+            msg.html = render_template(
+                'emails/order_cancellation_admin.html',
+                order=order,
+                cancellation_reason=cancellation_reason,
+                current_year=datetime.now().year
+            )
+            mail.send(msg)
+    except Exception as e:
+        current_app.logger.error(f"Failed to send cancellation notification to admin for order {order.id}: {e}")
+
+def send_reschedule_email_to_client(order, new_date, new_start_time, new_end_time, reschedule_reason, status):
+    try:
+        client_name = order.client.full_name
+        msg = Message(
+            f"Pembaruan Penjadwalan Ulang Pesanan Anda: {order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type)}",
+            recipients=[order.client.email]
+        )
+        msg.html = render_template(
+            'emails/order_reschedule_client.html',
+            order=order,
+            client_name=client_name,
+            new_date=new_date,
+            new_start_time=new_start_time,
+            new_end_time=new_end_time,
+            reschedule_reason=reschedule_reason,
+            status=status,
+            current_year=datetime.now().year
+        )
+        mail.send(msg)
+    except Exception as e:
+        current_app.logger.error(f"Failed to send reschedule email to client for order {order.id}: {e}")
+
+def send_reschedule_notification_to_admin(order, new_date, new_start_time, new_end_time, reschedule_reason, status):
+    try:
+        admins = User.query.filter_by(role="admin").all()
+        for admin_user in admins:
+            msg = Message(
+                f"Notifikasi Penjadwalan Ulang Pesanan: {order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type)}",
+                recipients=[admin_user.email]
+            )
+            msg.html = render_template(
+                'emails/order_reschedule_admin.html',
+                order=order,
+                new_date=new_date,
+                new_start_time=new_start_time,
+                new_end_time=new_end_time,
+                reschedule_reason=reschedule_reason,
+                status=status,
+                current_year=datetime.now().year
+            )
+            mail.send(msg)
+    except Exception as e:
+        current_app.logger.error(f"Failed to send reschedule notification to admin for order {order.id}: {e}")
 
 
 @admin.route("/admin/manage_homepage", methods=["GET", "POST"])
@@ -546,6 +645,10 @@ def approve_order(order_id):
     order.is_notified = False  # Reset notification status
     db.session.commit()
     flash("Order approved successfully!", "success")
+    try:
+        send_order_status_email(order)
+    except Exception as e:
+        current_app.logger.error(f"Failed to send order status email for order {order.id}: {e}")
     return redirect(url_for("admin.order_list"))
 
 
@@ -577,6 +680,33 @@ def approve_reschedule(order_id):
     db.session.commit()
 
     flash("Permintaan penjadwalan ulang disetujui!", "success")
+
+    # Send email notification to client
+    try:
+        send_reschedule_email_to_client(
+            order,
+            order.requested_event_date,
+            order.requested_start_time.time() if order.requested_start_time else None,
+            order.requested_end_time.time() if order.requested_end_time else None,
+            order.reschedule_reason,
+            "approved"
+        )
+    except Exception as e:
+        current_app.logger.error(f"Failed to send reschedule approval email to client for order {order.id}: {e}")
+
+    # Send notification to admin
+    try:
+        send_reschedule_notification_to_admin(
+            order,
+            order.requested_event_date,
+            order.requested_start_time.time() if order.requested_start_time else None,
+            order.requested_end_time.time() if order.requested_end_time else None,
+            order.reschedule_reason,
+            "approved"
+        )
+    except Exception as e:
+        current_app.logger.error(f"Failed to send reschedule approval notification to admin for order {order.id}: {e}")
+
     return redirect(url_for("admin.order_list"))
 
 
@@ -609,6 +739,33 @@ def reject_reschedule(order_id):
     db.session.commit()
 
     flash("Permintaan penjadwalan ulang ditolak!", "success")
+
+    # Send email notification to client
+    try:
+        send_reschedule_email_to_client(
+            order,
+            order.requested_event_date,
+            order.requested_start_time.time() if order.requested_start_time else None,
+            order.requested_end_time.time() if order.requested_end_time else None,
+            order.reschedule_reason,
+            "rejected"
+        )
+    except Exception as e:
+        current_app.logger.error(f"Failed to send reschedule rejection email to client for order {order.id}: {e}")
+
+    # Send notification to admin
+    try:
+        send_reschedule_notification_to_admin(
+            order,
+            order.requested_event_date,
+            order.requested_start_time.time() if order.requested_start_time else None,
+            order.requested_end_time.time() if order.requested_end_time else None,
+            order.reschedule_reason,
+            "rejected"
+        )
+    except Exception as e:
+        current_app.logger.error(f"Failed to send reschedule rejection notification to admin for order {order.id}: {e}")
+
     return redirect(url_for("admin.order_list"))
 
 
@@ -661,7 +818,21 @@ def approve_cancellation(order_id):
         db.session.commit()
         flash("Order cancellation approved and calendar slot released!", "success")
 
-        # --- NOTIFIKASI: Pembatalan Disetujui --- #
+        # Send email notification to client
+        cancellation_reason_client = "Pembatalan pesanan Anda telah disetujui. Mohon diperhatikan bahwa DP tidak dapat dikembalikan (hangus) sesuai kebijakan pembatalan. Untuk informasi lebih lanjut, silakan hubungi admin via WhatsApp di +6285740109107."
+        try:
+            send_cancellation_email_to_client(order, cancellation_reason_client)
+        except Exception as e:
+            current_app.logger.error(f"Failed to send cancellation approval email to client for order {order.id}: {e}")
+
+        # Send notification to admin
+        cancellation_reason_admin = f"Pesanan {order.id} dari {order.client.full_name} telah dibatalkan. Alasan: {order.cancellation_reason or 'Tidak ada alasan diberikan.'}"
+        try:
+            send_cancellation_notification_to_admin(order, cancellation_reason_admin)
+        except Exception as e:
+            current_app.logger.error(f"Failed to send cancellation approval notification to admin for order {order.id}: {e}")
+
+        # Create notification for client
         client_user = order.client
         package_or_service_name = (
             order.wedding_package.name if order.wedding_package else order.service_type
@@ -680,7 +851,8 @@ def approve_cancellation(order_id):
         )
         db.session.add(notification)
         db.session.commit()
-        # --- END NOTIFIKASI --- #
+
+        
 
     else:
         flash("No cancellation request found for this order.", "warning")
@@ -706,7 +878,21 @@ def reject_cancellation(order_id):
         db.session.commit()
         flash("Order cancellation request rejected. Order status reverted.", "success")
 
-        # --- NOTIFIKASI: Pembatalan Ditolak --- #
+        # Send email notification to client
+        cancellation_reason_client = "Permintaan pembatalan pesanan Anda telah ditolak. Pesanan Anda tidak dapat dibatalkan kembali. Untuk informasi lebih lanjut, silakan hubungi admin via WhatsApp di +6285740109107."
+        try:
+            send_cancellation_email_to_client(order, cancellation_reason_client)
+        except Exception as e:
+            current_app.logger.error(f"Failed to send cancellation rejection email to client for order {order.id}: {e}")
+
+        # Send notification to admin
+        cancellation_reason_admin = f"Permintaan pembatalan pesanan {order.id} dari {order.client.full_name} telah ditolak."
+        try:
+            send_cancellation_notification_to_admin(order, cancellation_reason_admin)
+        except Exception as e:
+            current_app.logger.error(f"Failed to send cancellation rejection notification to admin for order {order.id}: {e}")
+
+        # Create notification for client
         client_user = order.client
         package_or_service_name = (
             order.wedding_package.name if order.wedding_package else order.service_type
@@ -725,7 +911,6 @@ def reject_cancellation(order_id):
         )
         db.session.add(notification)
         db.session.commit()
-        # --- END NOTIFIKASI --- #
 
     else:
         flash("No cancellation request found for this order.", "warning")

@@ -27,12 +27,3 @@ class Config:
     MAIL_USERNAME = 'arunapicturee@gmail.com'
     MAIL_PASSWORD = 'yvqg cppw cxow nzmn'
     MAIL_DEFAULT_SENDER = 'arunapicturee@gmail.com'
-
-    # Konfigurasi Flask-Mail
-    MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 587
-    MAIL_USE_TLS = True
-    MAIL_USE_SSL = False
-    MAIL_USERNAME = 'arunapicturee@gmail.com'
-    MAIL_PASSWORD = 'yvqg cppw cxow nzmn'
-    MAIL_DEFAULT_SENDER = 'arunapicturee@gmail.com'

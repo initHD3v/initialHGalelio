@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembaruan Penjadwalan Ulang Pesanan Anda</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #4CAF50;
+            color: #ffffff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8em;
+            color: #777;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 15px;
+        }
+        .status-approved {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .status-rejected {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .status-requested {
+            color: #ffc107;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Pembaruan Penjadwalan Ulang Pesanan Anda</h2>
+        </div>
+        <div class="content">
+            <p>Yth. Bapak/Ibu {{ client_name }},</p>
+            <p>Dengan hormat, kami memberitahukan bahwa permintaan penjadwalan ulang pesanan Anda untuk layanan <strong>{{ order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type) }}</strong> telah <strong>{% if status == 'approved' %}disetujui{% elif status == 'rejected' %}ditolak{% else %}diajukan{% endif %}</strong>.</p>
+
+            {% if status == 'approved' %}
+                <p>Pesanan Anda sekarang dijadwalkan ulang pada detail berikut:</p>
+                <ul>
+                    <li><strong>Tanggal Baru:</strong> {{ new_date.strftime('%d %B %Y') }}</li>
+                    <li><strong>Waktu Mulai Baru:</strong> {{ new_start_time.strftime('%H:%M') }}</li>
+                    <li><strong>Waktu Selesai Baru:</strong> {{ new_end_time.strftime('%H:%M') }}</li>
+                </ul>
+                <p>Terima kasih atas kesabaran Anda. Kami menantikan untuk melayani Anda pada tanggal yang baru!</p>
+            {% elif status == 'rejected' %}
+                <p>Mohon maaf, permintaan penjadwalan ulang Anda telah ditolak. Pesanan Anda akan tetap pada jadwal semula.</p>
+                <p><strong>Alasan Penolakan:</strong> {{ reschedule_reason }}</p>
+                <p>Jika Anda memiliki pertanyaan atau memerlukan klarifikasi, silakan hubungi tim kami.</p>
+            {% else %}
+                <p>Permintaan penjadwalan ulang Anda sedang dalam proses peninjauan oleh admin. Kami akan segera memberitahukan statusnya setelah tinjauan selesai.</p>
+                <p>Detail permintaan penjadwalan ulang:</p>
+                <ul>
+                    <li><strong>Tanggal yang Diminta:</strong> {{ new_date.strftime('%d %B %Y') }}</li>
+                    <li><strong>Waktu Mulai yang Diminta:</strong> {{ new_start_time.strftime('%H:%M') }}</li>
+                    <li><strong>Waktu Selesai yang Diminta:</strong> {{ new_end_time.strftime('%H:%M') }}</li>
+                    <li><strong>Alasan:</strong> {{ reschedule_reason }}</li>
+                </ul>
+            {% endif %}
+
+            <p>Detail Pesanan Asli:</p>
+            <ul>
+                <li><strong>Tipe Layanan:</strong> {{ order.service_type }}</li>
+                <li><strong>Tanggal Acara Asli:</strong> {{ order.event_date.strftime('%d %B %Y') }}</li>
+                <li><strong>Lokasi:</strong> {{ order.location }}</li>
+            </ul>
+            <p>Terima kasih atas kepercayaan Anda kepada Aruna Moment.</p>
+            <p>Hormat kami,<br>Tim Aruna Moment</p>
+        </div>
+        <div class="footer">
+            <p>&copy; {{ current_year }} Aruna Moment. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
