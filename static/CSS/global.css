@@ -23,6 +23,10 @@
     transform: translateY(10px); /* Slide down to hide */
 }
 
+body.has-fixed-header {
+    padding-top: 70px; /* Sesuaikan dengan tinggi header Anda */
+}
+
 body {
     font-family: 'Montserrat', sans-serif; /* Modern font */
     background-color: #f0f2f5; /* Light gray background, similar to social media feeds */
@@ -340,4 +344,12 @@ body {
 .testimonial-card .fa-star, .testimonial-card .far.fa-star {
     font-size: 1.2rem;
     margin-right: 2px;
+}
+
+/* About Me Section */
+.about-me-img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
 }

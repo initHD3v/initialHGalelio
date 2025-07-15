@@ -1,6 +1,6 @@
 .hero-section {
     position: relative; /* This is the key for positioning children absolutely */
-    height: 100vh; /* Make the hero section full height */
+    height: 80vh; /* Make the hero section 80% of viewport height */
     display: flex;
     align-items: center;
     justify-content: center;

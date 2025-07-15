@@ -2,6 +2,7 @@
 .navbar.navbar-dark {
     transition: background-color 0.3s ease;
     background-color: transparent !important;
+    padding-top: 15px; /* Menambahkan padding atas */
 }
 
 .navbar.navbar-dark.scrolled {
@@ -10,7 +11,7 @@
 }
 
 .navbar-dark .navbar-nav .nav-link {
-    color: white;
+    color: #FFFFFF !important; /* Warna putih cerah */
 }
 
 .navbar-dark.scrolled .navbar-nav .nav-link {
@@ -18,9 +19,27 @@
 }
 
 .navbar-dark .navbar-brand {
-    color: white !important;
+    color: #FFFFFF !important; /* Warna putih cerah */
 }
 
 .navbar-dark.scrolled .navbar-brand {
     color: black !important;
+}
+
+.navbar.navbar-dark .navbar-brand {
+    margin-left: 15px !important; /* Padding kiri kustom */
+    padding-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.navbar.navbar-dark .navbar-nav:last-child {
+    margin-right: 15px !important; /* Padding kanan kustom */
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+}
+
+.navbar.navbar-dark .container-fluid {
+    max-width: 100% !important; /* Mengambil lebar penuh */
+    padding-left: 0 !important; /* Hapus padding bawaan container-fluid */
+    padding-right: 0 !important; /* Hapus padding bawaan container-fluid */
 }
