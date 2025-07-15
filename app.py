@@ -1,6 +1,6 @@
 from flask import Flask, request, session, flash
 from dotenv import load_dotenv
-from extensions import db, login_manager, migrate, babel
+from extensions import db, login_manager, migrate, babel, mail
 from models import User, Post, PostImage, Order, CalendarEvent, Testimonial, WeddingPackage, BankAccount, Notification, HomepageContent, HeroImage
 from werkzeug.security import generate_password_hash
 import os
@@ -30,6 +30,7 @@ db.init_app(app)
 login_manager.init_app(app)
 migrate.init_app(app, db)
 babel.init_app(app)
+mail.init_app(app)
 login_manager.login_view = "auth.login"
 
 app.register_blueprint(auth)

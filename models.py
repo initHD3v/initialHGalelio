@@ -1,6 +1,8 @@
 from flask_login import UserMixin
 from datetime import datetime, UTC
 from extensions import db
+from itsdangerous import URLSafeTimedSerializer as Serializer
+from flask import current_app
 
 
 class User(db.Model, UserMixin):
@@ -19,6 +21,19 @@ class User(db.Model, UserMixin):
     company_phone = db.Column(db.String(20), nullable=True)
     date_registered = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(UTC))
     orders = db.relationship("Order", backref="client", lazy=True)
+
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id})
+
+    @staticmethod
+    def verify_reset_token(token, expires_sec=1800):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token, max_age=expires_sec)['user_id']
+        except Exception:
+            return None
+        return User.query.get(user_id)
 
 
 class Post(db.Model):

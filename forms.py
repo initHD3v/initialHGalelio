@@ -1,3 +1,4 @@
+import re
 from wtforms.widgets import Select
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -21,12 +22,27 @@ from wtforms.validators import (
     Email,
     NumberRange,
     Optional,
+    Length,
 )
 from wtforms_sqlalchemy.fields import QuerySelectField
 from models import User, WeddingPackage, BankAccount  # Added BankAccount
 from extensions import db  # Added import
 from datetime import datetime, timedelta  # Added datetime import
 from wtforms.widgets import Select # Import Select widget
+
+def validate_password_strength(form, field):
+    password = field.data
+    if len(password) < 8:
+        raise ValidationError('Password must be at least 8 characters long.')
+    if not re.search(r'[A-Z]', password):
+        raise ValidationError('Password must contain at least one uppercase letter.')
+    if not re.search(r'[a-z]', password):
+        raise ValidationError('Password must contain at least one lowercase letter.')
+    if not re.search(r'\d', password):
+        raise ValidationError('Password must contain at least one digit.')
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        raise ValidationError('Password must contain at least one symbol.')
+
 
 class CustomQuerySelectField(QuerySelectField):
     def __init__(self, *args, **kwargs):
@@ -101,7 +117,7 @@ class RegistrationForm(FlaskForm):
         if len(whatsapp_number.data) < 10 or len(whatsapp_number.data) > 15:
             raise ValidationError("Nomor WhatsApp tidak valid.")
 
-    password = PasswordField("Password", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired(), validate_password_strength])
     confirm_password = PasswordField(
         "Confirm Password", validators=[DataRequired(), EqualTo("password")]
     )
@@ -245,7 +261,7 @@ class UserEditForm(FlaskForm):
     company_phone = StringField(
         "Telepon Perusahaan (Admin Saja)", validators=[Optional()]
     )
-    password = PasswordField("New Password (leave blank to keep current)")
+    password = PasswordField("New Password (leave blank to keep current)", validators=[Optional(), validate_password_strength])
     confirm_password = PasswordField(
         "Confirm New Password",
         validators=[EqualTo("password", message="Passwords must match")],
@@ -272,6 +288,24 @@ class UserEditForm(FlaskForm):
                 raise ValidationError(
                     "That email is taken. Please choose a different one."
                 )
+
+
+class RequestResetForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    submit = SubmitField("Request Password Reset")
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is None:
+            raise ValidationError("There is no account with that email. You must register first.")
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("Password", validators=[DataRequired(), validate_password_strength])
+    confirm_password = PasswordField(
+        "Confirm Password", validators=[DataRequired(), EqualTo("password")]
+    )
+    submit = SubmitField("Reset Password")
 
 
 class DPPaymentForm(FlaskForm):
@@ -351,7 +385,7 @@ class AdminOrderForm(FlaskForm):
         blank_text="-- Select a Pre-wedding package --",
         validators=[Optional()],
     )
-    event_date = DateField("Event Date", format="%Y-%m-%d", validators=[DataRequired()])
+    event_date = DateField("Event Date", format="%Y-%m-%dT%H:%M", validators=[DataRequired()])
     event_start_time = StringField("Start Time", validators=[Optional()])
     event_end_time = StringField("End Time", validators=[Optional()])
     location = StringField("Location", validators=[DataRequired()])
