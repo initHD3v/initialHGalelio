@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {% block head %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/home.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/hero.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/why_choose_us.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/portfolio_preview.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/testimonials.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/cta.css') }}">
     <title>Aruna Moment - Professional Photography</title>
 {% endblock %}
 
@@ -174,4 +178,25 @@
 {% block scripts %}
 {{ super() }}
 <script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Manual Carousel Initialization
+        var myCarousel = document.querySelector('#heroCarousel');
+        if (myCarousel) {
+            var carousel = new bootstrap.Carousel(myCarousel, {
+                interval: 15000, // Set interval to 15 seconds for auto-play
+                ride: 'carousel'
+            });
+        }
+    });
+</script>
 {% endblock %}

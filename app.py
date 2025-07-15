@@ -20,6 +20,12 @@ from client import client
 
 app = Flask(__name__)
 app.config.from_object("config.Config")
+
+@app.context_processor
+def inject_datetime():
+    from datetime import datetime
+    return dict(datetime=datetime)
+
 db.init_app(app)
 login_manager.init_app(app)
 migrate.init_app(app, db)

@@ -1,0 +1,22 @@
+
+/* Portfolio Preview Section */
+.portfolio-preview {
+    padding: 2rem 0;
+}
+
+.portfolio-preview h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.portfolio-preview .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.portfolio-preview .gallery img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}

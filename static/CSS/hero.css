@@ -1,0 +1,113 @@
+.hero-section {
+    position: relative; /* This is the key for positioning children absolutely */
+    height: 100vh; /* Make the hero section full height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#heroCarousel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#heroCarousel .carousel-inner,
+#heroCarousel .carousel-item,
+#heroCarousel .carousel-item img {
+    height: 100%;
+    object-fit: cover; /* Cover the entire area */
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4); /* Darker overlay for better text visibility */
+    z-index: 2; /* Above the carousel, below the content */
+}
+
+.hero-content {
+    position: relative; /* Relative to the hero-section */
+    z-index: 3; /* On top of everything */
+    color: white;
+}
+
+.hero-link {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    transition: opacity 0.3s;
+}
+
+.hero-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Ensure header is on top */
+.hero-section .navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 4; /* Above the content */
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-text {
+    opacity: 0; /* Start hidden */
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.fade-in-text.delay-1 {
+    animation-delay: 0.4s;
+}
+
+.fade-in-text.delay-2 {
+    animation-delay: 0.8s;
+}
+
+.fade-in-text.delay-3 {
+    animation-delay: 1.2s;
+}
+
+/* Carousel Controls & Indicators Styling */
+#heroCarousel .carousel-control-prev,
+#heroCarousel .carousel-control-next {
+    z-index: 10; /* Bring them above the overlay */
+}
+
+#heroCarousel .carousel-indicators {
+    bottom: 20px;
+    z-index: 4; /* Ensure they are clickable */
+    margin-bottom: 1rem;
+}
+
+#heroCarousel .carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 100%;
+    background-color: #fff;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+#heroCarousel .carousel-indicators .active {
+    opacity: 1;
+}

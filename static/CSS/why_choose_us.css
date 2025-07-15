@@ -1,0 +1,21 @@
+
+/* Why Choose Us Section */
+.why-choose-us-section {
+    padding: 2rem 0;
+    background-color: #f9f9f9;
+}
+
+.why-choose-us-section h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.why-choose-us-section .reasons {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.why-choose-us-section .reason {
+    max-width: 30%;
+}

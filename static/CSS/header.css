@@ -1,0 +1,26 @@
+/* Styles for the transparent header on the homepage */
+.navbar.navbar-dark {
+    transition: background-color 0.3s ease;
+    background-color: transparent !important;
+}
+
+.navbar.navbar-dark.scrolled {
+    background-color: white !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: white;
+}
+
+.navbar-dark.scrolled .navbar-nav .nav-link {
+    color: black;
+}
+
+.navbar-dark .navbar-brand {
+    color: white !important;
+}
+
+.navbar-dark.scrolled .navbar-brand {
+    color: black !important;
+}

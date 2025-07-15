@@ -1,0 +1,11 @@
+
+/* Call-to-Action Section */
+.cta-section {
+    padding: 2rem 0;
+    text-align: center;
+}
+
+.cta-section .btn {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+}
