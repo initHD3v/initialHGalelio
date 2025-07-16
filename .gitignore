@@ -31,3 +31,8 @@ instance/
 static/payment_proofs/
 static/images/dummy_image_*
 .env
+
+# Python cache files
+__pycache__/
+*.pyc
+

@@ -194,6 +194,8 @@
                                     <form action="{{ url_for('client.delete_order', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menghapus pesanan ini?');">
                                         <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Hapus Pesanan</button>
                                     </form>
+                                {% elif order.status == 'completed' and order.can_submit_testimonial and not get_testimonial_for_order(order.id) %}
+                                    <a href="{{ url_for('client.submit_testimonial', order_id=order.id) }}" class="btn btn-success btn-sm"><i class="fas fa-star"></i> Berikan Testimoni</a>
                                 {% else %}
                                     <span class="text-muted">Tidak ada aksi</span>
                                 {% endif %}

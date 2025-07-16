@@ -1,13 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Pendaftaran Berhasil</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konfirmasi Pendaftaran Akun</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #28a745; /* Green for success/confirmation */
+            color: #ffffff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8em;
+            color: #777;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
-    <p>Halo {{ user.username }},</p>
-    <p>Terima kasih telah mendaftar di Aruna Moment! Akun Anda telah berhasil dibuat.</p>
-    <p>Anda sekarang dapat login ke akun Anda menggunakan kredensial yang telah Anda daftarkan.</p>
-    <p>Terima kasih,</p>
-    <p>Tim Aruna Moment</p>
+    <div class="container">
+        <div class="header">
+            <h2>Konfirmasi Pendaftaran Akun</h2>
+        </div>
+        <div class="content">
+            <p>Yth. Bapak/Ibu {{ user.username }},</p>
+            <p>Terima kasih telah mendaftar di Aruna Moment! Akun Anda telah berhasil dibuat dan siap digunakan.</p>
+            <p>Anda sekarang dapat masuk ke akun Anda menggunakan kredensial yang telah Anda daftarkan untuk mulai menjelajahi layanan kami.</p>
+            <p><a href="{{ url_for('auth.login', _external=True) }}" class="button">Masuk ke Akun Anda</a></p>
+            <p>Hormat kami,<br>Tim Aruna Moment</p>
+        </div>
+        <div class="footer">
+            <p>Email ini dikirim secara otomatis. Mohon tidak membalas email ini.</p>
+            <p>&copy; {{ current_year }} Aruna Moment. Semua hak dilindungi.</p>
+        </div>
+    </div>
 </body>
 </html>
