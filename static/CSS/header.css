@@ -18,7 +18,7 @@
 
 /* Warna tautan navigasi di header gelap saat digulir */
 .navbar-dark.scrolled .navbar-nav .nav-link {
-    color: rgb(255, 255, 255); /* Warna hitam untuk tautan navigasi saat digulir */
+    color: black; /* Warna hitam untuk tautan navigasi saat digulir */
 }
 
 /* Warna merek (brand) di header gelap */

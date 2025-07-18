@@ -4,13 +4,12 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Kelola Rekening Bank</h1>
+    <a href="{{ url_for('admin.new_bank_account') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Tambah Rekening Baru</a>
 </div>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_panel') }}">Dashboard</a></li>
     <li class="breadcrumb-item active">Kelola Rekening Bank</li>
 </ol>
-    <a href="{{ url_for('admin.new_bank_account') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-plus fa-sm text-white-50"></i> Tambah Rekening Baru</a>
-</div>
 
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
