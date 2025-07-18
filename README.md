@@ -1,7 +1,7 @@
 
 # 📸 Web Aplikasi Pemesanan Jasa Fotografi
 
-WebApp ini adalah platform pemesanan jasa fotografi profesional berbasis web, dirancang khusus untuk mengelola layanan fotografi seperti **wedding, pre-wedding.oke beaoke coba  
+WebApp ini adalah platform pemesanan jasa fotografi profesional berbasis web, dirancang khusus untuk mengelola layanan fotografi seperti **wedding, pre-wedding.
 Dikembangkan menggunakan **Python (Flask)**, aplikasi ini menyediakan sistem autentikasi peran, live chat, manajemen pemesanan, sistem pembayaran DP, invoice otomatis, dan kalender terintegrasi.
 
 ---
