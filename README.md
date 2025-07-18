@@ -116,7 +116,6 @@ Buka di browser: `http://127.0.0.1:8000`
 ## 🔮 Rencana Pengembangan Selanjutnya
 
 - [ ] REST API penuh untuk Flutter App
-- [ ] Sistem testimoni dari klien
 - [ ] Integrasi notifikasi WA otomatis
 - [ ] WebSocket untuk chat live
 - [ ] Multi-role admin (Staff, Superadmin)
