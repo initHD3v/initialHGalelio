@@ -14,7 +14,7 @@
                 <h1>FAKTUR</h1>
                 <p class="mb-0"><strong>Aruna Moment Photography</strong></p>
                 <p class="mb-0">Saribudolok, Simalungun, Sumut, 21167</p>
-                <p class="mb-0">Email: arunamoment@gmail.com</p>
+                <p class="mb-0">Email: arunapicturee@gmail.com</p>
                 <p class="mb-0">Telepon: +62 85740109107</p>
             </div>
             <div class="invoice-meta text-end">
@@ -48,6 +48,16 @@
             </div>
         </div>
 
+        {% if order.status == 'cancelled' %}
+        <div class="invoice-section-title text-danger">Pesanan Dibatalkan</div>
+        <div class="alert alert-danger text-center" role="alert">
+            <p class="mb-0">Pesanan dengan layanan <strong>{{ order.service_type.capitalize() }}</strong> {% if order.wedding_package %}({{ order.wedding_package.name }}){% elif order.prewedding_package %}({{ order.prewedding_package.name }}){% endif %} telah dibatalkan oleh <strong>{{ order.client.full_name }}</strong> dan Admin.</p>
+            {% if order.cancellation_reason %}
+            <p class="mb-0">Alasan Pembatalan: {{ order.cancellation_reason }}</p>
+            {% endif %}
+            <p class="mb-0">Mohon diperhatikan bahwa pembayaran yang telah dilakukan tidak dapat dikembalikan sesuai kebijakan pembatalan.</p>
+        </div>
+        {% else %}
         <div class="invoice-section-title">Ringkasan Pembayaran</div>
         <div class="table-responsive">
             <table class="table table-bordered table-sm">
@@ -71,12 +81,24 @@
                         <td class="text-end">Rp {{ "%.2f"|format(order.dp_paid) }}</td>
                     </tr>
                     <tr class="total-row">
-                        <td>Sisa Pembayaran</td>
-                        <td class="text-end">Rp {{ "%.2f"|format(order.total_price - order.dp_paid) }}</td>
+                        {% if order.status == 'completed' %}
+                            <td>Total Pembayaran</td>
+                            <td class="text-end">Rp {{ "%.2f"|format(order.total_price) }}</td>
+                        {% else %}
+                            <td>Sisa Pembayaran</td>
+                            <td class="text-end">Rp {{ "%.2f"|format(order.total_price - order.dp_paid) }}</td>
+                        {% endif %}
                     </tr>
                 </tbody>
             </table>
         </div>
+        {% endif %}
+
+        {% if order.status == 'completed' %}
+        <div class="watermark">LUNAS</div>
+        {% elif order.status == 'cancelled' %}
+        <div class="watermark text-danger">PESANAN DIBATALKAN</div>
+        {% endif %}
 
         {% if order.bank_account %}
         <div class="bank-details-section">

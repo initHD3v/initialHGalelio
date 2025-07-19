@@ -60,6 +60,20 @@ def get_testimonial_for_order(order_id):
     ).first()
 
 
+@client.route('/notifications/mark_read/<int:notification_id>', methods=['POST'])
+@login_required
+def mark_notification_as_read(notification_id):
+    notification = Notification.query.get_or_404(notification_id)
+    
+    # Pastikan notifikasi milik pengguna yang sedang login
+    if notification.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
+        
+    notification.is_read = True
+    db.session.commit()
+    
+    return jsonify({'status': 'success', 'message': 'Notification marked as read'})
+
 @client.route("/dashboard")
 @login_required
 def dashboard():
@@ -73,7 +87,7 @@ def dashboard():
     history_orders = [
         order
         for order in orders
-        if order.status in ["completed", "rejected", "expired", "cancelled"]
+        if order.status in ["completed", "rejected", "expired", "cancelled"] and not order.is_client_hidden
     ]
 
     # Fetch notifications for the current user
@@ -225,23 +239,10 @@ def delete_order(order_id):
         flash("You do not have permission to delete this order.", "danger")
         return redirect(url_for("client.dashboard"))
 
-    # Only allow deletion if the order is rejected or expired
-    if order.status not in ["rejected", "expired"]:
-        flash("Only rejected or expired orders can be deleted.", "danger")
-        return redirect(url_for("client.dashboard"))
-
-    # Delete associated CalendarEvent if exists
-    if order.calendar_event:
-        db.session.delete(order.calendar_event)
-
-    # Delete associated Testimonial if exists
-    testimonial = Testimonial.query.filter_by(order_id=order.id).first()
-    if testimonial:
-        db.session.delete(testimonial)
-
-    db.session.delete(order)
+    # Mark as hidden instead of deleting
+    order.is_client_hidden = True
     db.session.commit()
-    flash("Order has been deleted successfully!", "success")
+    flash("Order has been hidden from your view!", "success")
     return redirect(url_for("client.dashboard"))
 
 
@@ -575,12 +576,4 @@ def edit_profile_client():
     )
 
 
-@client.route("/api/notifications/mark_read/<int:notification_id>", methods=["POST"])
-@login_required
-def mark_notification_as_read(notification_id):
-    notification = Notification.query.get(notification_id)
-    if notification and notification.user_id == current_user.id:
-        notification.is_read = True
-        db.session.commit()
-        return jsonify(success=True)
-    return jsonify(success=False), 400
+

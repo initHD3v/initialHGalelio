@@ -112,6 +112,7 @@ class Order(db.Model):
     can_submit_testimonial = db.Column(
         db.Boolean, default=False, nullable=False
     )  # New field
+    is_client_hidden = db.Column(db.Boolean, default=False, nullable=False) # New field to hide order from client view
     wedding_package_id = db.Column(
         db.Integer, db.ForeignKey("wedding_package.id"), nullable=True
     )

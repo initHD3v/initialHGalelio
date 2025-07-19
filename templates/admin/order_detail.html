@@ -1,0 +1,118 @@
+{% extends 'admin_base.html' %}
+{% block admin_content %}
+
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Detail Pesanan</h1>
+</div>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_panel') }}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('admin.order_list') }}">Manage Client Orders</a></li>
+    <li class="breadcrumb-item active">Detail Pesanan</li>
+</ol>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Informasi Pesanan #ODR-{{ order.created_at.strftime('%Y') }}-{{ '%05d' | format(order.id) }}</h6>
+        <a href="{{ url_for('admin.edit_order', order_id=order.id) }}" class="btn btn-warning btn-sm">
+            <i class="fas fa-edit"></i> Edit Pesanan
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Detail Klien</h5>
+                <p><strong>Nama Lengkap:</strong> {{ order.client.full_name }}</p>
+                <p><strong>Nama Pengguna:</strong> {{ order.client.username }}</p>
+                <p><strong>Email:</strong> {{ order.client.email }}</p>
+                <p><strong>Nomor WhatsApp:</strong> {{ order.client.whatsapp_number }}</p>
+            </div>
+            <div class="col-md-6">
+                <h5>Detail Layanan</h5>
+                <p><strong>Jenis Layanan:</strong> {{ order.service_type.capitalize() }}</p>
+                {% if order.wedding_package %}
+                <p><strong>Paket Pernikahan:</strong> {{ order.wedding_package.name }}</p>
+                {% endif %}
+                {% if order.prewedding_package %}
+                <p><strong>Paket Pra-pernikahan:</strong> {{ order.prewedding_package.name }}</p>
+                {% endif %}
+                <p><strong>Tanggal Acara:</strong> {{ order.event_date.strftime('%d %B %Y') }}</p>
+                <p><strong>Waktu:</strong> {% if order.event_start_time and order.event_end_time %}{{ order.event_start_time.strftime('%H:%M') }} - {{ order.event_end_time.strftime('%H:%M') }}{% else %}Sepanjang Hari{% endif %}</p>
+                <p><strong>Lokasi:</strong> {{ order.location }}</p>
+                <p><strong>Detail:</strong> {{ order.details if order.details else 'Tidak ada detail tambahan.' }}</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Detail Pembayaran</h5>
+                <p><strong>Total Harga:</strong> Rp {{ "{:,.2f}".format(order.total_price) }}</p>
+                <p><strong>DP Dibayar:</strong> Rp {{ "{:,.2f}".format(order.dp_paid) }}</p>
+                <p><strong>Sisa Pembayaran:</strong> Rp {{ "{:,.2f}".format(order.total_price - order.dp_paid) }}</p>
+                <p><strong>Status:</strong> 
+                    <span class="badge {% if order.status == 'waiting_dp' %}bg-info{% elif order.status == 'waiting_approval' %}bg-warning text-dark{% elif order.status == 'accepted' %}bg-success{% elif order.status == 'rejected' %}bg-danger{% elif order.status == 'completed' %}bg-primary{% elif order.status == 'cancelled' %}bg-secondary{% elif order.status == 'cancellation_requested' %}bg-danger{% elif order.status == 'reschedule_requested' %}bg-warning text-dark{% endif %}">
+                        {{ order.status.capitalize().replace('Dp', 'DP').replace('Approval', 'Persetujuan').replace('Cancellation_requested', 'Pembatalan Diminta').replace('Reschedule_requested', 'Jadwal Ulang Diminta') }}
+                    </span>
+                </p>
+                {% if order.bank_account %}
+                <p><strong>Rekening Bank Tujuan:</strong> {{ order.bank_account.bank_name }} - {{ order.bank_account.account_name }} ({{ order.bank_account.account_number }})</p>
+                {% endif %}
+                {% if order.dp_payment_proof %}
+                <p><strong>Bukti Pembayaran DP:</strong> <a href="{{ url_for('static', filename='payment_proofs/' + order.dp_payment_proof) }}" target="_blank">Lihat Bukti</a></p>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <h5>Informasi Tambahan</h5>
+                <p><strong>Dibuat Pada:</strong> {{ order.created_at.strftime('%d %B %Y %H:%M') }}</p>
+                <p><strong>Terakhir Diperbarui:</strong> {{ order.updated_at.strftime('%d %B %Y %H:%M') }}</p>
+                {% if order.cancellation_reason %}
+                <p class="text-danger"><strong>Alasan Pembatalan:</strong> {{ order.cancellation_reason }}</p>
+                {% endif %}
+                {% if order.reschedule_reason %}
+                <p class="text-danger"><strong>Alasan Penjadwalan Ulang:</strong> {{ order.reschedule_reason }}</p>
+                <p><strong>Tanggal Acara yang Diminta:</strong> {{ order.requested_event_date.strftime('%d %B %Y') if order.requested_event_date else 'N/A' }}</p>
+                <p><strong>Waktu Mulai yang Diminta:</strong> {{ order.requested_start_time.strftime('%H:%M') if order.requested_start_time else 'N/A' }}</p>
+                <p><strong>Waktu Selesai yang Diminta:</strong> {{ order.requested_end_time.strftime('%H:%M') if order.requested_end_time else 'N/A' }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="d-flex justify-content-end">
+            {% if order.status == 'waiting_approval' %}
+            <form action="{{ url_for('admin.approve_order', order_id=order.id) }}" method="POST" style="display:inline; margin-right: 10px;">
+                <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Approve</button>
+            </form>
+            <form action="{{ url_for('admin.reject_order', order_id=order.id) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger"><i class="fas fa-times"></i> Reject</button>
+            </form>
+            {% elif order.cancellation_requested %}
+            <form action="{{ url_for('admin.approve_cancellation', order_id=order.id) }}" method="POST" style="display:inline; margin-right: 10px;" onsubmit="return confirm('Anda yakin ingin menyetujui pembatalan pesanan ini?');">
+                <button type="submit" class="btn btn-success">Setujui Pembatalan</button>
+            </form>
+            <form action="{{ url_for('admin.reject_cancellation', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menolak pembatalan pesanan ini?');">
+                <button type="submit" class="btn btn-danger">Tolak Pembatalan</button>
+            </form>
+            {% elif order.status == 'reschedule_requested' %}
+            <form action="{{ url_for('admin.approve_reschedule', order_id=order.id) }}" method="POST" style="display:inline; margin-right: 10px;" onsubmit="return confirm('Anda yakin ingin menyetujui penjadwalan ulang pesanan ini?');">
+                <button type="submit" class="btn btn-success">Setujui Jadwal Ulang</button>
+            </form>
+            <form action="{{ url_for('admin.reject_reschedule', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menolak penjadwalan ulang pesanan ini?');">
+                <button type="submit" class="btn btn-danger">Tolak Jadwal Ulang</button>
+            </form>
+            {% elif order.status == 'accepted' %}
+            <form action="{{ url_for('admin.mark_order_completed', order_id=order.id) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-info">Mark as Completed</button>
+            </form>
+            {% endif %}
+            <a href="{{ url_for('admin.view_invoice_admin', order_id=order.id) }}" class="btn btn-primary ms-2" target="_blank"><i class="fas fa-file-invoice"></i> Lihat Invoice</a>
+            <form action="{{ url_for('admin.delete_order', order_id=order.id) }}" method="POST" style="display:inline; margin-left: 10px;" onsubmit="return confirm('Anda yakin ingin menghapus pesanan ini?');">
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Hapus Pesanan</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

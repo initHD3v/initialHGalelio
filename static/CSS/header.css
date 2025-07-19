@@ -14,6 +14,7 @@
 /* Warna tautan navigasi di header gelap */
 .navbar-dark .navbar-nav .nav-link {
     color: #FFFFFF !important; /* Warna putih cerah untuk tautan navigasi */
+    opacity: 1; /* Memastikan tidak ada transparansi */
 }
 
 /* Warna tautan navigasi di header gelap saat digulir */

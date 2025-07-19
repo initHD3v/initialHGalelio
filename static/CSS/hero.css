@@ -4,6 +4,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    mask-image: linear-gradient(to bottom, black 90%, transparent);
 }
 
 #heroCarousel {

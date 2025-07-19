@@ -18,9 +18,9 @@
         </div>
         <div class="card-body">
             {% for notification in notifications %}
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <div class="alert alert-info alert-dismissible fade show" role="alert" data-notification-id="{{ notification.id }}">
                 {{ notification.message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="markNotificationAsRead({{ notification.id }})"></button>
+                <button type="button" class="btn-close close-notification" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {% endfor %}
         </div>
@@ -184,7 +184,7 @@
                             <td>{{ order.service_type.capitalize() }}</td>
                             <td>{{ order.event_date.strftime('%d %B %Y') }}</td>
                             <td>
-                                <span class="badge rounded-pill {% if order.status == 'waiting_dp' %}bg-info{% elif order.status == 'waiting_approval' %}bg-warning text-dark{% elif order.status == 'accepted' %}bg-success{% elif order.status == 'rejected' %}bg-danger{% elif order.status == 'completed' %}bg-primary{% elif order.status == 'expired' %}bg-secondary{% endif %}">
+                                <span class="badge rounded-pill {% if order.status == 'waiting_dp' %}bg-info{% elif order.status == 'waiting_approval' %}bg-warning text-dark{% elif order.status == 'accepted' %}bg-success{% elif order.status == 'rejected' %}bg-danger{% elif order.status == 'completed' %}bg-primary{% elif order.status == 'expired' %}bg-secondary{% elif order.status == 'cancelled' %}bg-danger{% endif %}">
                                     {{ order.status.capitalize().replace('Dp', 'DP').replace('Approval', 'Persetujuan') }}
                                 </span>
                             </td>
@@ -192,14 +192,18 @@
                                 {% if order.status == 'rejected' or order.status == 'expired' %}
                                     <a href="{{ url_for('client.dp_payment', order_id=order.id) }}" class="btn btn-warning btn-sm"><i class="fas fa-upload"></i> Unggah Ulang Bukti</a>
                                     <form action="{{ url_for('client.delete_order', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menghapus pesanan ini?');">
-                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Hapus Pesanan</button>
+                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
+                                    </form>
+                                {% elif order.status == 'completed' or order.status == 'cancelled' %}
+                                    <a href="{{ url_for('client.view_invoice_client', order_id=order.id) }}" class="btn btn-info btn-sm"><i class="fas fa-file-invoice"></i> Lihat Invoice</a>
+                                    <form action="{{ url_for('client.delete_order', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menghapus pesanan ini?');">
+                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
                                     </form>
                                 {% elif order.status == 'completed' and order.can_submit_testimonial and not get_testimonial_for_order(order.id) %}
                                     <a href="{{ url_for('client.submit_testimonial', order_id=order.id) }}" class="btn btn-success btn-sm"><i class="fas fa-star"></i> Berikan Testimoni</a>
                                 {% else %}
                                     <span class="text-muted">Tidak ada aksi</span>
                                 {% endif %}
-                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -229,24 +233,38 @@
             }
         });
 
-        // Function to mark notification as read
-        window.markNotificationAsRead = function(notificationId) {
-            fetch(`/api/notifications/mark_read/${notificationId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('Notification marked as read');
-                } else {
-                    console.error('Failed to mark notification as read');
+        document.querySelectorAll('.close-notification').forEach(button => {
+            button.addEventListener('click', function() {
+                const notificationElement = this.closest('.alert');
+                const notificationId = notificationElement.dataset.notificationId;
+
+                if (notificationId) {
+                    fetch(`/notifications/mark_read/${notificationId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Jika Anda menggunakan CSRF protection, tambahkan token di sini
+                        // 
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            console.log('Notification marked as read.');
+                            // Elemen akan dihapus dari DOM oleh Bootstrap data-bs-dismiss="alert"
+                        } else {
+                            console.error('Failed to mark notification as read:', data.message);
+                            // Jika gagal, mungkin tampilkan kembali notifikasi atau beri tahu pengguna
+                            notificationElement.classList.add('show'); 
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        notificationElement.classList.add('show');
+                    });
                 }
-            })
-            .catch(error => console.error('Error:', error));
-        };
+            });
+        });
     });
 </script>
 

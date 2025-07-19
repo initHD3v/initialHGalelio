@@ -293,6 +293,17 @@ def admin_panel():
     )
 
 
+@admin.route("/admin/order/<int:order_id>")
+@login_required
+def order_detail(order_id):
+    if current_user.role != "admin":
+        flash("You do not have access to this page.", "danger")
+        return redirect(url_for("main.index"))
+
+    order = Order.query.get_or_404(order_id)
+    return render_template("admin/order_detail.html", order=order, title="Order Details")
+
+
 @admin.route("/admin/order/<int:order_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_order(order_id):

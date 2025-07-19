@@ -412,7 +412,7 @@ class AdminOrderForm(FlaskForm):
         ],
         validators=[DataRequired()],
     )
-    bank_account = QuerySelectField(
+    bank_account = CustomQuerySelectField(
         "Bank Account for Payment",
         query_factory=get_active_bank_accounts,
         get_pk=lambda x: x.id,
