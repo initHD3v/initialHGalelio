@@ -1,0 +1,105 @@
+body {
+    overflow: hidden; /* Prevent scrollbars from background effects */
+}
+
+.error-page-container {
+    position: relative;
+    min-height: 80vh; /* Ensure it takes up most of the viewport */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1; /* Ensure content is above background effects */
+}
+
+.error-content {
+    position: relative;
+    z-index: 2; /* Ensure text and image are above subtle effects */
+    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background for readability */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.error-image {
+    max-width: 300px; /* Adjust size of your 404.png */
+    height: auto;
+    margin-bottom: 20px;
+    filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.3)); /* Subtle shadow for depth */
+    animation: float 3s ease-in-out infinite alternate; /* Gentle floating animation */
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-15px); }
+}
+
+.error-title {
+    font-family: 'Montserrat', sans-serif; /* Use a strong, modern font */
+    font-weight: 700;
+    color: #333; /* Dark text for contrast */
+    margin-bottom: 15px;
+}
+
+.error-message {
+    font-family: 'Inter', sans-serif; /* Readable body font */
+    color: #555;
+    margin-bottom: 30px;
+    line-height: 1.8;
+}
+
+.error-button {
+    background-color: #007bff; /* Primary color, adjust to your brand */
+    border-color: #007bff;
+    transition: all 0.3s ease;
+}
+
+.error-button:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-3px); /* Lift effect on hover */
+}
+
+.error-contact a {
+    color: #007bff; /* Link color */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.error-contact a:hover {
+    text-decoration: underline;
+}
+
+/* Background dynamic effect */
+.background-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top left, rgba(255, 255, 0, 0.1), transparent 50%),
+                radial-gradient(circle at bottom right, rgba(0, 123, 255, 0.1), transparent 50%);
+    opacity: 0.7;
+    z-index: 0;
+    animation: backgroundPan 20s linear infinite alternate;
+}
+
+@keyframes backgroundPan {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .error-image {
+        max-width: 200px;
+    }
+    .error-title {
+        font-size: 1.8em;
+    }
+    .error-message {
+        font-size: 0.9em;
+    }
+}

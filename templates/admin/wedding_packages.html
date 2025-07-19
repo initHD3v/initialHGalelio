@@ -39,9 +39,9 @@
                         <td>Rp {{ "{:,.2f}".format(package.price) }}</td>
                         <td>{{ package.category }}</td>
                         <td>
-                            <a href="{{ url_for('admin.edit_wedding_package', package_id=package.id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
+                            <a href="{{ url_for('admin.edit_wedding_package', package_id=package.id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
                             <form action="{{ url_for('admin.delete_wedding_package', package_id=package.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this package?');"><i class="fas fa-trash-alt"></i> Delete</button>
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this package?');"><i class="fas fa-trash-alt"></i></button>
                             </form>
                         </td>
                     </tr>

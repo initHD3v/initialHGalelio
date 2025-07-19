@@ -1,4 +1,4 @@
-from flask import Flask, request, session, flash
+from flask import Flask, request, session, flash, render_template
 from dotenv import load_dotenv
 from extensions import db, login_manager, migrate, babel, mail
 from models import User, Post, PostImage, Order, CalendarEvent, Testimonial, WeddingPackage, BankAccount, Notification, HomepageContent, HeroImage
@@ -52,11 +52,9 @@ babel.init_app(app, locale_selector=get_locale)
 def inject_google_maps_api_key():
     return dict(google_maps_api_key=app.config["GOOGLE_MAPS_API_KEY"])
 
-
-
-
-
-
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
 
 
 if __name__ == "__main__":

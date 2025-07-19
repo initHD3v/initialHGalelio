@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/404_redesign.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container text-center py-5 error-page-container">
+    <div class="error-content">
+        <img src="{{ url_for('static', filename='images/404.png') }}" alt="404 Not Found" class="error-image img-fluid">
+        <h2 class="error-title">Oops! Anda Tersesat di Luar Bingkai.</h2>
+        <p class="error-message">
+            Sepertinya halaman yang Anda cari telah hilang dari fokus, atau mungkin belum sempat kami abadikan.
+            Jangan khawatir, kami akan membantu Anda kembali ke galeri kami.
+        </p>
+        <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg error-button">
+            <i class="fas fa-camera-retro me-2"></i> Kembali ke Galeri Utama
+        </a>
+        <p class="error-contact mt-4">
+            Jika Anda merasa ini adalah kesalahan teknis, silakan <a href="{{ url_for('main.contact') }}">hubungi kami</a>.
+        </p>
+    </div>
+    <div class="background-effect"></div> {# For subtle visual effects #}
+</div>
+{% endblock %}

@@ -43,9 +43,9 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{{ url_for('admin.edit_bank_account', account_id=account.id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
+                            <a href="{{ url_for('admin.edit_bank_account', account_id=account.id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
                             <form action="{{ url_for('admin.delete_bank_account', account_id=account.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menghapus rekening ini?');">
-                                <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Hapus</button>
+                                <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
                             </form>
                         </td>
                     </tr>

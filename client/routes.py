@@ -77,7 +77,7 @@ def mark_notification_as_read(notification_id):
 @client.route("/dashboard")
 @login_required
 def dashboard():
-    orders = Order.query.filter_by(client_id=current_user.id).all()
+    orders = Order.query.filter_by(client_id=current_user.id, is_client_hidden=False).all()
     now = datetime.now(pytz.utc)
     upcoming_orders = [
         order
