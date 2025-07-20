@@ -38,14 +38,14 @@ Dikembangkan menggunakan **Python (Flask)**, aplikasi ini menyediakan sistem aut
 
 | Komponen      | Teknologi                           |
 |---------------|--------------------------------------|
-| Backend       | Python, Flask, Flask-WTF, Jinja2     |
+| Backend       | Python, Flask, Flask-WTF, Jinja2, Celery, Redis |
 | Auth          | Flask-Login, Flask-Bcrypt            |
 | Database      | SQLite (dev), PostgreSQL (produksi)  |
 | API & Logic   | REST-like endpoints                  |
 | PDF Invoice   | WeasyPrint                           |
 | Kalender      | JS Datepicker + backend validation   |
 | Live Chat     | AJAX polling                         |
-| Deployment    | Gunicorn + Nginx                     |
+| Deployment    | Gunicorn + Nginx, Honcho (Local Dev) |
 
 ---
 
@@ -58,6 +58,9 @@ initialHGalelio/
 ├── models.py
 ├── forms.py
 ├── extensions.py
+├── tasks.py
+├── celery_worker_entrypoint.py
+├── Procfile
 ├── /routes/
 ├── /templates/
 ├── /static/
@@ -82,12 +85,28 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Jalankan Aplikasi
+### 3. Jalankan Aplikasi (dengan Celery Worker)
+
+Pastikan Redis server Anda berjalan di `localhost:6379`. Jika belum, instal dan jalankan:
+
 ```bash
-python app.py
+# Untuk macOS dengan Homebrew
+brew install redis
+brew services start redis
+
+# Untuk Linux dengan systemd
+sudo apt update && sudo apt install redis-server
+sudo systemctl start redis-server
+sudo systemctl enable redis-server
 ```
 
-Buka di browser: `http://127.0.0.1:8000`
+Kemudian, jalankan aplikasi Flask dan Celery worker secara bersamaan menggunakan `honcho`:
+
+```bash
+honcho start
+```
+
+Buka di browser: `http://127.0.0.1:5001`
 
 ---
 
@@ -126,3 +145,16 @@ Buka di browser: `http://127.0.0.1:8000`
 
 © 2025 Aruna Moment. Semua hak cipta dilindungi.  
 Aplikasi dikembangkan untuk kebutuhan internal dan komersial fotografi.
+
+---
+
+## 🗓️ Timeline Pengembangan (Juli 2025)
+
+### Minggu 3 (20 Juli 2025)
+- **Integrasi Celery untuk Tugas Latar Belakang Email:**
+  - Mengimplementasikan Celery untuk pengiriman email asinkron (pendaftaran pengguna baru, notifikasi order, pembatalan, penjadwalan ulang).
+  - Mengkonfigurasi Celery dengan Redis sebagai broker dan backend.
+  - Merefaktor struktur aplikasi Flask ke pola factory function (`create_app`).
+  - Menggunakan `honcho` untuk manajemen proses lokal (menjalankan Flask app dan Celery worker secara bersamaan).
+  - Memperbaiki masalah konfigurasi SSL/TLS untuk pengiriman email.
+  - Memastikan format email HTML yang dikirim sudah benar.
