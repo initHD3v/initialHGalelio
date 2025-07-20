@@ -4,6 +4,7 @@ from forms import LoginForm, RegistrationForm, RequestResetForm, ResetPasswordFo
 from models import User, PostImage, Notification
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import login_manager, db, mail
+from tasks import send_email_task # Import Celery task
 from flask_mail import Message
 from flask_babel import _
 from . import auth
@@ -13,7 +14,12 @@ def send_reset_email(user):
     token = user.get_reset_token()
     msg = Message('Permintaan Reset Kata Sandi', recipients=[user.email])
     msg.html = render_template('emails/reset_password.html', user=user, token=token)
-    mail.send(msg)
+    send_email_task.delay(
+        subject=msg.subject,
+        sender=msg.sender,
+        recipients=msg.recipients,
+        body=msg.html # Mengirim HTML sebagai body
+    )
 
 
 @login_manager.user_loader
@@ -64,7 +70,12 @@ def register():
         try:
             msg = Message("Pendaftaran Berhasil di Aruna Moment", recipients=[user.email])
             msg.html = render_template("emails/signup_confirmation.html", user=user)
-            mail.send(msg)
+            send_email_task.delay(
+                subject=msg.subject,
+                sender=msg.sender,
+                recipients=msg.recipients,
+                body=msg.html # Mengirim HTML sebagai body
+            )
             flash(_("Akun Anda telah dibuat! Email konfirmasi telah dikirim."), "success")
         except Exception as e:
             flash(_("Akun Anda telah dibuat, tetapi gagal mengirim email konfirmasi. Silakan hubungi dukungan."), "warning")

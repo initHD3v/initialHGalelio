@@ -10,6 +10,7 @@ from flask import (
 from flask_login import login_required, current_user
 from flask_mail import Message
 from extensions import mail
+from tasks import send_email_task # Import Celery task
 from models import (
     Order,
     Testimonial,
@@ -48,7 +49,12 @@ def send_new_order_notification_to_admin(order):
                 order=order,
                 current_year=datetime.now().year
             )
-            mail.send(msg)
+            send_email_task.delay(
+                subject=msg.subject,
+                sender=msg.sender,
+                recipients=msg.recipients,
+                body=msg.html # Mengirim HTML sebagai body
+            )
     except Exception as e:
         current_app.logger.error(f"Failed to send new order notification email for order {order.id}: {e}")
 
@@ -292,10 +298,7 @@ def request_cancellation(order_id):
 
     # Send email notification to admin
     cancellation_reason_admin = f"Permintaan pembatalan pesanan {order.id} dari {order.client.full_name} telah diajukan. Alasan: {order.cancellation_reason or 'Tidak ada alasan diberikan.'}"
-    try:
-        send_cancellation_notification_to_admin(order, cancellation_reason_admin)
-    except Exception as e:
-        current_app.logger.error(f"Failed to send cancellation request notification to admin for order {order.id}: {e}")
+    send_cancellation_notification_to_admin(order, cancellation_reason_admin)
 
     return redirect(url_for("client.dashboard"))
 
@@ -411,8 +414,7 @@ def request_reschedule(order_id):
         )
 
     # Send email notification to admin
-    try:
-        send_reschedule_notification_to_admin(
+    send_reschedule_notification_to_admin(
             order,
             new_event_date,
             new_start_time,
@@ -420,8 +422,6 @@ def request_reschedule(order_id):
             reschedule_reason,
             "requested"
         )
-    except Exception as e:
-        current_app.logger.error(f"Failed to send reschedule request notification to admin for order {order.id}: {e}")
 
     return redirect(url_for("client.dashboard"))
 

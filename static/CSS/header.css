@@ -28,7 +28,7 @@
 }
 
 /* Warna merek (brand) di header gelap saat digulir */
-.navbar-dark.scrolled .navbar-brand {
+.navbar.navbar-dark.scrolled .navbar-brand {
     color: black !important; /* Warna hitam untuk merek saat digulir */
 }
 

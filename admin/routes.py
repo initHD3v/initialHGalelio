@@ -11,6 +11,7 @@ from flask import (
 from flask_login import login_required, current_user
 from flask_mail import Message
 from extensions import mail # Import mail object
+from tasks import send_email_task # Import Celery task
 from models import (
     Post,
     Order,
@@ -57,7 +58,12 @@ def send_order_status_email(order):
             client_name=client_name,
             current_year=datetime.now().year
         )
-        mail.send(msg)
+        send_email_task.delay(
+            subject=msg.subject,
+            sender=msg.sender,
+            recipients=msg.recipients,
+            body=msg.html # Mengirim HTML sebagai body
+        )
     except Exception as e:
         current_app.logger.error(f"Failed to send order status email for order {order.id}: {e}")
 
@@ -75,7 +81,12 @@ def send_cancellation_email_to_client(order, cancellation_reason):
             cancellation_reason=cancellation_reason,
             current_year=datetime.now().year
         )
-        mail.send(msg)
+        send_email_task.delay(
+            subject=msg.subject,
+            sender=msg.sender,
+            recipients=msg.recipients,
+            body=msg.html # Mengirim HTML sebagai body
+        )
     except Exception as e:
         current_app.logger.error(f"Failed to send cancellation email to client for order {order.id}: {e}")
 
@@ -93,7 +104,12 @@ def send_cancellation_notification_to_admin(order, cancellation_reason):
                 cancellation_reason=cancellation_reason,
                 current_year=datetime.now().year
             )
-            mail.send(msg)
+            send_email_task.delay(
+                subject=msg.subject,
+                sender=msg.sender,
+                recipients=msg.recipients,
+                body=msg.html # Mengirim HTML sebagai body
+            )
     except Exception as e:
         current_app.logger.error(f"Failed to send cancellation notification to admin for order {order.id}: {e}")
 
@@ -115,7 +131,12 @@ def send_reschedule_email_to_client(order, new_date, new_start_time, new_end_tim
             status=status,
             current_year=datetime.now().year
         )
-        mail.send(msg)
+        send_email_task.delay(
+            subject=msg.subject,
+            sender=msg.sender,
+            recipients=msg.recipients,
+            body=msg.html # Mengirim HTML sebagai body
+        )
     except Exception as e:
         current_app.logger.error(f"Failed to send reschedule email to client for order {order.id}: {e}")
 
@@ -137,7 +158,12 @@ def send_reschedule_notification_to_admin(order, new_date, new_start_time, new_e
                 status=status,
                 current_year=datetime.now().year
             )
-            mail.send(msg)
+            send_email_task.delay(
+                subject=msg.subject,
+                sender=msg.sender,
+                recipients=msg.recipients,
+                body=msg.html # Mengirim HTML sebagai body
+            )
     except Exception as e:
         current_app.logger.error(f"Failed to send reschedule notification to admin for order {order.id}: {e}")
 
