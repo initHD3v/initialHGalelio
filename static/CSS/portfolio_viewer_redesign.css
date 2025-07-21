@@ -117,3 +117,8 @@
         border-radius: 0;
     }
 }
+
+/* Transparent backdrop for the modal */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.7); /* Adjust opacity as needed */
+}

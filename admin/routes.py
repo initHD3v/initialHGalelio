@@ -221,8 +221,8 @@ def manage_homepage():
             if request.form.get(delete_checkbox_name):
                 # Delete from filesystem
                 filepath = os.path.join(hero_image_dir, image.filename)
-                if os.path.exists(image_path):
-                    os.remove(image_path)
+                if os.path.exists(filepath):
+                    os.remove(filepath)
                 # Delete from database
                 db.session.delete(image)
 

@@ -14,6 +14,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Close modal on ESC key press
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && portfolioViewerModalElement.classList.contains('show')) {
+            portfolioViewerModal.hide();
+        }
+    });
+
+    // Blur any focused element inside the modal when it starts to hide
+    portfolioViewerModalElement.addEventListener('hide.bs.modal', function () {
+        if (document.activeElement && portfolioViewerModalElement.contains(document.activeElement)) {
+            document.activeElement.blur();
+        }
+    });
+
     portfolioCards.forEach(card => {
         card.addEventListener('click', function(event) {
             // Store the currently focused element before opening the modal
@@ -48,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 img.src = filename; // Use filename directly as it already contains the full static path
                                 img.className = 'portfolio-image-display'; // Simpler class for display
                                 img.alt = `Image ${index + 1} for ${postTitle}`;
+                                img.setAttribute('data-aos', 'fade-up'); // Add AOS animation attribute
 
                                 img.onload = () => {
                                     slideDiv.appendChild(img);
@@ -85,7 +100,9 @@ document.addEventListener('DOMContentLoaded', function() {
         imageViewerSection.innerHTML = ''; // Clear content when modal is closed
         // Explicitly ensure body scroll is re-enabled
         document.body.style.overflow = ''; // Reset overflow
+        document.documentElement.style.overflow = ''; // Reset overflow for html element
         document.body.classList.remove('modal-open'); // Remove Bootstrap's modal-open class
+        document.body.style.pointerEvents = ''; // Ensure pointer events are re-enabled
 
         // Aggressively remove any lingering modal-backdrop elements
         const backdrops = document.querySelectorAll('.modal-backdrop');
@@ -97,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 lastFocusedElement.focus();
                 console.log("Focus returned to last focused element.");
-            }, 200); // Increased delay to 200ms
+            }, 300); // Increased delay to 300ms
         } else {
             document.body.focus(); // Fallback to body if no element was previously focused or focus function is missing
             console.log("Focus returned to body (fallback).");

@@ -54,6 +54,7 @@ class PostImage(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey("post.id"), nullable=False)
     filename = db.Column(db.String(150), nullable=False)
     likes = db.Column(db.Integer, default=0, nullable=False)
+    image_likes = db.relationship("ImageLike", backref="post_image", lazy=True, cascade="all, delete-orphan")
 
 
 class ImageLike(db.Model):
@@ -70,7 +71,6 @@ class ImageLike(db.Model):
     )
 
     user = db.relationship("User", backref="image_likes")
-    post_image = db.relationship("PostImage", backref="image_likes")
 
 
 class Order(db.Model):
