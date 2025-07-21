@@ -3,6 +3,7 @@
 {% block styles %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='CSS/portfolio.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/portfolio_viewer_redesign.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -13,9 +14,9 @@
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for post in posts %}
         <div class="col">
-            <div class="card h-100 shadow-sm portfolio-card">
+            <div class="card h-100 shadow-sm portfolio-card portfolio-clickable" data-post-id="{{ post.id }}">
                 <!-- Bootstrap Carousel -->
-                <div id="carousel-{{ post.id }}" class="carousel slide" data-bs-ride="false">
+                <div id="carousel-{{ post.id }}" class="carousel slide">
                     <!-- Carousel Indicators (the dots) -->
                     <div class="carousel-indicators">
                         {% for image in post.images %}
@@ -76,9 +77,32 @@
     </div>
 </div>
 </div>
+
+<!-- Portfolio Viewer Modal -->
+<div class="modal fade" id="portfolio-viewer-modal" aria-labelledby="portfolioViewerModalLabel">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Image Viewer Section -->
+                <div class="image-viewer-section" id="image-viewer-section">
+                    <!-- Images will be loaded here dynamically -->
+                    <div class="spinner-container">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
 <script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
+<script src="{{ url_for('static', filename='js/portfolio_viewer.js') }}"></script>
 {% endblock %}

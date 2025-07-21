@@ -329,6 +329,13 @@ def unavailable_dates():
     return jsonify(list(dates))
 
 
+@main.route("/api/posts/<int:post_id>/images")
+def get_post_images(post_id):
+    post = Post.query.get_or_404(post_id)
+    image_urls = [url_for('static', filename='images/' + img.filename) for img in post.images]
+    return jsonify({'images': image_urls})
+
+
 @main.route("/like_image/<int:image_id>", methods=["POST"])
 @login_required
 def like_image(image_id):

@@ -1,0 +1,119 @@
+/*
+  Portfolio Viewer Modal Redesign CSS
+  Focus: Modern, Aesthetic, User-Friendly UI/UX
+*/
+
+/* Base Modal Styles */
+#portfolio-viewer-modal .modal-dialog {
+    max-width: 95vw; /* Slightly smaller than full screen */
+    height: 95vh; /* Slightly smaller than full screen */
+    margin: 2.5vh auto; /* Center vertically and horizontally */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#portfolio-viewer-modal .modal-content {
+    background-color: rgba(25, 25, 25, 0.95); /* Darker, slightly transparent background */
+    border-radius: 15px; /* Rounded corners */
+    overflow: hidden; /* Ensure content respects border-radius */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Stronger shadow */
+}
+
+/* Modal Header */
+#portfolio-viewer-modal .modal-header {
+    padding: 15px 25px;
+    border-bottom: none; /* No border */
+    display: flex;
+    justify-content: flex-end; /* Push close button to the right */
+    align-items: center;
+    flex-shrink: 0; /* Prevent header from shrinking */
+    position: absolute; /* Position over the image viewer */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10; /* Ensure it's above the image */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0)); /* Fade out background */
+}
+
+#portfolio-viewer-modal .btn-close {
+    filter: invert(1) grayscale(1) brightness(2); /* Make close button white */
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+#portfolio-viewer-modal .btn-close:hover {
+    opacity: 1;
+}
+
+/* Modal Body - Main Content Area */
+#portfolio-viewer-modal .modal-body {
+    flex-grow: 1; /* Allow body to take available space */
+    display: flex;
+    padding: 0; /* Remove default padding */
+    position: relative; /* For absolute positioning of controls */
+}
+
+/* Image Viewer Section */
+.image-viewer-section {
+    flex-grow: 1;
+    position: relative;
+    overflow-y: auto; /* Enable scrolling for images */
+    scroll-snap-type: y mandatory; /* Smooth snapping between images */
+    -webkit-overflow-scrolling: touch; /* Improve scrolling on iOS */
+    display: flex; /* Use flex to center images if they don't fill height */
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Align items to start, not center, for scroll */
+    background-color: #1a1a1a; /* Slightly lighter dark background for image area */
+}
+
+.portfolio-slide {
+    width: 100%;
+    min-height: 100%; /* Each slide takes at least full height of viewer */
+    display: flex;
+    align-items: center; /* Center image vertically within its slide */
+    justify-content: center; /* Center image horizontally within its slide */
+    scroll-snap-align: start; /* Snap to the start of each slide */
+    padding: 20px; /* Padding around images */
+    box-sizing: border-box; /* Include padding in width/height */
+}
+
+.portfolio-image-display {
+    max-width: 100%;
+    max-height: calc(95vh - 150px); /* Max height considering header/footer/padding */
+    object-fit: contain; /* Ensure entire image is visible */
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Loading Spinner */
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .portfolio-image-display {
+        max-height: calc(100vh - 120px); /* Adjust max height for full screen on mobile */
+    }
+}
+
+@media (max-width: 768px) {
+    #portfolio-viewer-modal .modal-dialog {
+        max-width: 100vw;
+        height: 100vh;
+        margin: 0;
+    }
+
+    #portfolio-viewer-modal .modal-content {
+        border-radius: 0;
+    }
+}
