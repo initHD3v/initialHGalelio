@@ -1,99 +1,118 @@
 {% extends "base.html" %}
+
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/about_new.css') }}">
+{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='CSS/about.css') }}">
-<div class="about-hero">
+<!-- HERO SECTION -->
+<div class="about-hero-new text-white d-flex justify-content-center align-items-center text-center position-relative" style="background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('{{ url_for('static', filename=config['HERO_IMAGE_PATH']) }}') no-repeat center center; background-size: cover; background-attachment: fixed;">
     <div class="container">
-        <h1>Kisah di Balik Lensa: Hidayat Fauzii Photography</h1>
-        <p class="lead">Mengabadikan setiap momen tak terlupakan dalam perjalanan cinta Anda dengan keindahan, emosi, dan keaslian.</p>
+        <h1 class="display-3 fw-bold" data-aos="fade-up">Kisah di Balik Lensa</h1>
+        <p class="lead col-lg-8 mx-auto" data-aos="fade-up" data-aos-delay="200">Lebih dari sekadar fotografer, saya adalah pencerita visual yang bersemangat mengubah momen menjadi kenangan abadi.</p>
+    </div>
+    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-5">
+        <a href="#" id="change-hero-image-btn" class="rounded-circle shadow p-3 text-white" data-bs-toggle="tooltip" data-bs-placement="top" title="Ganti Foto Hero" onclick="document.getElementById('hero-image-upload').click(); return false;">
+            <i class="fas fa-camera fs-4"></i>
+        </a>
+        <input type="file" id="hero-image-upload" accept="image/*" style="display: none;">
+    </div>
+    {% endif %}
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container-fluid bg-light py-5">
+    <div class="container">
+
+        <!-- SECTION: MEET THE PHOTOGRAPHER -->
+        <section class="row align-items-center py-5">
+            <div class="col-lg-5" data-aos="fade-right" data-aos-duration="1000">
+                <img src="{{ url_for('static', filename='images/hf.jpg') }}" class="img-fluid rounded-3 shadow-lg" alt="Hidayat Fauzii">
+            </div>
+            <div class="col-lg-7 ps-lg-5 mt-4 mt-lg-0" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                <h2 class="display-5 fw-bold">Halo, saya Hidayat Fauzii.</h2>
+                <p class="text-muted fs-5">Seorang seniman visual dengan hasrat untuk keindahan, emosi, dan keaslian.</p>
+                <p class="lh-lg">Selama lebih dari <strong data-aos="zoom-in"><span id="experience-counter" data-target="5">0</span> tahun</strong>, saya telah mendedikasikan diri untuk menangkap esensi dari hari-hari paling istimewa dalam hidup banyak orang. Filosofi saya sederhana: setiap klik kamera harus menceritakan sebuah kisah, setiap bingkai harus membangkitkan perasaan. Saya percaya pada kekuatan cahaya alami, komposisi yang tulus, dan momen-momen candid yang tak ternilai harganya.</p>
+            </div>
+        </section>
+
+        <!-- SECTION: TIMELINE OF EXPERTISE -->
+        <section class="py-5">
+            <h2 class="text-center display-5 fw-bold mb-5" data-aos="fade-up">Perjalanan & Keahlian Saya</h2>
+            <div class="timeline">
+                <!-- Timeline Item 1 -->
+                <div class="timeline-item" data-aos="fade-up">
+                    <div class="timeline-icon">
+                        <i class="fas fa-camera-retro"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4 class="fw-bold">Fotografi Candid & Autentik</h4>
+                        <p class="text-muted">Menangkap momen nyata tanpa rekayasa. Tawa, air mata, dan semua emosi di antaranya adalah kanvas saya.</p>
+                    </div>
+                </div>
+                <!-- Timeline Item 2 -->
+                <div class="timeline-item" data-aos="fade-up">
+                    <div class="timeline-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="timeline-content right">
+                        <h4 class="fw-bold">Pencahayaan Artistik</h4>
+                        <p class="text-muted">Memanfaatkan cahaya alami untuk melukis gambar yang dramatis dan lembut, memberikan nuansa sinematik pada setiap foto.</p>
+                    </div>
+                </div>
+                <!-- Timeline Item 3 -->
+                <div class="timeline-item" data-aos="fade-up">
+                    <div class="timeline-icon">
+                        <i class="fas fa-palette" data-aos="zoom-in" data-aos-delay="300"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4 class="fw-bold">Editing Berkarakter</h4>
+                        <p class="text-muted">Proses pasca-produksi yang teliti untuk menyempurnakan warna dan detail, menciptakan hasil akhir yang berkarakter dan abadi.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: CORE VALUES -->
+        <section class="py-5">
+            <h2 class="text-center display-5 fw-bold mb-5" data-aos="fade-up">Nilai-Nilai Saya</h2>
+            <div class="row g-4">
+                <div class="col-lg-4" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="card text-center p-4 h-100 border-0 shadow-sm">
+                        <i class="fas fa-heart fs-1 text-primary my-3"></i>
+                        <h4 class="fw-bold">Integritas</h4>
+                        <p class="text-muted">Kepercayaan Anda adalah segalanya. Saya berkomitmen pada kejujuran dan transparansi di setiap langkah.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="card text-center p-4 h-100 border-0 shadow-sm">
+                        <i class="fas fa-handshake fs-1 text-primary my-3"></i>
+                        <h4 class="fw-bold">Kolaborasi</h4>
+                        <p class="text-muted">Ini adalah kisah Anda. Saya di sini untuk mendengarkan, memahami, dan berkolaborasi untuk mewujudkan visi Anda.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="card text-center p-4 h-100 border-0 shadow-sm">
+                        <i class="fas fa-star fs-1 text-primary my-3"></i>
+                        <h4 class="fw-bold">Keunggulan</h4>
+                        <p class="text-muted">Saya tidak pernah puas dengan "cukup baik". Saya berusaha untuk keunggulan dalam setiap detail, dari pemotretan hingga hasil akhir.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </div>
 </div>
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-10 mx-auto">
-            <!-- 1. Pengantar & Filosofi -->
-            <section class="about-section text-center">
-                <h2 class="mb-4">Pengantar & Filosofi</h2>
-                <p>Halo, saya Hidayat Fauzii, seorang fotografer pernikahan yang berdedikasi untuk mengabadikan setiap momen tak terlupakan dalam perjalanan cinta Anda. Bagi saya, fotografi bukan hanya sekadar mengambil gambar, tetapi tentang menceritakan kisah unik setiap pasangan dengan keindahan, emosi, dan keaslian.</p>
-                <p>Filosofi saya berakar pada keyakinan bahwa setiap pernikahan adalah mahakarya yang tak terulang. Saya berusaha menangkap esensi dari hari istimewa Anda, dari tawa riang hingga air mata bahagia, menciptakan kenangan abadi yang akan Anda hargai selamanya.</p>
-            </section>
-
-            <!-- 2. Meet the Photographer -->
-            <section class="about-section text-center">
-                <h2 class="mb-4">Meet the Photographer</h2>
-                <div class="profile-img-container">
-                    <img src="{{ url_for('static', filename='images/hf.jpg') }}" class="profile-img" alt="Hidayat Fauzii">
-                </div>
-                <p>Dengan pengalaman lebih dari <strong>10 tahun</strong> di industri fotografi pernikahan, saya telah berkesempatan mengabadikan ratusan kisah cinta di berbagai lokasi dan budaya. Perjalanan ini telah mengasah keahlian saya dalam berbagai aspek fotografi pernikahan.</p>
-            </section>
-
-            <!-- 3. Pengalaman & Keahlian -->
-            <section class="about-section">
-                <h2 class="text-center mb-4">Perjalanan & Keahlian Saya</h2>
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <img src="{{ url_for('static', filename='images/A7E00370.jpeg') }}" class="img-fluid rounded shadow-lg mb-4" alt="Hidayat Fauzii - Wedding Photography Skills">
-                    </div>
-                    <div class="col-md-6">
-                        <ul class="list-unstyled">
-                            <li><i class="fas fa-camera-retro text-primary me-2"></i>Fotografi Candid yang Autentik</li>
-                            <li><i class="fas fa-lightbulb text-primary me-2"></i>Pencahayaan Alami dan Artistik</li>
-                            <li><i class="fas fa-palette text-primary me-2"></i>Editing yang Teliti dan Berkarakter</li>
-                            <li><i class="fas fa-users text-primary me-2"></i>Penguasaan Berbagai Gaya Pernikahan (Tradisional, Modern, Intim)</li>
-                        </ul>
-                        <p>Saya terus belajar dan berinovasi untuk memastikan setiap gambar yang saya hasilkan adalah yang terbaik.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 4. Pendekatan Kerja -->
-            <section class="about-section text-center">
-                <h2 class="mb-4">Pendekatan Saya dalam Mengabadikan Momen Anda</h2>
-                <p>Pendekatan saya adalah menciptakan pengalaman yang nyaman dan menyenangkan bagi setiap pasangan. Saya percaya pada komunikasi terbuka, mulai dari sesi konsultasi awal untuk memahami visi Anda, hingga panduan selama sesi foto, dan proses pasca-produksi yang teliti untuk memastikan setiap gambar sempurna.</p>
-                <p>Saya hadir untuk menjadi lebih dari sekadar fotografer; saya adalah pendukung Anda di hari besar Anda, memastikan Anda merasa rileks dan dapat menikmati setiap detik tanpa khawatir.</p>
-            </section>
-
-            <!-- 5. Nilai-nilai & Komitmen -->
-            <section class="about-section">
-                <h2 class="text-center mb-4">Nilai & Komitmen</h2>
-                <div class="row text-center g-4">
-                    <div class="col-md-4">
-                        <div class="values-card">
-                            <i class="fas fa-heart mb-3"></i>
-                            <h5>Integritas</h5>
-                            <p>Menjaga kepercayaan dan kejujuran dalam setiap interaksi dan hasil karya.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="values-card">
-                            <i class="fas fa-lightbulb mb-3"></i>
-                            <h5>Kreativitas</h5>
-                            <p>Menghadirkan perspektif segar dan unik untuk setiap cerita cinta.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="values-card">
-                            <i class="fas fa-handshake mb-3"></i>
-                            <h5>Dedikasi</h5>
-                            <p>Memberikan yang terbaik dari hati untuk setiap pasangan dan setiap momen.</p>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-center mt-4">Saya berkomitmen untuk memberikan hasil yang melampaui ekspektasi, dengan perhatian terhadap detail dan kualitas tanpa kompromi. Setiap pernikahan adalah unik, dan saya berjanji untuk memperlakukannya dengan hormat dan kehati-hatian yang sama.</p>
-            </section>
-
-            <!-- 6. Sentuhan Personal -->
-            <section class="about-section text-center">
-                <h2 class="mb-4">Di Balik Lensa</h2>
-                <p>Di luar lensa kamera, saya adalah seorang <strong>pecinta kopi dan penjelajah alam</strong>. Saya percaya bahwa passion saya dalam hidup juga tercermin dalam karya saya, membawa energi dan keaslian ke setiap proyek.</p>
-            </section>
-
-            <!-- 7. Ajakan Bertindak -->
-            <section class="about-section text-center">
-                <h2 class="mb-4">Mari Kita Mulai Kisah Anda</h2>
-                <p class="lead">Saya tidak sabar untuk mendengar kisah cinta Anda dan membantu mengabadikannya. Mari kita mulai percakapan!</p>
-                <a href="{{ url_for('main.contact') }}" class="btn btn-primary btn-lg"><i class="fas fa-envelope me-2"></i>Hubungi Saya untuk Konsultasi Gratis</a>
-            </section>
+<!-- CALL TO ACTION -->
+<div class="container-fluid py-5">
+    <div class="container text-center">
+        <div class="p-5 bg-white rounded-3 shadow-lg" data-aos="flip-up" data-aos-duration="1000">
+            <h2 class="display-5 fw-bold">Mari Kita Ciptakan Sesuatu yang Indah</h2>
+            <p class="lead col-lg-8 mx-auto text-muted">Kisah Anda layak untuk diceritakan dengan cara yang paling memukau. Saya siap membantu Anda mengabadikannya.</p>
+            <a href="{{ url_for('main.contact') }}" class="btn btn-primary btn-lg mt-3"><i class="fas fa-envelope me-2"></i>Hubungi Saya</a>
         </div>
     </div>
 </div>

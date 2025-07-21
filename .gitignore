@@ -30,6 +30,7 @@ instance/
 # Uploads (if any)
 static/payment_proofs/
 static/images/dummy_image_*
+static/images/hero_uploads/
 .env
 
 # Python cache files

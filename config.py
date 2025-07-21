@@ -22,3 +22,11 @@ class Config:
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
+
+    # Hero Image Path (dynamic)
+    _hero_image_config_file = os.path.join(basedir, 'instance', 'hero_image_config.txt')
+    if os.path.exists(_hero_image_config_file):
+        with open(_hero_image_config_file, 'r') as f:
+            HERO_IMAGE_PATH = f.read().strip()
+    else:
+        HERO_IMAGE_PATH = os.environ.get("HERO_IMAGE_PATH") or "images/A7E00354.jpeg" # Default hero image

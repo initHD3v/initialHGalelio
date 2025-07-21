@@ -239,6 +239,46 @@ def manage_homepage():
     )
 
 
+@admin.route("/admin/upload_hero_image", methods=["POST"])
+@login_required
+def upload_hero_image():
+    if current_user.role != "admin":
+        return jsonify({"success": False, "message": "Unauthorized"}), 403
+
+    if 'hero_image' not in request.files:
+        return jsonify({"success": False, "message": "No file part"}), 400
+
+    file = request.files['hero_image']
+
+    if file.filename == '':
+        return jsonify({"success": False, "message": "No selected file"}), 400
+
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+    def allowed_file(filename):
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        upload_folder = os.path.join(current_app.root_path, 'static', 'images', 'hero_uploads')
+        os.makedirs(upload_folder, exist_ok=True)
+        file_path = os.path.join(upload_folder, filename)
+        file.save(file_path)
+
+        # Update HERO_IMAGE_PATH in config and save to file
+        relative_path = os.path.join('images', 'hero_uploads', filename).replace('\\', '/')
+        current_app.config['HERO_IMAGE_PATH'] = relative_path
+
+        # Save the new path to a file for persistence
+        config_file_path = os.path.join(current_app.root_path, 'instance', 'hero_image_config.txt')
+        with open(config_file_path, 'w') as f:
+            f.write(relative_path)
+
+        return jsonify({"success": True, "message": "Hero image updated successfully!", "new_image_url": url_for('static', filename=relative_path)}), 200
+    else:
+        return jsonify({"success": False, "message": "Invalid file type"}), 400
+
+
 @admin.route("/admin")
 @login_required
 def admin_panel():

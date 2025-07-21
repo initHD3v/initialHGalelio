@@ -1,0 +1,116 @@
+/* static/CSS/about_new.css */
+
+/* HERO SECTION */
+.about-hero-new {
+    height: 60vh;
+    /* background properties moved to inline style in HTML */
+}
+
+/* TIMELINE SECTION */
+.timeline {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* The vertical line */
+.timeline::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    background-color: #0d6efd; /* Bootstrap primary color */
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    margin-left: -2px;
+    opacity: 0.2;
+}
+
+.timeline-item {
+    padding: 10px 40px;
+    position: relative;
+    width: 50%;
+}
+
+/* Position items to the left */
+.timeline-item:nth-child(odd) {
+    left: 0;
+    padding-right: 60px;
+    text-align: right;
+}
+
+/* Position items to the right */
+.timeline-item:nth-child(even) {
+    left: 50%;
+    padding-left: 60px;
+    text-align: left;
+}
+
+/* Timeline Icons */
+.timeline-icon {
+    position: absolute;
+    top: 20px;
+    z-index: 100;
+    width: 50px;
+    height: 50px;
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    border: 3px solid #f8f9fa; /* Bootstrap light background */
+}
+
+.timeline-item:nth-child(odd) .timeline-icon {
+    right: -25px; /* Half of icon width */
+}
+
+.timeline-item:nth-child(even) .timeline-icon {
+    left: -25px; /* Half of icon width */
+}
+
+.timeline-content {
+    padding: 20px 30px;
+    background-color: #ffffff;
+    position: relative;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* RESPONSIVE DESIGN FOR TIMELINE */
+@media screen and (max-width: 768px) {
+    .timeline::after {
+        left: 31px;
+    }
+
+    .timeline-item {
+        width: 100%;
+        padding-left: 70px;
+        padding-right: 25px;
+        text-align: left;
+    }
+
+    .timeline-item:nth-child(odd),
+    .timeline-item:nth-child(even) {
+        left: 0;
+        padding-left: 70px;
+        text-align: left;
+    }
+
+    .timeline-item:nth-child(odd) .timeline-icon,
+    .timeline-item:nth-child(even) .timeline-icon {
+        left: 6px;
+    }
+}
+
+/* CARD STYLING */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+}
