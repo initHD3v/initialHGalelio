@@ -37,3 +37,6 @@ static/images/hero_uploads/
 __pycache__/
 *.pyc
 
+# Local development files
+.devdbrc
+Screenshot 2025-07-23 at 04.35.32.png
