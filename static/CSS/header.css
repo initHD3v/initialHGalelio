@@ -52,3 +52,77 @@
     padding-left: 0 !important; /* Hapus padding bawaan container-fluid */
     padding-right: 0 !important; /* Hapus padding bawaan container-fluid */
 }
+
+/* Gaya untuk ikon sosial di header */
+.social-icons {
+    display: flex; /* Menggunakan flexbox untuk penataan */
+    align-items: center; /* Menyelaraskan item secara vertikal */
+}
+
+.social-icons a {
+    color: #FFFFFF; /* Warna putih untuk ikon */
+    margin-left: 15px; /* Jarak antar ikon */
+    font-size: 1.2rem; /* Ukuran ikon */
+    transition: color 0.3s ease; /* Transisi halus untuk perubahan warna */
+}
+
+.social-icons a:hover {
+    color: #f0f0f0; /* Warna sedikit lebih gelap saat di-hover */
+}
+
+/* Gaya untuk ikon sosial di header saat digulir */
+.navbar.navbar-dark.scrolled .social-icons a {
+    color: black; /* Warna hitam untuk ikon saat digulir */
+}
+
+/* Gaya untuk tombol login di header */
+.btn-login {
+    background-color: #007bff; /* Warna latar belakang biru */
+    color: white; /* Warna teks putih */
+    border: none; /* Tanpa border */
+    padding: 8px 20px; /* Padding di dalam tombol */
+    border-radius: 20px; /* Sudut yang membulat */
+    transition: background-color 0.3s ease; /* Transisi halus untuk perubahan warna latar belakang */
+}
+
+.btn-login:hover {
+    background-color: #0056b3; /* Warna latar belakang lebih gelap saat di-hover */
+}
+
+/* Gaya untuk tombol login di header saat digulir */
+.navbar.navbar-dark.scrolled .btn-login {
+    background-color: #007bff; /* Tetap biru saat digulir */
+    color: white; /* Tetap putih saat digulir */
+}
+
+.navbar.navbar-dark.scrolled .btn-login:hover {
+    background-color: #0056b3; /* Tetap lebih gelap saat di-hover */
+}
+
+/* Gaya untuk dropdown menu di header */
+.dropdown-menu {
+    background-color: #ffffff; /* Latar belakang putih untuk dropdown */
+    border: 1px solid #dbdbdb; /* Border tipis */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Bayangan untuk dropdown */
+}
+
+.dropdown-item {
+    color: #262626; /* Warna teks item dropdown */
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa; /* Warna latar belakang saat di-hover */
+}
+
+/* Gaya untuk dropdown menu di header saat digulir */
+.navbar.navbar-dark.scrolled .dropdown-menu {
+    background-color: #ffffff; /* Tetap putih saat digulir */
+}
+
+.navbar.navbar-dark.scrolled .dropdown-item {
+    color: #262626; /* Tetap hitam saat digulir */
+}
+
+.navbar.navbar-dark.scrolled .dropdown-item:hover {
+    background-color: #f8f9fa; /* Tetap abu-abu muda saat di-hover */
+}

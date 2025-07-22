@@ -1,0 +1,58 @@
+/* static/CSS/portfolio_viewer.css */
+
+.modal-fullscreen .modal-content {
+    background-color: rgba(0, 0, 0, 0.95); /* Dark transparent background */
+    display: flex; /* Ensure flex container */
+    flex-direction: column; /* Stack header, body, footer vertically */
+    height: 100%; /* Ensure it takes full height of modal-dialog */
+}
+
+.modal-fullscreen .modal-header {
+    border-bottom: none; /* Remove border from header */
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+.modal-fullscreen .modal-body {
+    overflow-y: auto; /* Enable scrolling for images */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    padding: 0; /* Remove padding from body to allow full slide height */
+    flex-grow: 1; /* Allow body to take up remaining space */
+    display: flex; /* Make body a flex container */
+    flex-direction: column; /* Stack slides vertically */
+    align-items: center; /* Center slides horizontally within body */
+    justify-content: flex-start; /* Start slides from the top */
+}
+
+/* Individual image slide container */
+.portfolio-slide {
+    height: 90vh; /* Each slide takes 90% of viewport height */
+    width: 100%; /* Ensure it takes full width of modal-body */
+    display: flex;
+    align-items: center; /* Center image vertically within slide */
+    justify-content: center; /* Center image horizontally within slide */
+    position: relative; /* For parallax effect on child image */
+    overflow: hidden; /* Hide parts of image outside slide */
+    flex-shrink: 0; /* Prevent slides from shrinking */
+    scroll-snap-align: center; /* Snap to center of slide */
+    padding: 20px; /* Add padding around the image */
+}
+
+.portfolio-slide img {
+    max-width: 70vw; /* Batasi lebar gambar hingga 70% dari lebar viewport */
+    max-height: 70vh; /* Batasi tinggi gambar hingga 70% dari tinggi viewport */
+    object-fit: contain; /* Pastikan seluruh gambar terlihat, tidak ada pemotongan */
+    display: block; /* Hapus ruang ekstra di bawah gambar */
+    margin: auto; /* Pusatkan gambar di dalam flex container-nya */
+    /* Kondisi awal untuk parallax/fade, akan dikontrol oleh JS */
+    transform: translateY(0px) scale(1);
+    opacity: 1;
+    transition: opacity 0.3s ease-out; /* Transisi fade halus */
+}
+
+.modal-fullscreen .modal-title {
+    color: white;
+}
+
+.modal-fullscreen .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%); /* Make close button white */
+}
