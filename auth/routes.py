@@ -43,7 +43,7 @@ def load_user(user_id):
 
 @auth.route("/login/google")
 def google_login():
-    redirect_uri = url_for('auth.google_callback', _external=True)
+    redirect_uri = request.url_root + 'auth/google/callback'
     # Use a secure random string for the nonce
     nonce = os.urandom(16).hex()
     session['nonce'] = nonce

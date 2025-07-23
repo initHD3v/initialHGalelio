@@ -1,3 +1,4 @@
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask, request, session, flash, render_template
 from dotenv import load_dotenv
 from config import Config # Import Config
@@ -62,6 +63,7 @@ def create_app(config_class=Config):
     def not_found_error(error):
         return render_template('404.html'), 404
 
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
     return app
 
 
