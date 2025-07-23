@@ -69,7 +69,7 @@ body {
             font-weight: 600;
             color: #fff;
         }
-        .status-waiting_dp { background-color: #17a2b8; } /* info */
+        .status-waiting_payment { background-color: #17a2b8; } /* info */
         .status-waiting_approval { background-color: #ffc107; color: #343a40; } /* warning */
         .status-accepted { background-color: #28a745; } /* success */
         .status-rejected { background-color: #dc3545; } /* danger */

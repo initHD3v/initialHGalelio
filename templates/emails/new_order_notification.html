@@ -23,6 +23,7 @@
             <h3>Detail Pesanan:</h3>
             <ul>
                 <li><strong>Pesanan:</strong> {{ order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type) }}</li>
+                <li><strong>Jenis Pembayaran:</strong> {{ payment_type_display }}</li>
                 <li><strong>Nama Klien:</strong> {{ order.client.full_name }}</li>
                 <li><strong>Email Klien:</strong> {{ order.client.email }}</li>
                 <li><strong>WhatsApp Klien:</strong> {{ order.client.whatsapp_number }}</li>

@@ -20,7 +20,7 @@
             <div class="invoice-meta text-end">
                 <p class="mb-0">Faktur #: <strong>INV-{{ order.created_at.strftime('%Y') }}-{{ '%05d' | format(order.id) }}</strong></p>
                 <p class="mb-0">Tanggal: {{ order.created_at.strftime('%d %B %Y') }}</p>
-                {% if order.status == 'waiting_dp' %}
+                {% if order.status == 'waiting_payment' %}
                     <p class="mb-0">Jatuh Tempo: {{ (order.created_at + timedelta(hours=1)).strftime('%d %B %Y %H:%M') }}</p>
                 {% endif %}
             </div>
@@ -68,33 +68,39 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% if order.payment_type == 'full' or order.status == 'completed' %}
                     <tr>
                         <td>Total Harga Layanan</td>
-                        <td class="text-end">Rp {{ "%.2f"|format(order.total_price) }}</td>
+                        <td class="text-end">Rp {{ "{:,.2f}".format(order.total_price) }}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Total Dibayar</td>
+                        <td class="text-end">Rp {{ "{:,.2f}".format(order.total_price) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td>Total Harga Layanan</td>
+                        <td class="text-end">Rp {{ "{:,.2f}".format(order.total_price) }}</td>
                     </tr>
                     <tr>
                         <td>DP (15% dari Total)</td>
-                        <td class="text-end">Rp {{ "%.2f"|format(order.total_price * 0.15) }}</td>
+                        <td class="text-end">Rp {{ "{:,.2f}".format(order.total_price * 0.15) }}</td>
                     </tr>
                     <tr>
                         <td>DP Dibayar</td>
-                        <td class="text-end">Rp {{ "%.2f"|format(order.dp_paid) }}</td>
+                        <td class="text-end">Rp {{ "{:,.2f}".format(order.dp_paid) }}</td>
                     </tr>
                     <tr class="total-row">
-                        {% if order.status == 'completed' %}
-                            <td>Total Pembayaran</td>
-                            <td class="text-end">Rp {{ "%.2f"|format(order.total_price) }}</td>
-                        {% else %}
-                            <td>Sisa Pembayaran</td>
-                            <td class="text-end">Rp {{ "%.2f"|format(order.total_price - order.dp_paid) }}</td>
-                        {% endif %}
+                        <td>Sisa Pembayaran</td>
+                        <td class="text-end">Rp {{ "{:,.2f}".format(order.total_price - order.dp_paid) }}</td>
                     </tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
         {% endif %}
 
-        {% if order.status == 'completed' %}
+        {% if order.payment_type == 'full' or order.status == 'completed' %}
         <div class="watermark">LUNAS</div>
         {% elif order.status == 'cancelled' %}
         <div class="watermark text-danger">PESANAN DIBATALKAN</div>

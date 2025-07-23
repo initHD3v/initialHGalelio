@@ -86,12 +86,13 @@ class Order(db.Model):
     details = db.Column(db.Text, nullable=True)
     total_price = db.Column(db.Float, nullable=False, default=0.0)
     dp_paid = db.Column(db.Float, nullable=False, default=0.0)
+    payment_type = db.Column(db.String(50), nullable=False, default="dp") # Kolom baru: 'dp' atau 'full'
     dp_payment_proof = db.Column(
         db.String(200), nullable=True
     )  # Path to the uploaded proof file
     status = db.Column(
-        db.String(50), default="waiting_dp", nullable=False
-    )  # e.g., waiting_dp, waiting_approval, accepted, rejected, completed,
+        db.String(50), default="waiting_payment", nullable=False
+    )  # e.g., waiting_payment, waiting_approval, accepted, rejected, completed,
     # cancellation_requested, cancelled, reschedule_requested
     created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(UTC))
     updated_at = db.Column(

@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Konfirmasi Pembayaran Pesanan</h4>
+                </div>
+                <div class="card-body">
+                    {% if order.status == 'rejected' %}
+                        <div class="alert alert-warning" role="alert">
+                            <h5 class="alert-heading">Bukti Pembayaran Ditolak</h5>
+                            <p>Bukti pembayaran Anda sebelumnya ditolak oleh admin. Silakan unggah ulang bukti yang valid.</p>
+                            <hr>
+                            <p class="mb-0">Batas waktu untuk unggah ulang: <strong>{{ deadline.strftime('%d %B %Y, %H:%M:%S') }}</strong></p>
+                            <p>Sisa waktu: <strong id="countdown"></strong></p>
+                        </div>
+                        <script>
+                            // Set the date we're counting down to
+                            var countDownDate = new Date("{{ deadline.isoformat() }}").getTime();
+
+                            // Update the count down every 1 second
+                            var x = setInterval(function() {
+
+                                // Get today's date and time
+                                var now = new Date().getTime();
+
+                                // Find the distance between now and the count down date
+                                var distance = countDownDate - now;
+
+                                // Time calculations for days, hours, minutes and seconds
+                                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                                // Display the result in the element with id="countdown"
+                                document.getElementById("countdown").innerHTML = hours + " jam "
+                                + minutes + " menit " + seconds + " detik ";
+
+                                // If the count down is finished, write some text
+                                if (distance < 0) {
+                                    clearInterval(x);
+                                    document.getElementById("countdown").innerHTML = "WAKTU HABIS";
+                                    // Optionally, hide the form
+                                    document.querySelector('form').style.display = 'none';
+                                }
+                            }, 1000);
+                        </script>
+                    {% else %}
+                        <p class="lead">Pesanan Anda (Paket: <strong>{{ package_name }}</strong>) telah berhasil dibuat. Silakan lakukan pembayaran untuk melanjutkan pemesanan.</p>
+                        <p>Batas waktu pembayaran: <strong>{{ deadline.strftime('%d %B %Y, %H:%M:%S') }}</strong></p>
+                        <p>Sisa waktu: <strong id="countdown"></strong></p>
+                        <script>
+                            // Set the date we're counting down to
+                            var countDownDate = new Date("{{ deadline.isoformat() }}").getTime();
+
+                            // Update the count down every 1 second
+                            var x = setInterval(function() {
+
+                                // Get today's date and time
+                                var now = new Date().getTime();
+
+                                // Find the distance between now and the count down date
+                                var distance = countDownDate - now;
+
+                                // Time calculations for days, hours, minutes and seconds
+                                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                                // Display the result in the element with id="countdown"
+                                document.getElementById("countdown").innerHTML = hours + " jam "
+                                + minutes + " menit " + seconds + " detik ";
+
+                                // If the count down is finished, write some text
+                                if (distance < 0) {
+                                    clearInterval(x);
+                                    document.getElementById("countdown").innerHTML = "WAKTU HABIS";
+                                    // Optionally, hide the form
+                                    document.querySelector('form').style.display = 'none';
+                                }
+                            }, 1000);
+                        </script>
+                    {% endif %}
+                    <hr>
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        <input type="hidden" name="payment_option" id="hidden_payment_option" value=""> {# Hidden field to submit selected value #}
+
+                        <h4 class="text-center">Pilih Opsi Pembayaran</h4>
+                        <div class="mb-3 d-flex justify-content-center">
+                            {% for subfield in form.payment_option %}
+                                <div class="form-check form-check-inline">
+                                    {{ subfield(class="form-check-input") }}
+                                    {{ subfield.label(class="form-check-label") }}
+                                </div>
+                            {% endfor %}
+                            {% for error in form.payment_option.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div id="order-details-section" style="display: none;"> {# Added ID and hidden by default #}
+                            <h4>Detail Pesanan</h4>
+                            <dl class="row">
+                                <dt class="col-sm-4">Nomor Invoice:</dt>
+                                <dd class="col-sm-8">INV-{{ order.created_at.strftime('%Y') }}-{{ '%05d' | format(order.id) }}</dd>
+                                <dt class="col-sm-4">Jenis Layanan:</dt>
+                                <dd class="col-sm-8">{{ order.service_type.capitalize() }}</dd>
+
+                                <dt class="col-sm-4">Paket Dipilih:</dt>
+                                <dd class="col-sm-8">{{ package_name }}</dd>
+
+                                <dt class="col-sm-4">Tanggal Acara:</dt>
+                                <dd class="col-sm-8">{{ order.event_date.strftime('%d %B %Y') }}</dd>
+
+                                <dt class="col-sm-4">Total Harga:</dt>
+                                <dd class="col-sm-8">Rp {{ "{:,.0f}".format(order.total_price) }}</dd>
+
+                                <dt class="col-sm-4" id="payment-amount-label">Jumlah yang Harus Dibayar:</dt>
+                                <dd class="col-sm-8"><strong class="fs-5" id="payment-amount-display">Rp {{ "{:,.0f}".format(display_amount) }}</strong></dd>
+                            </dl>
+                            <hr>
+
+                            <h4>Rekening Pembayaran</h4>
+                            <p>Silakan transfer ke salah satu rekening berikut:</p>
+                            <div class="row">
+                                {% for account in bank_accounts %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ account.bank_name }}</h5>
+                                            <p class="card-text mb-1">Nomor Rekening: <strong>{{ account.account_number }}</strong></p>
+                                            <p class="card-text">Atas Nama: <strong>{{ account.account_name }}</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="col-12">
+                                    <p class="text-muted">Tidak ada rekening bank yang tersedia saat ini. Silakan hubungi admin.</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <hr>
+                            <h4>Unggah Bukti Pembayaran</h4>
+                            <p>Setelah melakukan transfer, silakan unggah bukti pembayaran Anda di bawah ini.</p>
+                            <div class="mb-3">
+                                {{ form.bank_account.label(class="form-label") }}
+                                {{ form.bank_account(class="form-select") }}
+                                {% for error in form.bank_account.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.payment_proof.label(class="form-label") }}
+                                {{ form.payment_proof(class="form-control") }}
+                                {% for error in form.payment_proof.errors %}
+                                    <span class="text-danger">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {{ form.submit(class="btn btn-success btn-lg w-100") }}
+                        </div> {# End order-details-section #}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentOptionRadios = document.querySelectorAll('input[name="payment_option"]');
+        const hiddenPaymentOption = document.getElementById('hidden_payment_option');
+        const paymentAmountLabel = document.getElementById('payment-amount-label');
+        const paymentAmountDisplay = document.getElementById('payment-amount-display');
+        const totalOrderPrice = {{ order.total_price | tojson }};
+        const dpAmount = {{ (order.total_price * 0.15) | tojson }};
+        const orderDetailsSection = document.getElementById('order-details-section');
+
+        function formatRupiah(amount) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+        }
+
+        function updatePaymentAmountDisplay() {
+            const selectedOption = document.querySelector('input[name="payment_option"]:checked');
+            if (selectedOption) {
+                hiddenPaymentOption.value = selectedOption.value;
+                let amountToDisplay;
+
+                if (selectedOption.value === 'full') {
+                    paymentAmountLabel.textContent = 'Jumlah Pembayaran Lunas:';
+                    amountToDisplay = totalOrderPrice;
+                } else {
+                    paymentAmountLabel.textContent = 'Jumlah DP (15%):';
+                    amountToDisplay = dpAmount;
+                }
+                paymentAmountDisplay.textContent = formatRupiah(amountToDisplay);
+                orderDetailsSection.style.display = 'block'; // Show details when an option is selected
+            } else {
+                orderDetailsSection.style.display = 'none'; // Hide details if no option is selected
+            }
+        }
+
+        // Initial state: no radio button checked, details hidden
+        // No initial call to updatePaymentAmountDisplay() to keep it hidden
+
+        // Add event listener for changes on all radio buttons
+        paymentOptionRadios.forEach(radio => {
+            radio.addEventListener('change', updatePaymentAmountDisplay);
+        });
+
+        // Ensure the correct radio button is checked if order.payment_type is already set
+        // This handles cases where the page is reloaded or form has errors
+        const initialPaymentType = "{{ order.payment_type }}";
+        if (initialPaymentType) {
+            const preSelectedRadio = document.querySelector(`input[name="payment_option"][value="${initialPaymentType}"]`);
+            if (preSelectedRadio) {
+                preSelectedRadio.checked = true;
+                updatePaymentAmountDisplay(); // Update display based on pre-selected value
+            }
+        }
+
+    });
+</script>
+{% endblock %}

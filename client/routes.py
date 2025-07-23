@@ -40,13 +40,15 @@ def send_new_order_notification_to_admin(order):
     try:
         admins = User.query.filter_by(role="admin").all()
         for admin_user in admins:
+            payment_type_display = "DP" if order.payment_type == "dp" else "Lunas"
             msg = Message(
-                f"Pesanan Baru Ditempatkan: {order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type)}",
+                f"Pesanan Baru Ditempatkan ({payment_type_display}): {order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type)}",
                 recipients=[admin_user.email]
             )
             msg.html = render_template(
                 'emails/new_order_notification.html',
                 order=order,
+                payment_type_display=payment_type_display,
                 current_year=datetime.now().year
             )
             send_email_task.delay(
@@ -426,9 +428,9 @@ def request_reschedule(order_id):
     return redirect(url_for("client.dashboard"))
 
 
-@client.route("/dp_payment/<int:order_id>", methods=["GET", "POST"])
+@client.route("/payment/<int:order_id>", methods=["GET", "POST"])
 @login_required
-def dp_payment(order_id):
+def payment(order_id):
     order = Order.query.get_or_404(order_id)
     form = DPPaymentForm()
 
@@ -436,10 +438,10 @@ def dp_payment(order_id):
         flash("You do not have permission to view this page.", "danger")
         return redirect(url_for("client.dashboard"))
 
-    # Allow payment/re-upload only if status is 'waiting_dp' or 'rejected'
-    if order.status not in ["waiting_dp", "rejected"]:
+    # Allow payment/re-upload only if status is 'waiting_payment' or 'rejected'
+    if order.status not in ["waiting_payment", "rejected"]:
         flash(
-            f"This order is not awaiting DP payment (status: {order.status}).",
+            f"This order is not awaiting payment (status: {order.status}).",
             "warning",
         )
         return redirect(url_for("client.dashboard"))
@@ -451,7 +453,7 @@ def dp_payment(order_id):
     # Get current UTC time (timezone-aware)
     now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
 
-    if order.status == "waiting_dp":
+    if order.status == "waiting_payment":
         # created_at is naive UTC, make it timezone-aware UTC
         created_at_utc = order.created_at.replace(tzinfo=pytz.utc)
         deadline_utc = created_at_utc + timedelta(hours=1)
@@ -489,6 +491,8 @@ def dp_payment(order_id):
 
     if form.validate_on_submit():
         order.bank_account_id = int(form.bank_account.data)  # Save selected bank account
+        order.payment_type = form.payment_option.data # Update payment_type based on form selection
+
         if form.payment_proof.data:
             # Save the uploaded file
             filename = secure_filename(form.payment_proof.data.filename)
@@ -500,26 +504,50 @@ def dp_payment(order_id):
             form.payment_proof.data.save(file_path)
             order.dp_payment_proof = filename
 
-        order.dp_paid = order.total_price * 0.15
+        # Calculate dp_paid based on payment_type
+        if order.payment_type == "full":
+            order.dp_paid = order.total_price
+            flash_message = (
+                "Bukti pembayaran lunas berhasil dikirim! Pesanan Anda sekarang "
+                "menunggu persetujuan admin."
+            )
+        else: # Default to DP
+            order.dp_paid = order.total_price * 0.15
+            flash_message = (
+                "Bukti pembayaran DP berhasil dikirim! Pesanan Anda sekarang "
+                "menunggu persetujuan admin."
+            )
+
         order.status = "waiting_approval"
         order.dp_rejection_timestamp = None  # Clear timestamp on new submission
         db.session.commit()
-        flash(
-            "DP payment proof submitted successfully! Your order is now "
-            "awaiting admin approval.",
-            "success",
-        )
+
+        # Send new order notification to admin after payment proof submission
+        try:
+            send_new_order_notification_to_admin(order)
+        except Exception as e:
+            current_app.logger.error(f"Failed to send new order notification email to admin for order {order.id}: {e}")
+
+        flash(flash_message, "success")
         return redirect(url_for("client.dashboard"))
 
     # --- Data for Template ---
-    dp_amount = order.total_price * 0.15
+    # Set initial payment_option for the form based on order's current payment_type
+    if request.method == "GET":
+        form.payment_option.data = order.payment_type
+
+    dp_amount = order.total_price * 0.15 # Default DP amount for display
+    if order.payment_type == "full":
+        display_amount = order.total_price
+    else:
+        display_amount = dp_amount
 
     package_name = "N/A"
     if order.wedding_package:
         package_name = order.wedding_package.name
 
     return render_template(
-        "client/dp_payment.html",
+        "client/payment.html",
         order=order,
         dp_amount=dp_amount,
         form=form,
@@ -527,6 +555,7 @@ def dp_payment(order_id):
         time_remaining=time_remaining,
         deadline=deadline,
         package_name=package_name,
+        display_amount=display_amount,
     )
 
 

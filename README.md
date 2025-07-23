@@ -114,7 +114,7 @@ Buka di browser: `http://127.0.0.1:5001`
 
 1. Klien daftar & login
 2. Melihat layanan & memilih tanggal
-3. Order → status: `waiting_dp`
+3. Order → status: `waiting_payment`
 4. Upload bukti transfer DP → status: `waiting_approval`
 5. Admin validasi DP → `accepted` → invoice dikirim
 6. Jika ditolak → bisa upload ulang dalam waktu 1 jam

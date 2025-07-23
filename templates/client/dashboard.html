@@ -55,8 +55,8 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Menunggu DP</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ orders|selectattr('status', 'equalto', 'waiting_dp')|list|length }}</div>
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Menunggu Pembayaran</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ orders|selectattr('status', 'equalto', 'waiting_payment')|list|length }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
@@ -125,24 +125,34 @@
                             <td>{{ order.event_date.strftime('%d %B %Y') }}</td>
                             <td>{% if order.event_start_time and order.event_end_time %}{{ order.event_start_time.strftime('%H:%M') }} - {{ order.event_end_time.strftime('%H:%M') }}{% else %}Sepanjang Hari{% endif %}</td>
                             <td>{{ order.location }}</td>
-                            <td><span class="badge bg-success">{{ order.status.capitalize() }}</span></td>
                             <td>
-                                {% if order.status == 'waiting_dp' %}
-                                    <a href="{{ url_for('client.dp_payment', order_id=order.id) }}" class="btn btn-success btn-sm mb-1"><i class="fas fa-money-bill-wave"></i> Bayar DP</a>
+                                <span class="badge rounded-pill {% if order.status == 'waiting_payment' %}bg-info{% elif order.status == 'waiting_approval' %}bg-warning text-dark{% elif order.status == 'accepted' %}bg-success{% elif order.status == 'cancellation_requested' %}bg-danger{% elif order.status == 'reschedule_requested' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                    {% if order.status == 'waiting_payment' %}
+                                        Menunggu Pembayaran
+                                    {% elif order.status == 'waiting_approval' %}
+                                        Menunggu Persetujuan
+                                    {% elif order.status == 'cancellation_requested' %}
+                                        Pembatalan Diminta
+                                    {% elif order.status == 'reschedule_requested' %}
+                                        Jadwal Ulang Diminta
+                                    {% else %}
+                                        {{ order.status.replace('_', ' ').capitalize() }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if order.status == 'waiting_payment' %}
+                                    <a href="{{ url_for('client.payment', order_id=order.id) }}" class="btn btn-success btn-sm mb-1"><i class="fas fa-money-bill-wave"></i> Bayar Sekarang</a>
                                 {% elif order.status == 'accepted' %}
                                     <a href="{{ url_for('client.view_invoice_client', order_id=order.id) }}" class="btn btn-info btn-sm mb-1">Lihat Invoice</a>
                                     <button type="button" class="btn btn-danger btn-sm mb-1" data-bs-toggle="modal" data-bs-target="#cancelOrderModal{{ order.id }}">
-                                        <i class="fas fa-times-circle"></i> Batalkan Pesanan
+                                        <i class="fas fa-times-circle"></i> Batalkan
                                     </button>
                                     <button type="button" class="btn btn-warning btn-sm mb-1" data-bs-toggle="modal" data-bs-target="#rescheduleOrderModal{{ order.id }}">
                                         <i class="fas fa-calendar-alt"></i> Jadwal Ulang
                                     </button>
-                                {% elif order.status == 'cancellation_requested' %}
-                                    <span class="badge bg-danger">Pembatalan Diminta</span>
-                                {% elif order.status == 'reschedule_requested' %}
-                                    <span class="badge bg-warning text-dark">Jadwal Ulang Diminta</span>
-                                {% else %}
-                                    <a href="{{ url_for('client.view_invoice_client', order_id=order.id) }}" class="btn btn-info btn-sm">Lihat Invoice</a>
+                                {% elif order.status in ['waiting_approval', 'cancellation_requested', 'reschedule_requested'] %}
+                                     <a href="{{ url_for('client.view_invoice_client', order_id=order.id) }}" class="btn btn-info btn-sm">Lihat Invoice</a>
                                 {% endif %}
                             </td>
                         </tr>
@@ -184,13 +194,13 @@
                             <td>{{ order.service_type.capitalize() }}</td>
                             <td>{{ order.event_date.strftime('%d %B %Y') }}</td>
                             <td>
-                                <span class="badge rounded-pill {% if order.status == 'waiting_dp' %}bg-info{% elif order.status == 'waiting_approval' %}bg-warning text-dark{% elif order.status == 'accepted' %}bg-success{% elif order.status == 'rejected' %}bg-danger{% elif order.status == 'completed' %}bg-primary{% elif order.status == 'expired' %}bg-secondary{% elif order.status == 'cancelled' %}bg-danger{% endif %}">
-                                    {{ order.status.capitalize().replace('Dp', 'DP').replace('Approval', 'Persetujuan') }}
+                                <span class="badge rounded-pill {% if order.status == 'waiting_payment' %}bg-info{% elif order.status == 'waiting_approval' %}bg-warning text-dark{% elif order.status == 'accepted' %}bg-success{% elif order.status == 'rejected' %}bg-danger{% elif order.status == 'completed' %}bg-primary{% elif order.status == 'expired' %}bg-secondary{% elif order.status == 'cancelled' %}bg-danger{% endif %}">
+                                    {{ order.status.capitalize().replace('Dp', 'DP').replace('Approval', 'Persetujuan').replace('Waiting_payment', 'Menunggu Pembayaran') }}
                                 </span>
                             </td>
                             <td>
                                 {% if order.status == 'rejected' or order.status == 'expired' %}
-                                    <a href="{{ url_for('client.dp_payment', order_id=order.id) }}" class="btn btn-warning btn-sm"><i class="fas fa-upload"></i> Unggah Ulang Bukti</a>
+                                    <a href="{{ url_for('client.payment', order_id=order.id) }}" class="btn btn-warning btn-sm"><i class="fas fa-upload"></i> Unggah Ulang Bukti</a>
                                     <form action="{{ url_for('client.delete_order', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menghapus pesanan ini?');">
                                         <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
                                     </form>

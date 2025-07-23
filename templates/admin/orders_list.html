@@ -21,7 +21,7 @@
                 <input class="form-control me-2" type="search" placeholder="Search orders..." aria-label="Search" name="search" value="{{ search_query if search_query else '' }}">
                 <select class="form-select me-2" name="status">
                     <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Statuses</option>
-                    <option value="waiting_dp" {% if status_filter == 'waiting_dp' %}selected{% endif %}>Waiting DP</option>
+                    <option value="waiting_payment" {% if status_filter == 'waiting_payment' %}selected{% endif %}>Waiting Payment</option>
                     <option value="waiting_approval" {% if status_filter == 'waiting_approval' %}selected{% endif %}>Waiting Approval</option>
                     <option value="accepted" {% if status_filter == 'accepted' %}selected{% endif %}>Accepted</option>
                     <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>

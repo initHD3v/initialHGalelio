@@ -51,7 +51,7 @@
                 <p><strong>DP Dibayar:</strong> Rp {{ "{:,.2f}".format(order.dp_paid) }}</p>
                 <p><strong>Sisa Pembayaran:</strong> Rp {{ "{:,.2f}".format(order.total_price - order.dp_paid) }}</p>
                 <p><strong>Status:</strong> 
-                    <span class="badge {% if order.status == 'waiting_dp' %}bg-info{% elif order.status == 'waiting_approval' %}bg-warning text-dark{% elif order.status == 'accepted' %}bg-success{% elif order.status == 'rejected' %}bg-danger{% elif order.status == 'completed' %}bg-primary{% elif order.status == 'cancelled' %}bg-secondary{% elif order.status == 'cancellation_requested' %}bg-danger{% elif order.status == 'reschedule_requested' %}bg-warning text-dark{% endif %}">
+                    <span class="badge {% if order.status == 'waiting_payment' %}bg-info{% elif order.status == 'waiting_approval' %}bg-warning text-dark{% elif order.status == 'accepted' %}bg-success{% elif order.status == 'rejected' %}bg-danger{% elif order.status == 'completed' %}bg-primary{% elif order.status == 'cancelled' %}bg-secondary{% elif order.status == 'cancellation_requested' %}bg-danger{% elif order.status == 'reschedule_requested' %}bg-warning text-dark{% endif %}">">
                         {{ order.status.capitalize().replace('Dp', 'DP').replace('Approval', 'Persetujuan').replace('Cancellation_requested', 'Pembatalan Diminta').replace('Reschedule_requested', 'Jadwal Ulang Diminta') }}
                     </span>
                 </p>
@@ -85,34 +85,42 @@
             <form action="{{ url_for('admin.approve_order', order_id=order.id) }}" method="POST" style="display:inline; margin-right: 10px;">
                 <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Approve</button>
             </form>
-            <form action="{{ url_for('admin.reject_order', order_id=order.id) }}" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-danger"><i class="fas fa-times"></i> Reject</button>
-            </form>
-            {% elif order.cancellation_requested %}
-            <form action="{{ url_for('admin.approve_cancellation', order_id=order.id) }}" method="POST" style="display:inline; margin-right: 10px;" onsubmit="return confirm('Anda yakin ingin menyetujui pembatalan pesanan ini?');">
-                <button type="submit" class="btn btn-success">Setujui Pembatalan</button>
-            </form>
-            <form action="{{ url_for('admin.reject_cancellation', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menolak pembatalan pesanan ini?');">
-                <button type="submit" class="btn btn-danger">Tolak Pembatalan</button>
-            </form>
-            {% elif order.status == 'reschedule_requested' %}
-            <form action="{{ url_for('admin.approve_reschedule', order_id=order.id) }}" method="POST" style="display:inline; margin-right: 10px;" onsubmit="return confirm('Anda yakin ingin menyetujui penjadwalan ulang pesanan ini?');">
-                <button type="submit" class="btn btn-success">Setujui Jadwal Ulang</button>
-            </form>
-            <form action="{{ url_for('admin.reject_reschedule', order_id=order.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menolak penjadwalan ulang pesanan ini?');">
-                <button type="submit" class="btn btn-danger">Tolak Jadwal Ulang</button>
-            </form>
-            {% elif order.status == 'accepted' %}
-            <form action="{{ url_for('admin.mark_order_completed', order_id=order.id) }}" method="POST" style="display:inline;">
-                <button type="submit" class="btn btn-info">Mark as Completed</button>
-            </form>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectOrderModal">
+                <i class="fas fa-times"></i> Reject
+            </button>
             {% endif %}
-            <a href="{{ url_for('admin.view_invoice_admin', order_id=order.id) }}" class="btn btn-primary ms-2" target="_blank"><i class="fas fa-file-invoice"></i> Lihat Invoice</a>
-            <form action="{{ url_for('admin.delete_order', order_id=order.id) }}" method="POST" style="display:inline; margin-left: 10px;" onsubmit="return confirm('Anda yakin ingin menghapus pesanan ini?');">
-                <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Hapus Pesanan</button>
-            </form>
-        </div>
-    </div>
-</div>
 
+            <!-- Reject Order Modal -->
+            <div class="modal fade" id="rejectOrderModal" tabindex="-1" role="dialog" aria-labelledby="rejectOrderModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="rejectOrderModalLabel">Tolak Pesanan</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="{{ url_for('admin.reject_order', order_id=order.id) }}" method="POST">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="rejection_reason">Alasan Penolakan:</label>
+                                    <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="3" required>Bukti pembayaran tidak sesuai atau tidak valid.</textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-danger">Tolak Pesanan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+                        <a href="{{ url_for('admin.view_invoice_admin', order_id=order.id) }}" class="btn btn-info" style="margin-right: 10px;">
+                <i class="fas fa-file-invoice"></i> Lihat Invoice
+            </a>
+            <form action="{{ url_for('admin.delete_order', order_id=order.id) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this order? This action cannot be undone.');">
+                    <i class="fas fa-trash"></i> Hapus Pesanan
+                </button>
+            </form>
 {% endblock %}

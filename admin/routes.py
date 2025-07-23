@@ -67,6 +67,29 @@ def send_order_status_email(order):
     except Exception as e:
         current_app.logger.error(f"Failed to send order status email for order {order.id}: {e}")
 
+def send_payment_rejection_email_to_client(order, rejection_reason):
+    try:
+        client_name = order.client.full_name
+        msg = Message(
+            f"Bukti Pembayaran Ditolak untuk Pesanan Anda: {order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type)}",
+            recipients=[order.client.email]
+        )
+        msg.html = render_template(
+            'emails/order_payment_rejected_client.html',
+            order=order,
+            client_name=client_name,
+            rejection_reason=rejection_reason,
+            current_year=datetime.now().year
+        )
+        send_email_task.delay(
+            subject=msg.subject,
+            sender=msg.sender,
+            recipients=msg.recipients,
+            body=msg.html # Mengirim HTML sebagai body
+        )
+    except Exception as e:
+        current_app.logger.error(f"Failed to send payment rejection email to client for order {order.id}: {e}")
+
 def send_cancellation_email_to_client(order, cancellation_reason):
     try:
         client_name = order.client.full_name
@@ -860,6 +883,9 @@ def reject_order(order_id):
             "danger",
         )
         return redirect(url_for("admin.order_list"))
+    
+    rejection_reason = request.form.get("rejection_reason", "Bukti pembayaran tidak sesuai atau tidak valid.")
+
     order.status = "rejected"
     order.is_notified = False  # Reset notification status
     order.dp_rejection_timestamp = datetime.now(UTC)  # Set rejection timestamp
@@ -874,6 +900,12 @@ def reject_order(order_id):
         order.dp_payment_proof = None  # Clear the proof from DB
     db.session.commit()
     flash("Order rejected successfully!", "success")
+
+    try:
+        send_payment_rejection_email_to_client(order, rejection_reason)
+    except Exception as e:
+        current_app.logger.error(f"Failed to send payment rejection email to client for order {order.id}: {e}")
+
     return redirect(url_for("admin.order_list"))
 
 

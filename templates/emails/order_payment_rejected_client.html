@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bukti Pembayaran Ditolak</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .header h1 {
+            margin: 0;
+            color: #d9534f; /* Red color for rejection */
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .content p {
+            margin-bottom: 10px;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #777;
+        }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: #ffffff !important;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 15px;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bukti Pembayaran Ditolak</h1>
+        </div>
+        <div class="content">
+            <p>Halo <span class="highlight">{{ client_name }}</span>,</p>
+            <p>Kami ingin memberitahukan bahwa bukti pembayaran untuk pesanan Anda (<span class="highlight">{{ order.wedding_package.name if order.wedding_package else (order.prewedding_package.name if order.prewedding_package else order.service_type) }}</span>) telah <span class="highlight">ditolak</span> oleh admin.</p>
+            <p>Alasan penolakan: <span class="highlight">{{ rejection_reason }}</span></p>
+            <p>Mohon segera unggah ulang bukti pembayaran yang valid melalui halaman pembayaran Anda. Anda memiliki waktu <span class="highlight">1 jam</span> sejak penolakan ini untuk mengunggah ulang bukti pembayaran sebelum pesanan Anda kedaluwarsa.</p>
+            <p>Silakan kunjungi halaman pembayaran Anda di sini:</p>
+            <p style="text-align: center;">
+                <a href="{{ url_for('client.payment', order_id=order.id, _external=True) }}" class="button">Unggah Ulang Bukti Pembayaran</a>
+            </p>
+            <p>Jika Anda memiliki pertanyaan atau membutuhkan bantuan, jangan ragu untuk menghubungi kami.</p>
+            <p>Terima kasih atas perhatian Anda.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; {{ current_year }} Aruna Moment. Semua Hak Dilindungi.</p>
+        </div>
+    </div>
+</body>
+</html>

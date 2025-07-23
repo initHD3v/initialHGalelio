@@ -14,6 +14,7 @@ from wtforms import (
     HiddenField,
     FloatField,
     DecimalField,
+    RadioField,
 )
 from wtforms.validators import (
     DataRequired,
@@ -309,6 +310,11 @@ class ResetPasswordForm(FlaskForm):
 
 
 class DPPaymentForm(FlaskForm):
+    payment_option = RadioField(
+        "Pilih Opsi Pembayaran",
+        choices=[("dp", "Bayar Down Payment (DP)"), ("full", "Bayar Lunas")],
+        validators=[DataRequired()],
+    )
     bank_account = SelectField(
         "Pilih Rekening Bank Tujuan",
         validators=[DataRequired()]
@@ -404,7 +410,7 @@ class AdminOrderForm(FlaskForm):
     status = SelectField(
         "Status",
         choices=[
-            ("waiting_dp", "Waiting DP"),
+            ("waiting_payment", "Waiting Payment"),
             ("waiting_approval", "Waiting Approval"),
             ("accepted", "Accepted"),
             ("rejected", "Rejected"),

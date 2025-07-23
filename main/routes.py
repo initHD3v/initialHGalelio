@@ -268,9 +268,9 @@ def order():
             longitude=form.longitude.data if form.longitude.data else None,
             details=form.details.data,
             total_price=order_total_price,
-            dp_paid=dp_amount,
+            dp_paid=0.0, # Initial dp_paid is 0.0, actual amount set in payment route
             wedding_package_id=selected_wedding_package_id,
-            status="waiting_dp",
+            status="waiting_payment", # Initial status is waiting_payment
         )
         db.session.add(order)
         db.session.commit()
@@ -291,15 +291,9 @@ def order():
 
         db.session.commit()
 
-        # Send new order notification to admin
-        try:
-            send_new_order_notification_to_admin(order)
-        except Exception as e:
-            current_app.logger.error(f"Failed to send new order notification email to admin for order {order.id}: {e}")
-
         print("DEBUG: Order and notifications created. Redirecting...")
-        flash("Pesanan Anda berhasil dibuat! Silakan lanjutkan ke pembayaran DP.", "success")
-        return redirect(url_for("client.dp_payment", order_id=order.id))
+        flash("Pesanan Anda berhasil dibuat! Silakan lanjutkan ke pembayaran.", "success")
+        return redirect(url_for("client.payment", order_id=order.id))
     else:
         print(f"DEBUG: Form validation failed. Errors: {form.errors}")
         return render_template(
