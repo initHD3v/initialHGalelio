@@ -21,6 +21,44 @@
     </div>
 </div>
 
+<!-- Event List Card -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Daftar Event Mendatang</h6>
+    </div>
+    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+        {% if display_events %}
+        <ul class="list-group list-group-flush">
+            {% for event in display_events %}
+            <li class="list-group-item">
+                <strong>{{ event.title }}</strong>
+                {% if event.order_id %}
+                    - <a href="{{ url_for('admin.order_detail', order_id=event.order_id) }}">Pesanan #ODR-{{ event.start_time.strftime('%Y') }}-{{ '%05d' | format(event.order_id) }}</a>
+                    {% if event.client_name %}({{ event.client_name }}){% endif %}
+                {% endif %}
+                <br>
+                <small class="text-muted">{{ event.start_time.strftime('%d %B %Y %H:%M') }} - {{ event.end_time.strftime('%H:%M') }}</small>
+                {% if event.order_status %}
+                    <span class="badge rounded-pill bg-info float-end">Status: {{ event.order_status.capitalize().replace('_', ' ') }}</span>
+                {% elif not event.is_available %}
+                    <span class="badge rounded-pill bg-danger float-end">Tidak Tersedia</span>
+                {% else %}
+                    <span class="badge rounded-pill bg-success float-end">Tersedia</span>
+                {% endif %}
+                {% if event.time_remaining and event.time_remaining.days >= 0 %}
+                    <span class="badge bg-primary text-white float-end me-2">
+                        Sisa: {{ event.time_remaining.days }} hari, {{ event.time_remaining.hours }} jam
+                    </span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Tidak ada event yang akan datang.</p>
+        {% endif %}
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts_extra %}
@@ -37,8 +75,11 @@
             },
             events: {{ events | tojson }},
             eventClick: function(info) {
-                // Redirect to edit page on event click
-                window.location.href = "{{ url_for('admin.edit_calendar_event', event_id=0) }}".replace('0', info.event.id);
+                if (info.event.extendedProps.order_id) {
+                    window.location.href = "{{ url_for('admin.order_detail', order_id=0) }}".replace('0', info.event.extendedProps.order_id);
+                } else {
+                    window.location.href = "{{ url_for('admin.edit_calendar_event', event_id=0) }}".replace('0', info.event.id);
+                }
             },
             eventDidMount: function(info) {
                 // Add description to event title on hover

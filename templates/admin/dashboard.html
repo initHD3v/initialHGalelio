@@ -110,8 +110,12 @@
             height: 'auto', // Set height to auto
             contentHeight: 'auto', // Adjust content height automatically
             eventClick: function(info) {
-                // Optional: Redirect to full calendar page or show event details in a modal
-                window.location.href = "{{ url_for('admin.calendar') }}";
+                if (info.event.extendedProps.order_id) {
+                    window.location.href = "{{ url_for('admin.order_detail', order_id=0) }}".replace('0', info.event.extendedProps.order_id);
+                } else {
+                    // Optional: Redirect to full calendar page or show event details in a modal
+                    window.location.href = "{{ url_for('admin.calendar') }}";
+                }
             }
         });
         calendar.render();

@@ -335,6 +335,7 @@ def admin_panel():
             "color": (
                 "#28a745" if event.order_id else "#dc3545"
             ),  # Green for approved orders, red for unavailable
+            "order_id": event.order_id, # Include order_id
         }
         for event in calendar_events
     ]
@@ -1283,25 +1284,69 @@ def calendar():
     if current_user.role != "admin":
         flash("You do not have access to this page.", "danger")
         return redirect(url_for("main.index"))
-    calendar_events = CalendarEvent.query.all()
-    formatted_events = [
-        {
+    
+    # Fetch calendar events, eagerly loading associated orders
+    # Use outerjoin to include CalendarEvents that are not linked to an Order
+    calendar_events_with_orders = db.session.query(CalendarEvent, Order).\
+        outerjoin(Order, CalendarEvent.order_id == Order.id).\
+        all()
+
+    formatted_events = []
+    display_events = [] # New list for displaying below calendar
+
+    for event, order in calendar_events_with_orders:
+        # Data for FullCalendar
+        formatted_event = {
             "title": event.title,
-            "start": event.start_time.strftime(
-                "%Y-%m-%dT%H:%M:%S"
-            ),  # ISO 8601 format for FullCalendar
-            "end": event.end_time.strftime(
-                "%Y-%m-%dT%H:%M:%S"
-            ),  # ISO 8601 format for FullCalendar
+            "start": event.start_time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "end": event.end_time.strftime("%Y-%m-%dT%H:%M:%S"),
             "description": event.description,
-            "color": (
-                "#28a745" if event.order_id else "#dc3545"
-            ),  # Green for approved orders, red for unavailable
-            "id": event.id,  # Pass event ID for editing/deleting
+            "color": ("#28a745" if event.order_id else "#dc3545"),
+            "id": event.id,
+            "extendedProps": {
+                "order_id": event.order_id
+            }
         }
-        for event in calendar_events
-    ]
-    return render_template("admin/calendar.html", events=formatted_events)
+        formatted_events.append(formatted_event);
+
+        # Data for the list below the calendar
+        display_event = {
+            "id": event.id,
+            "title": event.title,
+            "description": event.description,
+            "start_time": event.start_time,
+            "end_time": event.end_time,
+            "is_available": event.is_available,
+            "order_id": event.order_id,
+            "order_status": None,
+            "time_remaining": None,
+            "client_name": None,
+            "service_type": None
+        }
+
+        if order: # If there's an associated order
+            display_event["order_status"] = order.status
+            display_event["client_name"] = order.client.full_name if order.client else "N/A"
+            display_event["service_type"] = order.service_type
+
+            # Calculate time remaining for order-related events
+            if order.event_date and order.event_start_time:
+                event_datetime = datetime.combine(order.event_date, order.event_start_time.time())
+                time_remaining = event_datetime - datetime.utcnow()
+                display_event["time_remaining"] = {
+                    "days": time_remaining.days,
+                    "hours": time_remaining.seconds // 3600,
+                    "minutes": (time_remaining.seconds % 3600) // 60
+                }
+        
+        display_events.append(display_event)
+
+    # Sort display_events by start_time
+    display_events.sort(key=lambda x: x['start_time'])
+
+    
+
+    return render_template("admin/calendar.html", events=formatted_events, display_events=display_events)
 
 
 @admin.route("/admin/calendar/new", methods=["GET", "POST"])
