@@ -1,164 +1,126 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5 pt-5">
-    <h1 class="text-center mb-4">Pertanyaan yang Sering Diajukan (FAQ)</h1>
-    <p class="lead text-center mb-5">Temukan informasi lengkap tentang Aruna Moment, mulai dari layanan kami hingga cara kerja sistem pemesanan.</p>
+<div class="container my-5 pt-5">
+    <h1 class="text-center mb-3 display-4 fw-bold text-primary">Pertanyaan yang Sering Diajukan</h1>
+    <p class="lead text-center text-muted mb-5">Temukan semua yang perlu Anda ketahui tentang Aruna Moment, layanan kami, dan bagaimana kami bekerja untuk Anda.</p>
 
-    <div class="accordion" id="faqAccordion">
+    <div class="accordion accordion-flush" id="faqAccordion">
         <!-- Section: Sebagai Pengunjung Biasa -->
-        <div class="card mb-3">
-            <div class="card-header" id="headingOne">
-                <h2 class="mb-0">
-                    <button class="btn btn-link btn-block text-left" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        1. Sebagai Pengunjung Biasa (Hanya Ingin Tahu)
-                    </button>
-                </h2>
-            </div>
-            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
-                <div class="card-body">
-                    <p>Sebagai pengunjung biasa yang baru pertama kali mendarat di website Aruna Moment, Anda akan disambut oleh halaman utama (homepage) yang dirancang untuk memberikan gambaran umum tentang layanan kami.</p>
-                    <ul>
-                        <li><strong>Halaman Utama (Homepage):</strong> Anda akan melihat galeri foto atau carousel gambar yang menampilkan karya-karya terbaik Aruna Moment. Ada juga bagian "Tentang Kami" singkat yang menjelaskan siapa kami dan filosofi kami, serta mungkin beberapa testimoni dari klien sebelumnya.</li>
-                        <li><strong>Portofolio:</strong> Anda bisa menjelajahi berbagai kategori portofolio (misalnya, pernikahan, pra-pernikahan, acara) untuk melihat lebih banyak contoh hasil karya fotografi kami. Setiap postingan portofolio akan menampilkan gambar-gambar dan deskripsi singkat.</li>
-                        <li><strong>Daftar Harga (Pricelist):</strong> Jika Anda tertarik dengan layanan kami, Anda dapat melihat halaman daftar harga yang menampilkan berbagai paket fotografi yang ditawarkan, beserta detail dan harganya.</li>
-                        <li><strong>Tentang Kami (About Us):</strong> Halaman ini memberikan informasi lebih mendalam tentang tim Aruna Moment, visi, dan misi kami.</li>
-                        <li><strong>Kontak:</strong> Jika Anda memiliki pertanyaan atau ingin berinteraksi, ada halaman kontak yang menyediakan formulir, alamat email, atau nomor telepon/WhatsApp untuk menghubungi kami.</li>
-                        <li><strong>Testimoni:</strong> Anda bisa membaca ulasan dan pengalaman klien lain yang telah menggunakan jasa Aruna Moment.</li>
+        <div class="accordion-item mb-3 shadow-sm rounded">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button collapsed fs-5 fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    <i class="fas fa-eye me-3 text-info"></i> 1. Sebagai Pengunjung Biasa (Hanya Ingin Tahu)
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                <div class="accordion-body bg-light-subtle">
+                    <p>Sebagai pengunjung baru di website Aruna Moment, Anda akan menemukan informasi lengkap tentang kami dan layanan kami:</p>
+                    <ul class="list-group list-group-flush mt-3">
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-home me-2 text-primary"></i> <strong>Halaman Utama (Homepage):</strong> Menampilkan galeri foto/carousel karya terbaik, bagian singkat "Tentang Kami", dan testimoni klien.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-images me-2 text-success"></i> <strong>Portofolio:</strong> Jelajahi berbagai kategori (pernikahan, pra-pernikahan, acara) dengan gambar dan deskripsi.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-tags me-2 text-warning"></i> <strong>Daftar Harga (Pricelist):</strong> Lihat detail paket fotografi, termasuk deskripsi dan harga.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-info-circle me-2 text-danger"></i> <strong>Tentang Kami (About Us):</strong> Informasi mendalam tentang tim, visi, dan misi Aruna Moment.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-envelope me-2 text-secondary"></i> <strong>Kontak:</strong> Temukan formulir, email, atau nomor WhatsApp untuk pertanyaan Anda.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-comments me-2 text-info"></i> <strong>Testimoni:</strong> Baca ulasan dan pengalaman klien lain.</li>
                     </ul>
-                    <p>Sebagai pengunjung, Anda dapat menelusuri semua halaman ini tanpa perlu mendaftar atau login. Tujuannya adalah untuk memberikan informasi yang cukup agar Anda tertarik untuk menjadi klien.</p>
+                    <p class="mt-3">Semua halaman ini dapat diakses tanpa perlu mendaftar atau login, dirancang untuk memberikan gambaran yang menarik tentang layanan kami.</p>
                 </div>
             </div>
         </div>
 
         <!-- Section: Sebagai Klien -->
-        <div class="card mb-3">
-            <div class="card-header" id="headingTwo">
-                <h2 class="mb-0">
-                    <button class="btn btn-link btn-block text-left collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        2. Sebagai Klien (Melakukan Order)
-                    </button>
-                </h2>
-            </div>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
-                <div class="card-body">
-                    <p>Jika Anda tertarik untuk menggunakan jasa Aruna Moment, alurnya akan lebih interaktif:</p>
-                    <ol>
-                        <li><strong>Pendaftaran & Login:</strong> Anda perlu mendaftar akun baru atau login jika sudah memiliki akun. Ini akan memberikan Anda akses ke fitur-fitur khusus klien.</li>
-                        <li><strong>Membuat Pesanan (Order):</strong>
-                            <ul>
-                                <li>Anda akan memilih jenis layanan (misalnya, pernikahan, pra-pernikahan) dan paket yang diinginkan dari daftar harga.</li>
-                                <li>Anda akan diminta untuk memilih tanggal acara dari kalender yang tersedia dan mengisi detail lokasi serta informasi tambahan lainnya.</li>
-                                <li>Setelah mengisi semua detail, Anda akan mengonfirmasi pesanan. Status awal pesanan Anda akan menjadi "Menunggu Pembayaran" (<code>waiting_payment</code>).</li>
-                            </ul>
-                        </li>
-                        <li><strong>Pembayaran:</strong>
-                            <ul>
-                                <li>Anda akan diarahkan ke halaman pembayaran di mana Anda dapat memilih opsi pembayaran: Down Payment (DP) atau pembayaran penuh (Lunas).</li>
-                                <li>Anda akan memilih rekening bank tujuan dari daftar yang disediakan oleh Aruna Moment.</li>
-                                <li>Setelah melakukan transfer, Anda harus mengunggah bukti pembayaran (foto/screenshot) melalui formulir yang disediakan.</li>
-                                <li>Setelah bukti pembayaran diunggah, status pesanan Anda akan berubah menjadi "Menunggu Persetujuan" (<code>waiting_approval</code>).</li>
-                            </ul>
-                        </li>
-                        <li><strong>Notifikasi & Persetujuan Admin:</strong>
-                            <ul>
-                                <li>Admin akan menerima notifikasi tentang pesanan baru dan bukti pembayaran Anda.</li>
-                                <li>Admin akan memverifikasi bukti pembayaran.</li>
-                                <li>Jika bukti pembayaran <strong>disetujui</strong>, status pesanan Anda akan berubah menjadi "Diterima" (<code>accepted</code>). Anda akan menerima email notifikasi yang mengonfirmasi pesanan Anda.</li>
-                                <li>Jika bukti pembayaran <strong>ditolak</strong> (misalnya, karena salah atau tidak valid), status pesanan Anda akan kembali menjadi "Ditolak" (<code>rejected</code>). Anda akan menerima email notifikasi yang menjelaskan alasan penolakan dan Anda dapat mengunggah ulang bukti pembayaran.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Pelacakan Pesanan:</strong> Anda dapat melihat status pesanan Anda di dashboard klien, termasuk detail pembayaran, tanggal acara, dan sisa waktu hingga acara.</li>
-                        <li><strong>Permintaan Pembatalan/Penjadwalan Ulang:</strong> Jika ada perubahan rencana, Anda dapat mengajukan permintaan pembatalan atau penjadwalan ulang melalui dashboard Anda. Admin akan meninjau permintaan ini.</li>
-                        <li><strong>Testimoni:</strong> Setelah pesanan Anda ditandai sebagai "Selesai" (<code>completed</code>) oleh admin, Anda akan memiliki opsi untuk mengirimkan testimoni tentang pengalaman Anda.</li>
-                    </ol>
+        <div class="accordion-item mb-3 shadow-sm rounded">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed fs-5 fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    <i class="fas fa-user-check me-3 text-success"></i> 2. Sebagai Klien (Melakukan Order)
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                <div class="accordion-body bg-light-subtle">
+                    <p>Jika Anda siap untuk memesan layanan kami, berikut adalah alur interaktifnya:</p>
+                    <ul class="list-group list-group-flush mt-3">
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-user-plus me-2 text-primary"></i> <strong>Pendaftaran & Login:</strong> Buat akun atau login untuk mengakses fitur khusus klien.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-calendar-alt me-2 text-info"></i> <strong>Membuat Pesanan (Order):</strong> Pilih layanan dan paket, tentukan tanggal acara dari kalender, isi detail lokasi, dan konfirmasi. Status awal: "Menunggu Pembayaran" (<code>waiting_payment</code>).</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-money-bill-wave me-2 text-success"></i> <strong>Pembayaran:</strong> Pilih opsi DP atau Lunas, pilih rekening bank, dan unggah bukti transfer. Status berubah menjadi "Menunggu Persetujuan" (<code>waiting_approval</code>).</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-bell me-2 text-warning"></i> <strong>Notifikasi & Persetujuan Admin:</strong> Admin memverifikasi pembayaran. Jika <strong>disetujui</strong>, status menjadi "Diterima" (<code>accepted</code>) dan Anda menerima email konfirmasi. Jika <strong>ditolak</strong>, Anda menerima email alasan penolakan dan dapat mengunggah ulang bukti.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-chart-line me-2 text-danger"></i> <strong>Pelacakan Pesanan:</strong> Pantau status pesanan, detail pembayaran, tanggal acara, dan sisa waktu di dashboard klien.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-exchange-alt me-2 text-secondary"></i> <strong>Permintaan Pembatalan/Penjadwalan Ulang:</strong> Ajukan perubahan rencana melalui dashboard, yang akan ditinjau admin.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-star me-2 text-info"></i> <strong>Testimoni:</strong> Setelah pesanan selesai, Anda dapat mengirimkan testimoni tentang pengalaman Anda.</li>
+                    </ul>
                 </div>
             </div>
         </div>
 
         <!-- Section: Sebagai Admin -->
-        <div class="card mb-3">
-            <div class="card-header" id="headingThree">
-                <h2 class="mb-0">
-                    <button class="btn btn-link btn-block text-left collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                        3. Sebagai Admin (Mengelola Website)
-                    </button>
-                </h2>
-            </div>
-            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
-                <div class="card-body">
+        <div class="accordion-item mb-3 shadow-sm rounded">
+            <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed fs-5 fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    <i class="fas fa-user-shield me-3 text-danger"></i> 3. Sebagai Admin (Mengelola Website)
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                <div class="accordion-body bg-light-subtle">
                     <p>Sebagai admin, Anda memiliki kontrol penuh atas operasional website dan pesanan:</p>
-                    <ol>
-                        <li><strong>Login Admin:</strong> Anda akan login melalui halaman khusus admin.</li>
-                        <li><strong>Dashboard Admin:</strong> Setelah login, Anda akan melihat dashboard yang memberikan gambaran umum tentang:
-                            <ul>
-                                <li>Statistik penting (jumlah klien, total pesanan, pesanan tertunda, pesanan disetujui, dll.).</li>
-                                <li>Daftar pesanan yang akan datang dengan sisa waktu (countdown).</li>
-                                <li>Kalender yang menampilkan semua event (pesanan dan blokir ketersediaan).</li>
-                            </ul>
-                        </li>
-                        <li><strong>Kelola Pesanan (Manage Orders):</strong>
-                            <ul>
-                                <li>Melihat daftar semua pesanan dengan detail lengkap.</li>
-                                <li>Menyetujui Pesanan: Memverifikasi bukti pembayaran dan mengubah status pesanan menjadi "Diterima" (<code>accepted</code>). Sistem akan mengirim email notifikasi ke klien.</li>
-                                <li>Menolak Pesanan: Jika bukti pembayaran tidak valid, Anda dapat menolak pesanan dan memasukkan alasan penolakan. Sistem akan mengirim email notifikasi ke klien.</li>
-                                <li>Mengedit Pesanan: Mengubah detail pesanan seperti jenis layanan, tanggal, lokasi, harga, dan status.</li>
-                                <li>Menghapus Pesanan: Menghapus pesanan beserta semua data terkait (bukti pembayaran, event kalender, testimoni).</li>
-                                <li>Melihat Invoice: Mengakses dan melihat invoice untuk setiap pesanan.</li>
-                                <li>Menandai Selesai: Menandai pesanan sebagai "Selesai" (<code>completed</code>) setelah acara berlangsung, yang juga akan mengaktifkan opsi testimoni untuk klien.</li>
-                                <li>Mengelola Permintaan Penjadwalan Ulang/Pembatalan: Menyetujui atau menolak permintaan penjadwalan ulang atau pembatalan dari klien.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Kelola Klien (Manage Clients):</strong>
-                            <ul>
-                                <li>Melihat daftar semua klien terdaftar.</li>
-                                <li>Mencari klien berdasarkan nama, username, atau email.</li>
-                                <li>Menghapus akun klien (dengan penanganan data terkait seperti <code>image_like</code> yang perlu diperhatikan).</li>
-                            </ul>
-                        </li>
-                        <li><strong>Kelola Portofolio (Manage Portfolio):</strong>
-                            <ul>
-                                <li>Menambah postingan portofolio baru dengan judul, deskripsi, dan gambar.</li>
-                                <li>Mengedit postingan portofolio yang sudah ada.</li>
-                                <li>Menghapus postingan portofolio atau gambar individual.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Kelola Kalender (Manage Calendar):</strong>
-                            <ul>
-                                <li>Melihat semua event di kalender.</li>
-                                <li>Menambah event baru (misalnya, blokir tanggal tidak tersedia).</li>
-                                <li>Mengedit atau menghapus event kalender yang sudah ada.</li>
-                                <li>Mengklik event kalender yang terkait dengan pesanan akan mengarahkan langsung ke detail pesanan tersebut.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Kelola Testimoni (Manage Testimonials):</strong>
-                            <ul>
-                                <li>Melihat semua testimoni yang dikirimkan oleh klien.</li>
-                                <li>Menyetujui atau menolak testimoni untuk ditampilkan di website publik.</li>
-                                <li>Mengedit atau menghapus testimoni.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Kelola Daftar Harga (Manage Pricelist):</strong>
-                            <ul>
-                                <li>Menambah paket layanan baru.</li>
-                                <li>Mengedit detail paket yang sudah ada (nama, deskripsi, harga, kategori).</li>
-                                <li>Menghapus paket layanan.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Kelola Rekening Bank (Manage Bank Accounts):</strong>
-                            <ul>
-                                <li>Menambah, mengedit, atau menghapus informasi rekening bank yang digunakan untuk pembayaran.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Kelola Homepage (Manage Homepage):</strong>
-                            <ul>
-                                <li>Mengedit teks "Tentang Kami" di homepage.</li>
-                                <li>Mengelola gambar carousel di homepage.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Profil Admin:</strong> Mengedit informasi profil admin sendiri.</li>
-                    </ol>
+                    <ul class="list-group list-group-flush mt-3">
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-sign-in-alt me-2 text-primary"></i> <strong>Login Admin:</strong> Akses melalui halaman khusus admin.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-tachometer-alt me-2 text-info"></i> <strong>Dashboard Admin:</strong> Ringkasan statistik, pesanan mendatang, dan kalender event.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-clipboard-list me-2 text-success"></i> <strong>Kelola Pesanan (Manage Orders):</strong> Lihat, setujui/tolak, edit, hapus, lihat invoice, tandai selesai, dan kelola permintaan penjadwalan/pembatalan.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-users-cog me-2 text-warning"></i> <strong>Kelola Klien (Manage Clients):</strong> Lihat, cari, dan hapus akun klien.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-camera-retro me-2 text-danger"></i> <strong>Kelola Portofolio (Manage Portfolio):</strong> Tambah, edit, dan hapus postingan/gambar portofolio.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-calendar-check me-2 text-secondary"></i> <strong>Kelola Kalender (Manage Calendar):</strong> Lihat, tambah, edit, dan hapus event kalender.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-comments-dollar me-2 text-info"></i> <strong>Kelola Testimoni (Manage Testimonials):</strong> Lihat, setujui/tolak, edit, dan hapus testimoni.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-tags me-2 text-primary"></i> <strong>Kelola Daftar Harga (Manage Pricelist):</strong> Tambah, edit, dan hapus paket layanan.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-university me-2 text-success"></i> <strong>Kelola Rekening Bank (Manage Bank Accounts):</strong> Tambah, edit, dan hapus informasi rekening bank.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-home me-2 text-warning"></i> <strong>Kelola Homepage (Manage Homepage):</strong> Edit teks "Tentang Kami" dan kelola gambar carousel.</li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-user-edit me-2 text-danger"></i> <strong>Profil Admin:</strong> Edit informasi profil admin sendiri.</li>
+                    </ul>
                 </div>
+            </div>
+        </div>
+
+        <!-- Section: Pertanyaan Umum Seputar Layanan & Kebijakan -->
+        <div class="accordion-item mb-3 shadow-sm rounded">
+            <h2 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed fs-5 fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                    <i class="fas fa-question-circle me-3 text-primary"></i> 4. Pertanyaan Umum Seputar Layanan & Kebijakan
+                </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                <div class="accordion-body bg-light-subtle">
+                    <p>Berikut adalah beberapa pertanyaan umum terkait layanan dan kebijakan Aruna Moment:</p>
+                    <ul class="list-group list-group-flush mt-3">
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-calendar-times me-2 text-danger"></i> <strong>Kebijakan Pembatalan dan Penjadwalan Ulang:</strong>
+                            <p class="mb-0 mt-2">Pembatalan pesanan setelah pembayaran DP akan mengakibatkan DP hangus dan tidak dapat dikembalikan. Untuk penjadwalan ulang, mohon ajukan permintaan melalui dashboard klien Anda setidaknya 7 hari sebelum tanggal acara. Penjadwalan ulang tergantung ketersediaan dan mungkin dikenakan biaya tambahan.</p>
+                        </li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-cloud-download-alt me-2 text-success"></i> <strong>Proses Pengiriman Hasil Foto:</strong>
+                            <p class="mb-0 mt-2">Hasil foto akan melalui proses editing profesional dan akan dikirimkan dalam waktu 14-30 hari kerja setelah tanggal acara. Anda akan menerima akses ke galeri online pribadi (Google Drive) untuk mengunduh foto-foto resolusi tinggi. Pengiriman fisik (USB/Album Foto) juga akan dikirim dalam waktu 14-30 hari kerja.</p>
+                        </li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-copyright me-2 text-info"></i> <strong>Hak Cipta dan Penggunaan Foto:</strong>
+                            <p class="mb-0 mt-2">Hak cipta atas semua foto tetap menjadi milik Aruna Moment. Anda diberikan lisensi penggunaan pribadi untuk mencetak, berbagi, dan menggunakan foto untuk keperluan non-komersial. Aruna Moment berhak menggunakan beberapa foto untuk keperluan promosi portofolio kami, kecuali ada perjanjian tertulis sebelumnya.</p>
+                        </li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-comments me-2 text-warning"></i> <strong>Konsultasi Pra-Sesi:</strong>
+                            <p class="mb-0 mt-2">Ya, kami sangat menganjurkan sesi konsultasi pra-sesi untuk membahas detail, visi, dan ekspektasi Anda. Konsultasi dapat dilakukan secara online atau tatap muka sesuai kesepakatan.</p>
+                        </li>
+                        <li class="list-group-item bg-light-subtle"><i class="fas fa-dollar-sign me-2 text-primary"></i> <strong>Biaya Tambahan/Tersembunyi:</strong>
+                            <p class="mb-0 mt-2">Harga paket kami sudah mencakup sebagian besar biaya. Namun, biaya tambahan mungkin berlaku untuk: lokasi di luar area layanan utama, biaya perizinan lokasi (jika ada), penambahan jam kerja di luar paket, atau permintaan khusus lainnya. Semua biaya tambahan akan dikomunikasikan dan disepakati di awal.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action Section -->
+<div class="container my-5 text-center">
+    <div class="p-4 p-md-5 mb-4 rounded-3 bg-light">
+        <div class="col-md-10 mx-auto">
+            <h2 class="display-6 fw-bold mb-3">Masih Punya Pertanyaan?</h2>
+            <p class="fs-5 text-muted">Jika Anda tidak menemukan jawaban yang Anda cari di sini, jangan ragu untuk menghubungi kami.</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+                <a href="{{ url_for('main.contact') }}" class="btn btn-primary btn-lg px-4 me-sm-3"><i class="fas fa-envelope me-2"></i> Hubungi Kami</a>
+                <a href="https://wa.me/6285740109107" target="_blank" class="btn btn-success btn-lg px-4"><i class="fab fa-whatsapp me-2"></i> WhatsApp Kami</a>
             </div>
         </div>
     </div>

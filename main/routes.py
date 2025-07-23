@@ -134,24 +134,7 @@ def faq():
     return render_template("main/faq.html")
 
 
-@main.route("/order", methods=["GET", "POST"])
-@login_required
-def order():
-    packages = WeddingPackage.query.order_by(
-        WeddingPackage.category, WeddingPackage.price
-    ).all()
-    # Group packages by category
-    categorized_packages = {}
-    for pkg in packages:
-        if pkg.category not in categorized_packages:
-            categorized_packages[pkg.category] = []
-        categorized_packages[pkg.category].append(pkg)
 
-    # Get list of images for the slider from the database
-    portfolio_images = PostImage.query.all()
-    images = [img.filename for img in portfolio_images]
-
-    return render_template("pricelist.html", categorized_packages=categorized_packages, images=images)
 
 
 @main.route("/order", methods=["GET", "POST"])
