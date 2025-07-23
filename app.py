@@ -51,7 +51,7 @@ def create_app(config_class=Config):
     def not_found_error(error):
         return render_template('404.html'), 404
 
-    return app
+    return app, celery_app # Return both app and celery_app
 
 
 def get_locale():
@@ -63,7 +63,7 @@ def get_locale():
 if __name__ == "__main__":
     # The app.run() call is only for local development and will now respect
     # the FLASK_DEBUG environment variable.
-    app = create_app() # Create app instance here
+    app, celery_app = create_app() # Create app and get celery_app instance
     is_debug = app.config.get("DEBUG", False)
     
     app.run(debug=is_debug, host="0.0.0.0", port=5001)

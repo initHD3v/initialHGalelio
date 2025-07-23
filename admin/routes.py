@@ -636,7 +636,7 @@ def delete_client(user_id):
         flash("Client and all associated data deleted successfully!", "success")
     except Exception as e:
         db.session.rollback()
-        flash(f"Error deleting client: {str(e)}", "danger")
+        flash("Gagal menghapus klien. Klien ini memiliki data terkait (misalnya, suka pada gambar) yang tidak dapat dihapus secara otomatis. Mohon periksa data terkait atau hubungi dukungan teknis.", "danger")
     return redirect(url_for("admin.client_list"))
 
 
