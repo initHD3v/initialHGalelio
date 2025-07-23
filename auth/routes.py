@@ -1,14 +1,28 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, session
+import os
 from flask_login import login_user, logout_user, login_required, current_user
 from forms import LoginForm, RegistrationForm, RequestResetForm, ResetPasswordForm
 from models import User, PostImage, Notification
 from werkzeug.security import generate_password_hash, check_password_hash
-from extensions import login_manager, db, mail
+from extensions import login_manager, db, mail, oauth
 from tasks import send_email_task # Import Celery task
 from flask_mail import Message
 from flask_babel import _
 from . import auth
 
+
+def send_social_signup_admin_notification(user, provider):
+    admins = User.query.filter_by(role="admin").all()
+    admin_emails = [admin.email for admin in admins]
+    if admin_emails:
+        msg = Message(f"Notifikasi: Pengguna Baru Mendaftar via {provider.capitalize()}", recipients=admin_emails)
+        msg.html = render_template('emails/new_social_user_notification.html', user=user, provider=provider.capitalize())
+        send_email_task.delay(
+            subject=msg.subject,
+            sender=msg.sender,
+            recipients=msg.recipients,
+            body=msg.html
+        )
 
 def send_reset_email(user):
     token = user.get_reset_token()
@@ -25,6 +39,42 @@ def send_reset_email(user):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@auth.route("/login/google")
+def google_login():
+    redirect_uri = url_for('auth.google_callback', _external=True)
+    # Use a secure random string for the nonce
+    nonce = os.urandom(16).hex()
+    session['nonce'] = nonce
+    return oauth.google.authorize_redirect(redirect_uri, nonce=nonce)
+
+
+@auth.route("/auth/google/callback")
+def google_callback():
+    token = oauth.google.authorize_access_token()
+    nonce = session.pop('nonce', None)
+    # The user_info is a dict that contains user claims,
+    # we can verify the nonce is the same as we sent
+    user_info = oauth.google.parse_id_token(token, nonce=nonce)
+    email = user_info.get('email')
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        user = User(
+            email=email,
+            full_name=user_info.get('name'),
+            username=email.split('@')[0], # Generate username from email
+            password=generate_password_hash(email), # Set a dummy password
+            whatsapp_number='', # Provide an empty string to satisfy NOT NULL constraint
+            role='client'
+        )
+        db.session.add(user)
+        db.session.commit()
+        # Send notification to admin for new social user
+        send_social_signup_admin_notification(user, 'google')
+
+    login_user(user)
+    return redirect(url_for('client.dashboard'))
 
 
 @auth.route("/login", methods=["GET", "POST"])

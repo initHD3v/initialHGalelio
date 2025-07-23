@@ -9,6 +9,13 @@ class Config:
     GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
     GOOGLE_MAPS_MAP_ID = os.environ.get("GOOGLE_MAPS_MAP_ID")
 
+    # OAuth Credentials
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID") or "326710860533-t70jp81orhb78h1ruuucqhekhfq20kh4.apps.googleusercontent.com"
+    GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET") or "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"
+    FACEBOOK_CLIENT_ID = os.environ.get("FACEBOOK_CLIENT_ID")
+    FACEBOOK_CLIENT_SECRET = os.environ.get("FACEBOOK_CLIENT_SECRET")
+
+
     # Konfigurasi Flask-Mail
     MAIL_SERVER = os.environ.get("MAIL_SERVER") or 'smtp.gmail.com'
     MAIL_PORT = int(os.environ.get("MAIL_PORT") or 587)

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notifikasi Pendaftaran Pengguna Baru</title>
+</head>
+<body>
+    <h2>Pengguna Baru Mendaftar via {{ provider }}</h2>
+    <p>Halo Admin,</p>
+    <p>Seorang pengguna baru telah mendaftar di Aruna Moment menggunakan akun <strong>{{ provider }}</strong> mereka.</p>
+    <p>Berikut adalah detailnya:</p>
+    <ul>
+        <li><strong>Nama Lengkap:</strong> {{ user.full_name }}</li>
+        <li><strong>Email:</strong> {{ user.email }}</li>
+        <li><strong>Username:</strong> {{ user.username }}</li>
+        <li><strong>Tanggal Daftar:</strong> {{ user.date_registered.strftime('%Y-%m-%d %H:%M:%S') }}</li>
+    </ul>
+    <p>Anda mungkin ingin memeriksa profil mereka di panel admin.</p>
+    <p>Terima kasih,<br>Sistem Aruna Moment</p>
+</body>
+</html>

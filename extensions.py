@@ -5,12 +5,14 @@ from flask_babel import Babel
 from flask_mail import Mail
 from celery import Celery
 from config import Config # Import Config directly
+from authlib.integrations.flask_client import OAuth
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
 babel = Babel()
 mail = Mail()
+oauth = OAuth()
 
 # Configure celery directly using Config object
 celery = Celery(

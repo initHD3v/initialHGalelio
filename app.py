@@ -1,7 +1,7 @@
 from flask import Flask, request, session, flash, render_template
 from dotenv import load_dotenv
 from config import Config # Import Config
-from extensions import db, login_manager, mail, migrate, babel, create_celery_app
+from extensions import db, login_manager, mail, migrate, babel, create_celery_app, oauth
 from models import User, Post, PostImage, Order, CalendarEvent, Testimonial, WeddingPackage, BankAccount, Notification, HomepageContent, HeroImage
 from werkzeug.security import generate_password_hash
 import os
@@ -18,7 +18,6 @@ from main import main
 from client import client
 
 
-
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -32,6 +31,18 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     migrate.init_app(app, db)
     babel.init_app(app)
+    oauth.init_app(app)
+
+    # Register Google OAuth provider
+    oauth.register(
+        name='google',
+        client_id=app.config.get('GOOGLE_CLIENT_ID'),
+        client_secret=app.config.get('GOOGLE_CLIENT_SECRET'),
+        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+        client_kwargs={
+            'scope': 'openid email profile'
+        }
+    )
 
     # Inisialisasi Celery
     celery_app = create_celery_app(app)
