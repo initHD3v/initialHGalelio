@@ -44,6 +44,7 @@ class Post(db.Model):
     is_hidden = db.Column(
         db.Boolean, default=False, nullable=False
     )  # New field for visibility
+    category = db.Column(db.String(50), nullable=True) # New field for post category
     images = db.relationship(
         "PostImage", backref="post", lazy=True, cascade="all, delete-orphan"
     )

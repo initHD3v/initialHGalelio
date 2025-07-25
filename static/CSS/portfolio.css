@@ -116,6 +116,35 @@
     transition: opacity 0.8s ease-in-out;
 }
 
+/* Category Filter Buttons */
+.btn-category-filter {
+    background-color: #e9ecef; /* Light gray background */
+    color: #495057; /* Dark gray text */
+    border: 1px solid #ced4da;
+    border-radius: 25px; /* Rounded corners */
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease; /* Smooth transition for hover and active states */
+    cursor: pointer;
+    text-transform: capitalize; /* Capitalize first letter of category */
+}
+
+.btn-category-filter:hover {
+    background-color: #dee2e6; /* Slightly darker gray on hover */
+    color: #212529;
+    transform: translateY(-2px); /* Subtle lift effect */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-category-filter.active {
+    background-color: #007bff; /* Primary blue for active button */
+    color: white;
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0,123,255,0.2);
+    transform: translateY(0); /* Reset lift effect for active */
+}
+
 @media (max-width: 768px) {
     .fixed-cta .cta-text {
         font-size: 1.1rem;

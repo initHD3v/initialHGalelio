@@ -140,6 +140,16 @@ class RegistrationForm(FlaskForm):
 class PostForm(FlaskForm):
     title = StringField("Title", validators=[DataRequired()])
     content = TextAreaField("Content", validators=[DataRequired()])
+    category = SelectField(
+        "Category",
+        choices=[
+            ("Wedding", "Wedding"),
+            ("Prewedding", "Prewedding"),
+            ("MBS", "MBS"),
+            ("Martuppol", "Martuppol"),
+        ],
+        validators=[DataRequired()]
+    )
     image = FileField("Images")  # Akan diatur multiple di template
     submit = SubmitField("Post")
 

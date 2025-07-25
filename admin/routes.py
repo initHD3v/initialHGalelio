@@ -1129,7 +1129,7 @@ def new_portfolio_post():
             )
 
         post = Post(
-            title=request.form.get("title"), content=request.form.get("content")
+            title=request.form.get("title"), content=request.form.get("content"), category=request.form.get("category")
         )
         db.session.add(post)
         db.session.commit()  # Commit here to get post.id
@@ -1213,6 +1213,7 @@ def edit_portfolio_post(post_id):
 
         post.title = request.form.get("title")
         post.content = request.form.get("content")
+        post.category = request.form.get("category") # Update category
         db.session.commit()
 
         return jsonify(
@@ -1226,6 +1227,7 @@ def edit_portfolio_post(post_id):
     elif request.method == "GET":
         form.title.data = post.title
         form.content.data = post.content
+        form.category.data = post.category # Populate category field
     return render_template(
         "admin_post_form.html", form=form, title="Edit Portfolio Post", post=post
     )

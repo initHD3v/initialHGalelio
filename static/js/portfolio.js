@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 likeIcon.classList.remove('far');
                 likeIcon.classList.add('fas', 'text-danger');
             } else {
-                likeIcon.classList.remove('fas', 'text-danger');
+                likeIcon.classList.remove('fas');
                 likeIcon.classList.add('far');
             }
         };
@@ -32,7 +32,67 @@ document.addEventListener('DOMContentLoaded', () => {
         updateButtonState();
     });
 
-    // --- Event Delegation for Clicks ---
+    // --- Category Filter Logic ---
+    const portfolioCards = document.querySelectorAll('.portfolio-card');
+    const categoryFilterButtonsContainer = document.getElementById('category-filter-buttons');
+
+    if (categoryFilterButtonsContainer) {
+        const categories = new Set();
+        portfolioCards.forEach(card => {
+            const category = card.dataset.category;
+            if (category) {
+                categories.add(category);
+            }
+        });
+
+        // Create "All" button
+        const allButton = document.createElement('button');
+        allButton.textContent = 'Semua';
+        allButton.classList.add('btn', 'btn-category-filter', 'active');
+        allButton.dataset.filter = 'all';
+        categoryFilterButtonsContainer.appendChild(allButton);
+
+        // Define the desired order of categories
+        const desiredCategoryOrder = ["Wedding", "Prewedding", "MBS", "Martuppol"];
+
+        // Create buttons for each unique category in the desired order
+        desiredCategoryOrder.forEach(categoryName => {
+            if (categories.has(categoryName)) { // Only create button if category exists in posts
+                const button = document.createElement('button');
+                button.textContent = categoryName;
+                button.classList.add('btn', 'btn-category-filter');
+                button.dataset.filter = categoryName;
+                categoryFilterButtonsContainer.appendChild(button);
+            }
+        });
+
+        // Add click event listener to the container (event delegation)
+        categoryFilterButtonsContainer.addEventListener('click', (event) => {
+            const targetButton = event.target.closest('.btn-category-filter');
+            if (!targetButton) return;
+
+            // Remove active class from all buttons
+            categoryFilterButtonsContainer.querySelectorAll('.btn-category-filter').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add active class to the clicked button
+            targetButton.classList.add('active');
+
+            const filterCategory = targetButton.dataset.filter;
+
+            portfolioCards.forEach(card => {
+                const cardCategory = card.dataset.category;
+                if (filterCategory === 'all' || cardCategory === filterCategory) {
+                    card.style.display = ''; // Show card
+                } else {
+                    card.style.display = 'none'; // Hide card
+                }
+            });
+        });
+    }
+
+    // --- Event Delegation for Clicks (Like Button) ---
     // Listen for clicks on the whole document
     document.body.addEventListener('click', event => {
         // Check if the clicked element is a like button
@@ -101,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         likeIcon.classList.add('fas', 'text-danger');
                         likeIcon.classList.add('like-animation'); // Add animation class
                     } else {
-                        likeIcon.classList.remove('fas', 'text-danger');
+                        likeIcon.classList.remove('fas');
                         likeIcon.classList.add('far');
                         likeIcon.classList.remove('like-animation'); // Remove animation class
                     }
