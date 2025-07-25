@@ -40,6 +40,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const postId = this.dataset.postId;
             const postTitle = this.querySelector('.card-title').textContent; // Get title from the card
+            const postCaption = this.querySelector('.card-text').textContent; // Get caption from the card
+
+            // Update modal title and caption
+            document.getElementById('portfolio-modal-title').textContent = postTitle;
+            document.getElementById('portfolio-modal-caption').textContent = postCaption;
 
             // Show spinner while loading
             imageViewerSection.innerHTML = '<div class="spinner-container"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
@@ -52,35 +57,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     // console.log("API Response Data:", data); // Removed for cleaner console
                     imageViewerSection.innerHTML = ''; // Clear spinner
                     if (data.images && data.images.length > 0) {
-                        // Use a Promise.all to ensure all images are loaded before displaying
-                        const imageLoadPromises = data.images.map((filename, index) => {
-                            return new Promise((resolve) => {
-                                const slideDiv = document.createElement('div');
-                                slideDiv.className = 'portfolio-slide';
+                        data.images.forEach((filename, index) => {
+                            const imgContainer = document.createElement('div');
+                            imgContainer.className = 'portfolio-slide'; // Use portfolio-slide class for styling
 
-                                const img = document.createElement('img');
-                                img.src = filename; // Use filename directly as it already contains the full static path
-                                img.className = 'portfolio-image-display'; // Simpler class for display
-                                img.alt = `Image ${index + 1} for ${postTitle}`;
-                                img.setAttribute('data-aos', 'fade-up'); // Add AOS animation attribute
+                            const img = document.createElement('img');
+                            img.src = filename; // Use filename directly as it already contains the full static path
+                            img.className = 'portfolio-image-display'; // Simpler class for display
+                            img.alt = `Image ${index + 1} for ${postTitle}`;
+                            img.setAttribute('data-aos', 'fade-up'); // Add AOS animation attribute
 
-                                img.onload = () => {
-                                    slideDiv.appendChild(img);
-                                    imageViewerSection.appendChild(slideDiv); // Append to imageViewerSection
-                                    resolve();
-                                };
-                                img.onerror = () => {
-                                    console.error(`Failed to load image: ${filename}`);
-                                    // Append a placeholder or skip this image
-                                    slideDiv.innerHTML = '<p class="text-danger">Error loading image</p>';
-                                    imageViewerSection.appendChild(slideDiv); // Append to imageViewerSection
-                                    resolve();
-                                };
-                            });
+                            imgContainer.appendChild(img);
+                            imageViewerSection.appendChild(imgContainer);
                         });
 
-                        Promise.all(imageLoadPromises).then(() => {
-                            // All images loaded, no complex scroll logic needed for simple display
+                        // Re-initialize AOS to detect new elements and watch the modal's scrollable area
+                        AOS.refresh();
+                        AOS.init({ 
+                            once: false, // Allow animation to happen every time you scroll up or down
+                            offset: 50, // Offset (in px) from the original trigger point
+                            mirror: true, // Whether elements should animate out while scrolling past them
+                            anchorPlacement: 'top-bottom', // Defines which position of the element regarding to window should trigger the animation
+                            container: imageViewerSection // Specify the scroll container
                         });
 
                     } else {

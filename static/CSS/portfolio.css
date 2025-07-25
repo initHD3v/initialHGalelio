@@ -71,12 +71,12 @@
 
 /* Call to Action Section */
 .fixed-cta {
-    background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%); /* Gradient background */
-    color: white;
-    padding: 20px 0; /* More padding */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Stronger shadow */
+    background: white;
+    color: #262626; /* Mengubah warna teks menjadi hitam gelap */
+    padding: 20px 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     z-index: 1030;
-    text-align: center; /* Center content */
+    text-align: center;
 }
 
 .fixed-cta .container {
@@ -97,7 +97,7 @@
 .hero-text-button {
     background: none;
     border: none;
-    color: white; /* Text color */
+    color: #007bff; /* Mengubah warna teks menjadi biru */
     font-size: 1.25rem; /* Equivalent to btn-lg */
     padding: 0.5rem 1rem; /* Standard button padding */
     text-decoration: none; /* Remove default underline for links */
@@ -106,9 +106,14 @@
 }
 
 .hero-text-button:hover {
-    color: #f8f9fa; /* Slightly brighter white on hover */
+    color: #0056b3; /* Warna biru yang lebih gelap saat di-hover */
     text-decoration: underline; /* Underline on hover */
     transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* Custom transition duration for carousel-fade */
+.carousel.carousel-fade .carousel-item {
+    transition: opacity 0.8s ease-in-out;
 }
 
 @media (max-width: 768px) {

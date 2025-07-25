@@ -14,7 +14,7 @@
 }
 
 #portfolio-viewer-modal .modal-content {
-    background-color: rgba(25, 25, 25, 0.95); /* Darker, slightly transparent background */
+    background-color: rgba(25, 25, 25, 0.5); /* More transparent background for modal content */
     border-radius: 15px; /* Rounded corners */
     overflow: hidden; /* Ensure content respects border-radius */
     display: flex;
@@ -28,7 +28,7 @@
     padding: 15px 25px;
     border-bottom: none; /* No border */
     display: flex;
-    justify-content: flex-end; /* Push close button to the right */
+    justify-content: space-between; /* Space between title and close button */
     align-items: center;
     flex-shrink: 0; /* Prevent header from shrinking */
     position: absolute; /* Position over the image viewer */
@@ -39,10 +39,33 @@
     background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0)); /* Fade out background */
 }
 
+.modal-title-container {
+    flex-grow: 1;
+    text-align: center;
+    color: white;
+    padding: 0 50px; /* Add padding to prevent text from touching close button */
+}
+
+.modal-title-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.modal-caption-text {
+    font-size: 1rem;
+    font-weight: 400;
+    opacity: 0.8;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
 #portfolio-viewer-modal .btn-close {
     filter: invert(1) grayscale(1) brightness(2); /* Make close button white */
     opacity: 0.7;
     transition: opacity 0.2s ease;
+    position: relative; /* Ensure close button is positioned correctly */
+    z-index: 11; /* Ensure it's above the title container */
 }
 
 #portfolio-viewer-modal .btn-close:hover {
@@ -68,7 +91,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start; /* Align items to start, not center, for scroll */
-    background-color: #1a1a1a; /* Slightly lighter dark background for image area */
+    background-color: rgba(26, 26, 26, 0.7); /* More transparent dark background for image area */
 }
 
 .portfolio-slide {

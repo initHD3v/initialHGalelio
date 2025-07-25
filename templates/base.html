@@ -11,8 +11,8 @@
     {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/global.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/header.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/portfolio_viewer.css') }}">
     {% endblock %}
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
     <title>My Portfolio</title>
 </head>
 <body data-is-logged-in="{{ 'true' if current_user.is_authenticated else 'false' }}" data-user-role="{{ current_user.role if current_user.is_authenticated else 'guest' }}" style="display: flex; flex-direction: column; min-height: 100vh;" {% if request.endpoint != 'main.index' %}class="has-fixed-header"{% endif %}>
@@ -64,7 +64,6 @@
       AOS.init();
     </script>
     <script src="{{ url_for('static', filename='js/custom_about.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/portfolio_viewer.js') }}"></script>
     {% endblock %}
 </body>
 </html>
