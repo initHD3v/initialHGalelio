@@ -116,6 +116,21 @@
     transition: opacity 0.8s ease-in-out;
 }
 
+/* Homepage Featured Gallery Carousel Item Styling */
+.homepage-portfolio-carousel-item {
+    height: 250px; /* Fixed height for consistency */
+    overflow: hidden; /* Hide overflowing parts of the image */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.homepage-portfolio-carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure image covers the area without distortion */
+}
+
 /* Category Filter Buttons */
 .btn-category-filter {
     background-color: #e9ecef; /* Light gray background */
@@ -149,4 +164,12 @@
     .fixed-cta .cta-text {
         font-size: 1.1rem;
     }
+}
+
+.portfolio-container h1 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Add text shadow */
+}
+
+.portfolio-container p.lead {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* Add subtle text shadow */
 }

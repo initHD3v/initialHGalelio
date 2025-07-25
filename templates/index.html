@@ -63,7 +63,7 @@
             <div class="col-md-4">
                 <div class="card h-100 shadow-sm portfolio-card">
                     <!-- Bootstrap Carousel -->
-                    <div id="carousel-{{ post.id }}" class="carousel slide" data-bs-ride="false">
+                    <div id="carousel-{{ post.id }}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
                         <!-- Carousel Indicators (the dots) -->
                         <div class="carousel-indicators">
                             {% for image in post.images %}
@@ -74,7 +74,7 @@
                         <!-- Carousel Inner Content -->
                         <div class="carousel-inner">
                             {% for image in post.images %}
-                            <div class="carousel-item {% if loop.first %}active{% endif %}" data-image-id="{{ image.id }}" data-likes="{{ image.likes }}" data-is-liked="{{ image.is_liked_by_current_user }}">
+                            <div class="carousel-item {% if loop.first %}active{% endif %} homepage-portfolio-carousel-item" data-image-id="{{ image.id }}" data-likes="{{ image.likes }}" data-is-liked="{{ image.is_liked_by_current_user }}">
                                 <img src="{{ url_for('static', filename='images/' + image.filename) }}" class="d-block w-100 portfolio-image" alt="{{ post.title }}">
                             </div>
                             {% endfor %}
@@ -96,6 +96,9 @@
                     <!-- Card Body -->
                     <div class="card-body">
                         <h5 class="card-title">{{ post.title }}</h5>
+                        {% if post.category %}
+                        <p class="card-text text-muted mb-2"><small>{{ post.category }}</small></p>
+                        {% endif %}
                         <p class="card-text">{{ post.content | truncate(100) }}</p>
                     </div>
 
